@@ -1,12 +1,13 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+﻿import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: "/", name: "home", component: () => import("@/views/HomeView.vue") },
     { path: "/catalogo", name: "catalog", component: () => import("@/views/CatalogView.vue") },
-    { path: "/catalogo/novo", name: "catalog-create", component: () => import("@/views/PlaceholderView.vue"), props: { title: "Adicionar título", description: "Formulário completo a migrar." } },
-    { path: "/catalogo/:id", name: "catalog-detail", component: () => import("@/views/PlaceholderView.vue"), props: { title: "Detalhe do título", description: "Detalhe, relações, reviews e exemplares." } },
+    { path: "/catalogo/novo", name: "catalog-create", component: () => import("@/views/TitleCreateView.vue") },
+    { path: "/catalogo/:id/editar", name: "catalog-edit", component: () => import("@/views/PlaceholderView.vue"), props: { title: "Editar tÃ­tulo", description: "A ediÃ§Ã£o serÃ¡ o prÃ³ximo incremento do catÃ¡logo." } },
+    { path: "/catalogo/:id", name: "catalog-detail", component: () => import("@/views/TitleDetailView.vue") },
     { path: "/vod", name: "vod", component: () => import("@/views/VodView.vue") },
     { path: "/podcasts", name: "podcasts", component: () => import("@/views/PodcastsView.vue") },
     { path: "/tv", name: "live", component: () => import("@/views/LiveView.vue") },
@@ -19,3 +20,4 @@ const router = createRouter({
 
 router.afterEach(() => document.querySelector<HTMLElement>("#main-content")?.focus({ preventScroll: true }));
 export default router;
+
