@@ -1,0 +1,29 @@
+{
+  "name": "media-vault-next",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run type-check && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "type-check": "vue-tsc --noEmit",
+    "check": "npm run type-check && vite build",
+    "audit:prod": "npm audit --omit=dev"
+  },
+  "dependencies": {
+    "pocketbase": "0.27.0",
+    "vue": "3.5.42",
+    "vue-router": "5.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.10",
+    "typescript": "5.9.2",
+    "vite": "8.3.8",
+    "vue-tsc": "3.3.13",
+    "@types/node": "26.6.5"
+  }
+}
