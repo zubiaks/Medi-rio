@@ -1,3 +1,11 @@
+﻿/**
+ * MediÃ¡rio
+ * Copyright Â© 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 export const VOD_TYPES = ["streaming", "aluguer", "compra", "gratuito", "broadcast", "biblioteca", "fisico", "outro"] as const;
 export type VodType = (typeof VOD_TYPES)[number];
 export const VOD_QUALITIES = ["desconhecida", "sd", "hd", "fhd", "4k", "8k", "audio"] as const;

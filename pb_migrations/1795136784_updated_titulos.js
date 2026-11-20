@@ -1,3 +1,11 @@
+﻿/**
+ * MediÃ¡rio
+ * Copyright Â© 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 /// <reference path="../pb_data/types.d.ts" />
 migrate((app) => {
   const collection = app.findCollectionByNameOrId("pbc_32799029")

@@ -1,3 +1,11 @@
+﻿/**
+ * MediÃ¡rio
+ * Copyright Â© 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 import type { AvailabilityRecord } from "@/types/records";
 import { createEmptyVodForm, type VodFormData, type VodQuality, type VodType, VOD_QUALITIES, VOD_TYPES } from "./models";
 const date=(v?:string)=>v?.match(/^(\d{4}-\d{2}-\d{2})/)?.[1]||"";

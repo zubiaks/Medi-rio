@@ -1,3 +1,11 @@
+﻿/**
+ * MediÃ¡rio
+ * Copyright Â© 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 import type { AvailabilityRecord } from "@/types/records";
 import type { VodFormData } from "./models";
 const normalize=(v:string)=>v.trim().toLocaleLowerCase("pt-PT");

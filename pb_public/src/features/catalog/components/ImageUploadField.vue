@@ -1,3 +1,11 @@
+﻿<!--
+  MediÃ¡rio
+  Copyright Â© 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 import{computed,onBeforeUnmount,ref,watch}from"vue";import{resizeImageFile}from"@/domain/catalog/imageResize";
 const file=defineModel<File|null>({required:true});const url=defineModel<string>("url",{required:true});
