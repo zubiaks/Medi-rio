@@ -22,3 +22,4 @@ import "@/styles/vod-management.css";
 
 
 createApp(App).use(router).mount("#app");
+import "@/styles/vod-title-search.css";

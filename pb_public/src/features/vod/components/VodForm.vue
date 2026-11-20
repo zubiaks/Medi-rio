@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { onMounted, ref, toRaw, watch } from "vue";
 import { PocketBaseRepository } from "@/infrastructure/pocketbase/repository";
-import type { BaseRecord, TitleRecord } from "@/types/records";
+import type { BaseRecord } from "@/types/records";
 import {
   createEmptyVodForm,
   type VodFormData,
@@ -17,6 +17,7 @@ import {
   VOD_TYPES,
 } from "@/domain/vod/models";
 import { validateVodForm } from "@/domain/vod/validation";
+import VodTitleSearch from "./VodTitleSearch.vue";
 
 type CountryRecord = BaseRecord & {
   nome?: string;
@@ -43,11 +44,9 @@ const emit = defineEmits<{
   dirtyChange: [boolean];
 }>();
 
-const titleRepository = new PocketBaseRepository<TitleRecord>("titulos");
 const countryRepository = new PocketBaseRepository<CountryRecord>("paises");
 
 const form = ref<VodFormData>(createEmptyVodForm());
-const titles = ref<TitleRecord[]>([]);
 const countries = ref<CountryRecord[]>([]);
 const errors = ref<VodValidationErrors>({});
 const validationMessage = ref("");
@@ -64,6 +63,17 @@ const qualityOptions = [
   { value: "8k", label: "8K" },
   { value: "audio", label: "Áudio" },
 ] as const;
+
+const typeLabels: Record<(typeof VOD_TYPES)[number], string> = {
+  streaming: "Streaming",
+  aluguer: "Aluguer",
+  compra: "Compra",
+  gratuito: "Gratuito",
+  broadcast: "Emissão",
+  biblioteca: "Biblioteca",
+  fisico: "Físico",
+  outro: "Outro",
+};
 
 function copyForm(value: VodFormData): VodFormData {
   return { ...toRaw(value) };
@@ -93,19 +103,11 @@ watch(
 
 onMounted(async () => {
   try {
-    const [titlePage, countryPage] = await Promise.all([
-      titleRepository.list({
-        perPage: 500,
-        filter: "apagado = false",
-        sort: "titulo",
-      }),
-      countryRepository.list({
-        perPage: 500,
-        sort: "nome",
-      }),
-    ]);
+    const countryPage = await countryRepository.list({
+      perPage: 500,
+      sort: "nome",
+    });
 
-    titles.value = titlePage.items;
     countries.value = countryPage.items;
   } catch (error) {
     loadError.value = error instanceof Error ? error.message : String(error);
@@ -160,18 +162,10 @@ function submit(): void {
       <legend>Oferta</legend>
 
       <div class="form-grid">
-        <label class="form-field field-wide" for="vod-title">
-          <span>Título *</span>
-          <select id="vod-title" v-model="form.tituloId" name="titulo">
-            <option value="">Selecionar…</option>
-            <option v-for="title in titles" :key="title.id" :value="title.id">
-              {{ title.titulo }}{{ title.ano ? ` (${title.ano})` : "" }}
-            </option>
-          </select>
-          <small v-if="errors.tituloId" class="field-error">
-            {{ errors.tituloId }}
-          </small>
-        </label>
+        <VodTitleSearch
+          v-model="form.tituloId"
+          :error="errors.tituloId"
+        />
 
         <label class="form-field" for="vod-provider">
           <span>Provider *</span>
@@ -191,7 +185,7 @@ function submit(): void {
           <span>Modalidade</span>
           <select id="vod-type" v-model="form.tipo" name="tipo">
             <option v-for="type in VOD_TYPES" :key="type" :value="type">
-              {{ type }}
+              {{ typeLabels[type] }}
             </option>
           </select>
         </label>
