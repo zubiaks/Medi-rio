@@ -24,8 +24,8 @@ Bibliotecas, ferramentas, fontes, conteúdos e outros componentes de terceiros m
 
 Após o commit da transição:
 
-1. guardar o hash do último commit MIT;
-2. guardar o hash do primeiro commit PolyForm;
+1. guardar o hash do último commit MIT; c2632ddc3cf26ad0b9da354c6555e59333b34e60
+2. guardar o hash do primeiro commit PolyForm; c2632ddc3cf26ad0b9da354c6555e59333b34e60
 3. criar uma tag para o último estado MIT, se necessário;
 4. indicar ambos os hashes neste documento.
 
