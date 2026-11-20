@@ -1,6 +1,6 @@
-﻿/**
- * MediÃ¡rio
- * Copyright Â© 2026 Zubiaks.
+/**
+ * Mediario
+ * Copyright (c) 2026 Zubiaks.
  *
  * Source-available under the PolyForm Noncommercial License 1.0.0.
  * Commercial use requires prior written permission from Zubiaks.

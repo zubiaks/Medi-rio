@@ -1,4 +1,4 @@
-[CmdletBinding(SupportsShouldProcess)]
+﻿[CmdletBinding(SupportsShouldProcess)]
 param(
   [string]$ProjectDir = "",
   [int]$Year = 2026
@@ -21,8 +21,8 @@ $targets = @(
 
 $blockHeader = @" 
 /**
- * Mediário
- * Copyright © $Year Zubiaks.
+ * Mediario
+ * Copyright (c) $Year Zubiaks.
  *
  * Source-available under the PolyForm Noncommercial License 1.0.0.
  * Commercial use requires prior written permission from Zubiaks.
@@ -33,8 +33,8 @@ $blockHeader = @"
 
 $htmlHeader = @" 
 <!--
-  Mediário
-  Copyright © $Year Zubiaks.
+  Mediario
+  Copyright (c) $Year Zubiaks.
 
   Source-available under the PolyForm Noncommercial License 1.0.0.
   Commercial use requires prior written permission from Zubiaks.
@@ -44,8 +44,8 @@ $htmlHeader = @"
 "@
 
 $psHeader = @" 
-# Mediário
-# Copyright © $Year Zubiaks.
+# Mediario
+# Copyright (c) $Year Zubiaks.
 #
 # Source-available under the PolyForm Noncommercial License 1.0.0.
 # Commercial use requires prior written permission from Zubiaks.
