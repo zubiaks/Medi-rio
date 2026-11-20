@@ -1,0 +1,97 @@
+.lookup-multi-select {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lookup-multi-select > legend {
+  margin-bottom: 0.6rem;
+  padding: 0;
+  font-weight: 700;
+}
+
+.lookup-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+.lookup-chip,
+.lookup-clear {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lookup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.lookup-chip:hover,
+.lookup-chip:focus-visible {
+  border-color: var(--accent);
+}
+
+.lookup-clear {
+  padding: 0.35rem 0.65rem;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.lookup-search {
+  margin-bottom: 0.65rem;
+}
+
+.lookup-options {
+  display: grid;
+  max-height: 15rem;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--surface);
+}
+
+.lookup-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+}
+
+.lookup-option + .lookup-option {
+  border-top: 1px solid var(--border);
+}
+
+.lookup-option:hover,
+.lookup-option.is-selected {
+  background: var(--surface-soft);
+}
+
+.lookup-option input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+}
+
+.lookup-empty,
+.lookup-count {
+  color: var(--text-muted);
+}
+
+.lookup-empty {
+  margin: 0;
+  padding: 0.9rem;
+}
+
+.lookup-count {
+  display: block;
+  margin-top: 0.45rem;
+}
