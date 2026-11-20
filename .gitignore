@@ -1,77 +1,9 @@
-# ============================================================
-# MEDIÁRIO / POCKETBASE
-# Dados locais, credenciais e ficheiros privados
-# ============================================================
-
-# Base de dados, uploads e estado local do PocketBase
-pb_data/
-pb_data_*/
-pb_data-backup*/
-pb_data_backup*/
-pb_data_incompleta*/
-
-# Backups reais da base
-backups/
-backup/
-*.zip
-*.7z
-*.rar
-
-# Credenciais e segredos
-.credentials.xml
-*.credentials.xml
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-*.pfx
-*.p12
-
-# Executável do PocketBase
-pocketbase.exe
-pocketbase
-pocketbase_*.exe
-
-# Logs, relatórios e resultados temporários
-*.log
-*_erros.csv
-*_erros_restantes.csv
-relatorios/
-logs/
-
-# Cópias antigas e ficheiros temporários
-*.bak
-*.tmp
-*.temp
-*.old
-*.orig
-*~
-~$*
-
-# Ficheiros locais de teste ou trabalho
-1.ps1
-2.ps1
-
-# Dependências Node.js
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Cobertura e builds
-coverage/
 dist/
-build/
-.cache/
-
-# Editores
-.vscode/
-.idea/
-*.code-workspace
-
-# Sistema operativo
-Thumbs.db
-Desktop.ini
+.env
+.env.local
+.env.*.local
+*.log
+.vscode/*
+!.vscode/extensions.json
 .DS_Store
