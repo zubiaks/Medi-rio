@@ -1,0 +1,64 @@
+name: Bug
+about: Reportar um comportamento incorreto e reproduzível
+title: "[Bug]: "
+labels: ["bug", "status: needs review"]
+body:
+  - type: markdown
+    attributes:
+      value: "Obrigado por ajudar a melhorar o Mediário. Não incluas credenciais nem dados pessoais."
+  - type: input
+    id: version
+    attributes:
+      label: Versão ou commit
+      placeholder: v0.2.0-alpha.1 ou hash do commit
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options: [Catálogo, VOD, Podcasts, TV e streams, Biblioteca, Providers, Base de dados, Interface, Outra]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: "1. Abrir...
+2. Clicar...
+3. Observar..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Resultado observado
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Sistema operativo, browser, Node.js, npm e PocketBase.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs ou capturas
+      description: Remove tokens, emails, caminhos privados e dados pessoais.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Procurei Issues semelhantes.
+          required: true
+        - label: Testei sem extensões do navegador, quando relevante.
+          required: false
+        - label: O relatório não contém segredos ou dados pessoais.
+          required: true

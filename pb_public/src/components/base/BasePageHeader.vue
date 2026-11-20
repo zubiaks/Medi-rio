@@ -1,3 +1,11 @@
+<!--
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 withDefaults(defineProps<{ eyebrow?: string; title: string; description?: string }>(), { eyebrow: "Media Vault", description: "" });
 </script>

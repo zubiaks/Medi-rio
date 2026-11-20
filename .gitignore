@@ -1,77 +1,48 @@
-# ============================================================
-# MEDIÁRIO / POCKETBASE
-# Dados locais, credenciais e ficheiros privados
-# ============================================================
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
 
-# Base de dados, uploads e estado local do PocketBase
+# PocketBase: dados locais, uploads e ficheiros SQLite
 pb_data/
 pb_data_*/
-pb_data-backup*/
-pb_data_backup*/
-pb_data_incompleta*/
+**/pb_data/
+**/pb_data_*/
+*.db
+*.db-shm
+*.db-wal
 
-# Backups reais da base
-backups/
-backup/
-*.zip
-*.7z
-*.rar
-
-# Credenciais e segredos
+# Credenciais e executável local
 .credentials.xml
 *.credentials.xml
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-*.pfx
-*.p12
-
-# Executável do PocketBase
 pocketbase.exe
-pocketbase
 pocketbase_*.exe
 
-# Logs, relatórios e resultados temporários
-*.log
-*_erros.csv
-*_erros_restantes.csv
-relatorios/
-logs/
+# Dependências e builds
+**/node_modules/
+**/dist/
+**/.vite/
 
-# Cópias antigas e ficheiros temporários
-*.bak
-*.tmp
-*.temp
-*.old
-*.orig
-*~
-~$*
+# Releases geradas localmente
+releases/
 
-# Ficheiros locais de teste ou trabalho
-1.ps1
-2.ps1
+# Credenciais locais
+.credentials.xml
+*.credentials.xml
 
-# Dependências Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# Executável PocketBase
+pocketbase.exe
+pocketbase_*.exe
 
-# Cobertura e builds
-coverage/
-dist/
-build/
-.cache/
+# Credenciais locais
+.credentials.xml
+*.credentials.xml
 
-# Editores
-.vscode/
-.idea/
-*.code-workspace
-
-# Sistema operativo
-Thumbs.db
-Desktop.ini
-.DS_Store
+# Executável PocketBase
+pocketbase.exe
+pocketbase_*.exe

@@ -1,3 +1,11 @@
+<!--
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 import{computed,ref}from"vue";import type{LookupOption}from"@/types/lookups";
 const model=defineModel<string[]>({required:true});const props=withDefaults(defineProps<{label:string;options:LookupOption[];name?:string}>(),{name:""});const query=ref("");const fieldName=computed(()=>props.name||`lookup-${props.label.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-")}`);const filtered=computed(()=>{const q=query.value.trim().toLocaleLowerCase("pt-PT");return q?props.options.filter(o=>o.label.toLocaleLowerCase("pt-PT").includes(q)):props.options});const selected=computed(()=>{const s=new Set(model.value);return props.options.filter(o=>s.has(o.id))});const has=(id:string)=>model.value.includes(id);function toggle(id:string){model.value=has(id)?model.value.filter(x=>x!==id):[...model.value,id]}function remove(id:string){model.value=model.value.filter(x=>x!==id)}

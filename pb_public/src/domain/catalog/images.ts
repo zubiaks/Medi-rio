@@ -1,3 +1,11 @@
+/**
+ * Mediario
+ * Copyright (c) 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 import type { TitleFormData } from "./models";
 export interface ExistingTitleImages { poster?:string; backdrop?:string; logo?:string }
 export function isSafeImageUrl(value:string):boolean{if(!value.trim())return true;try{const u=new URL(value);return u.protocol==="http:"||u.protocol==="https:"}catch{return false}}

@@ -1,3 +1,11 @@
+/**
+ * Mediario
+ * Copyright (c) 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
+ */
 import type { RecordModel } from "pocketbase";
 import { createEmptyTitleForm, type TitleFormData } from "./models";
 import { applyTitleImages } from "./images";

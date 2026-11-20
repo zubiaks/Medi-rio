@@ -1,3 +1,11 @@
+<!--
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 import{computed,onMounted,ref,watch}from"vue";import{useRoute,useRouter}from"vue-router";import BaseEmptyState from"@/components/base/BaseEmptyState.vue";import BasePageHeader from"@/components/base/BasePageHeader.vue";import type{TitleRecord}from"@/types/records";import{titleRepository}from"@/domain/repositories";import{pb}from"@/infrastructure/pocketbase/client";
 const route=useRoute(),router=useRouter(),items=ref<TitleRecord[]>([]),total=ref(0),loading=ref(false),error=ref(""),query=ref(String(route.query.pesquisa||""));const safeQuery=computed(()=>query.value.replaceAll('"','\\"'));const poster=(i:TitleRecord)=>i.poster?pb.files.getURL(i,i.poster,{thumb:"300x450"}):i.poster_url||"";

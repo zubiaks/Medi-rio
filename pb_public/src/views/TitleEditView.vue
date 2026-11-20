@@ -1,3 +1,11 @@
+<!--
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 import{onBeforeUnmount,onMounted,ref}from"vue";import{onBeforeRouteLeave,useRoute,useRouter}from"vue-router";import BaseEmptyState from"@/components/base/BaseEmptyState.vue";import BasePageHeader from"@/components/base/BasePageHeader.vue";import TitleForm from"@/features/catalog/components/TitleForm.vue";import type{TitleFormData}from"@/domain/catalog/models";import type{ExistingTitleImages}from"@/domain/catalog/images";import{mapTitleFormToUpdatePayload,mapTitleRecordToForm}from"@/domain/catalog/mapper";import{titleRepository}from"@/domain/repositories";import{pb}from"@/infrastructure/pocketbase/client";import type{TitleRecord}from"@/types/records";
 const route=useRoute(),router=useRouter(),id=String(route.params.id);const initialValue=ref<TitleFormData|null>(null),existingImages=ref<ExistingTitleImages>({}),titleName=ref(""),loading=ref(true),saving=ref(false),dirty=ref(false),error=ref("");let allowNavigation=false;

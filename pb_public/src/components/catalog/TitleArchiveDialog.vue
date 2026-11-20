@@ -1,3 +1,11 @@
+<!--
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
 <script setup lang="ts">
 import { ref, watch } from "vue";
 const props=defineProps<{open:boolean;title:string;saving?:boolean}>();
