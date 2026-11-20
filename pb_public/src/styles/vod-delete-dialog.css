@@ -1,0 +1,93 @@
+/* VodDeleteDialog: layout responsivo e sem sobreposições */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 1rem;
+  background: rgba(8, 15, 28, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.dialog-panel {
+  box-sizing: border-box;
+  width: min(100%, 32rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  padding: 1.5rem;
+  color: var(--text, #111827);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d8dee8);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+}
+
+.dialog-panel h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  line-height: 1.2;
+}
+
+.dialog-panel p {
+  margin: 0 0 1.25rem;
+  line-height: 1.55;
+}
+
+.dialog-panel .form-field {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dialog-panel .form-field span {
+  line-height: 1.4;
+}
+
+.dialog-panel .form-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.dialog-panel .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.dialog-panel .form-actions .button {
+  min-height: 2.75rem;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .dialog-backdrop {
+    align-items: end;
+    padding: 0.75rem;
+  }
+
+  .dialog-panel {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .dialog-panel .form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-panel .form-actions .button {
+    width: 100%;
+  }
+
+  .dialog-panel .button-danger {
+    order: -1;
+  }
+}
