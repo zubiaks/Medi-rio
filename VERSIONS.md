@@ -2,7 +2,7 @@
 
 Este documento regista as versões do **Mediário**, o objetivo de cada marco, as funcionalidades incluídas, o estado de validação e o trabalho ainda pendente.
 
-As versões estão ordenadas da **mais recente para a mais antiga**. No GitHub, cada bloco pode ser aberto ou fechado através da seta apresentada junto ao título.
+As versões estão ordenadas da **mais recente para a mais antiga**. Cada bloco pode ser aberto ou fechado no GitHub.
 
 > **Versão atual:** `v0.2.0-alpha.1` — Fundação VOD, em desenvolvimento.
 
@@ -90,7 +90,7 @@ Centralizar providers externos, sincronizações, importações, diagnóstico e 
 - estado, latência e último sucesso de cada provider;
 - `sync_jobs` e respetivos erros;
 - `fontes_externas` por título;
-- TMDB, OMDb, RAWG, Open Library, Google Books, AniList, Jikan, MusicBrainz e outros providers configurados gradualmente;
+- TMDB, OMDb, RAWG, Open Library, Google Books, AniList, Jikan e MusicBrainz;
 - centro de importação para CSV, JSON, NFO, M3U, RSS e XMLTV;
 - deteção de duplicados e records incompletos;
 - auditoria, backup e recuperação;
@@ -139,8 +139,7 @@ Gerir exemplares físicos, edições, formatos, compras e empréstimos.
 - formatos físicos e tipos de edição;
 - condição, localização e notas do exemplar;
 - códigos de barras;
-- histórico de empréstimos;
-- devoluções;
+- histórico de empréstimos e devoluções;
 - filtros e estatísticas da coleção física;
 - ligação entre exemplares e títulos.
 
@@ -157,17 +156,16 @@ A página inicial lê dados existentes, mas o domínio ainda não foi reconstru�
 
 Migrar e consolidar televisão, rádios, webcams, IPTV e links alternativos.
 
-## Já validado no backend anterior
+## Já validado
 
 - criação de canais em `canais_tv`;
 - criação de links em `stream_links`;
 - relação canal → links;
 - manifesto HLS válido;
 - tipo técnico `hls`;
-- qualidade normalizada;
 - criação, leitura e eliminação pela API.
 
-## Trabalho previsto na aplicação Vue
+## Trabalho previsto
 
 - listagem e detalhe de canais;
 - importação M3U;
@@ -192,7 +190,7 @@ A listagem inicial reutiliza a base atual. A gestão completa está planeada.
 
 Migrar o domínio de podcasts para módulos Vue e TypeScript independentes.
 
-## Já validado no projeto anterior
+## Já validado
 
 - parsing RSS;
 - namespaces iTunes através de `getElementsByTagNameNS`;
@@ -248,12 +246,9 @@ Campos utilizados:
 ## Concluído e testado
 
 - listagem de disponibilidades;
-- criação de uma disponibilidade;
-- edição de uma disponibilidade;
+- criação e edição;
 - relação com título e país;
-- provider;
-- modalidade;
-- URL externa;
+- provider, modalidade e URL;
 - preço e moeda;
 - inclusão na subscrição;
 - data de início e fim;
@@ -261,7 +256,7 @@ Campos utilizados:
 - proteção contra alterações não guardadas;
 - rotas `/vod`, `/vod/novo` e `/vod/:id/editar`;
 - links VOD na navegação;
-- correção da qualidade para Select;
+- qualidade limitada a valores aceites pelo PocketBase;
 - criação e edição aprovadas manualmente.
 
 ## Valores técnicos de qualidade
@@ -276,39 +271,34 @@ Campos utilizados:
 | `8k` | 8K |
 | `audio` | Áudio |
 
-Os valores são guardados em minúsculas para respeitar o Select do PocketBase.
-
 ## Gestão VOD preparada, aguardando validação final
 
 - pesquisa por título e provider;
 - filtros por país, modalidade, qualidade, estado e subscrição;
 - ofertas ativas, inativas, todas ou expiradas;
-- apresentação legível da qualidade;
 - preço formatado em `pt-PT`;
 - ativar e desativar ofertas;
 - eliminação definitiva com confirmação pelo provider;
-- abrir título relacionado;
-- abrir URL do provider;
+- acesso ao título e ao provider;
 - integração “Onde ver” no detalhe do título;
 - deteção de duplicados por título, provider, país e modalidade;
 - normalização de valores antigos como `FHD` para `fhd`.
 
 ## Falta validar para concluir a versão
 
-- instalar e validar o pacote de gestão VOD;
-- testar filtros combinados;
-- testar ofertas ativas, inativas e expiradas;
-- testar ativação e desativação;
-- testar eliminação definitiva;
-- validar “Onde ver” no detalhe do título;
-- validar aviso de duplicado na criação e edição;
-- executar `npm run type-check`;
-- executar `npm run build`;
-- confirmar consola sem erros da aplicação.
+- filtros combinados;
+- ofertas ativas, inativas e expiradas;
+- ativação e desativação;
+- eliminação definitiva;
+- secção “Onde ver” no detalhe;
+- aviso de duplicado na criação e edição;
+- `npm run type-check`;
+- `npm run build`;
+- consola sem erros da aplicação.
 
 ## Estado
 
-**Em desenvolvimento.** A fundação está funcional. A gestão avançada foi preparada, mas só deve ser marcada como concluída depois dos testes acima.
+**Em desenvolvimento.** A fundação está funcional. A gestão avançada só deve ser marcada como concluída após os testes acima.
 
 </details>
 
@@ -323,13 +313,10 @@ Concluir o primeiro domínio funcional do Mediário: criação, leitura, ediçã
 
 ### Títulos
 
-- criação;
-- detalhe;
-- edição;
+- criação, detalhe e edição;
 - limpeza de campos existentes;
-- validação;
-- proteção contra alterações não guardadas;
-- relação com mídia, tipo e estado;
+- validação e alterações não guardadas;
+- mídia, tipo e estado;
 - relações múltiplas para géneros, tags, idiomas, países, plataformas e companhias;
 - pesquisa nas relações extensas.
 
@@ -338,18 +325,15 @@ Concluir o primeiro domínio funcional do Mediário: criação, leitura, ediçã
 - poster, backdrop e logo como ficheiros PocketBase;
 - `poster_url`, `backdrop_url` e `logo_url` como URLs externas;
 - prioridade ficheiro local → URL externa → placeholder;
-- pré-visualização;
-- substituição;
-- remoção;
+- pré-visualização, substituição e remoção;
 - redimensionamento no browser;
 - thumbnails PocketBase no catálogo;
-- poster, backdrop e logo apresentados no detalhe.
+- poster, backdrop e logo no detalhe.
 
 ### Lixeira
 
 - arquivamento lógico;
-- motivo opcional;
-- data e origem da eliminação;
+- motivo, data e origem da eliminação;
 - títulos arquivados escondidos do catálogo;
 - página `/lixeira`;
 - restauro;
@@ -357,26 +341,19 @@ Concluir o primeiro domínio funcional do Mediário: criação, leitura, ediçã
 
 ### Correções relevantes
 
-- `data_lancamento` convertido para `yyyy-MM-dd` no input HTML;
-- TMDB ID `0` tratado como campo vazio;
+- `data_lancamento` convertido para `yyyy-MM-dd`;
+- TMDB ID `0` tratado como vazio;
 - TMDB ID opcional validado apenas quando preenchido;
-- formulários reativos copiados sem `structuredClone` de Proxy Vue;
-- erros de validação apresentados no topo do formulário;
-- valores vazios enviados corretamente para limpar campos antigos.
+- cópia segura de formulários reativos;
+- erros de validação apresentados no topo;
+- valores vazios limpam campos antigos.
 
 ## Validação executada
 
-- criação de título;
-- detalhe;
-- edição;
-- limpeza de campos;
+- criação, detalhe e edição;
 - relações múltiplas;
-- imagem local;
-- imagem por URL;
-- prioridade de imagem local;
-- arquivamento;
-- restauro;
-- eliminação definitiva;
+- imagens locais e URLs;
+- arquivamento, restauro e eliminação definitiva;
 - `npm run type-check`;
 - `npm run build`;
 - navegação sem erros da aplicação.
@@ -384,7 +361,7 @@ Concluir o primeiro domínio funcional do Mediário: criação, leitura, ediçã
 ## Limitações conhecidas
 
 - testes automáticos ainda não implementados;
-- listas muito extensas poderão precisar de virtualização;
+- listas extensas poderão precisar de virtualização;
 - créditos, temporadas e episódios ainda não estão integrados no detalhe Vue.
 
 ## Estado
@@ -442,8 +419,7 @@ Criar uma reconstrução organizada do frontend, preservando a base PocketBase e
 - router por hash;
 - layout e sidebar;
 - tema claro e escuro;
-- cliente PocketBase;
-- repositórios genéricos;
+- cliente PocketBase e repositórios;
 - páginas iniciais para catálogo, VOD, podcasts, TV, biblioteca e diagnóstico;
 - carregamento por rota;
 - script `.bat` para iniciar PocketBase e Vite;
@@ -461,7 +437,7 @@ Criar uma reconstrução organizada do frontend, preservando a base PocketBase e
 - PocketBase isolado por repositórios;
 - frontend e dados desacoplados;
 - desenvolvimento local sem login durante a estabilização;
-- dependências beta, RC, nightly ou canary apenas quando houver vantagem concreta e documentada.
+- versões experimentais apenas com vantagem concreta e documentada.
 
 ## Estado
 
@@ -474,21 +450,21 @@ Criar uma reconstrução organizada do frontend, preservando a base PocketBase e
 <details>
 <summary><strong>Convenção de versões</strong> · [+] Mostrar detalhes</summary>
 
-O Mediário segue [Semantic Versioning](https://semver.org/):
+O Mediário segue [Semantic Versioning](https://semver.org/) no formato:
 
 ```text
 MAJOR.MINOR.PATCH
 ```
 
-- **MAJOR**: alterações incompatíveis ou mudança estrutural importante;
-- **MINOR**: nova funcionalidade compatível;
-- **PATCH**: correção compatível.
+- **MAJOR**: alterações incompatíveis, migrações profundas ou nova arquitetura;
+- **MINOR**: novas funcionalidades compatíveis;
+- **PATCH**: correções, segurança, desempenho e melhorias sem quebra de compatibilidade.
 
 Durante o desenvolvimento:
 
-- `alpha`: funcionalidades ainda em construção;
-- `beta`: principais funcionalidades presentes, foco em integração e correções;
-- `rc`: candidato a versão estável;
+- `alpha.N`: fundação e funcionalidades incompletas;
+- `beta.N`: funcionalidades principais prontas para testes alargados;
+- `rc.N`: candidato a versão estável;
 - sem sufixo: versão estável.
 
 Exemplos:
@@ -514,7 +490,7 @@ Atualizar `VERSIONS.md` quando:
 - uma decisão alterar o roadmap;
 - um teste funcional confirmar ou rejeitar uma implementação.
 
-Não marcar funcionalidades como concluídas apenas porque o código foi preparado. Uma funcionalidade só deve ser marcada como concluída depois de:
+Uma funcionalidade só deve ser marcada como concluída depois de:
 
 - `npm run type-check` aprovado;
 - `npm run build` aprovado;
@@ -549,11 +525,20 @@ git tag -a v0.2.0-alpha.1 -m "Mediário v0.2.0-alpha.1 — Fundação VOD"
 git push origin v0.2.0-alpha.1
 ```
 
-10. Criar uma Release no GitHub e marcar como **pre-release** enquanto a versão for alpha, beta ou RC.
+10. Criar uma Release no GitHub e marcar como **pre-release** enquanto for alpha, beta ou RC.
 
 </details>
 
 ---
+
+## Histórico resumido
+
+| Data | Versão | Marco |
+|---|---|---|
+| 2026-11-19 | `v0.1.0-alpha.1` | Fundação Vue 3 + TypeScript e reutilização do PocketBase atual. |
+| 2026-11-19 | `v0.1.0-alpha.2` | Criação e detalhe de títulos no novo catálogo. |
+| 2026-11-20 | `v0.1.0-alpha.3` | Edição, relações, imagens, lixeira e restauro. |
+| 2026-11-20 | `v0.2.0-alpha.1` | Fundação VOD iniciada. |
 
 ## Autor e licença
 
