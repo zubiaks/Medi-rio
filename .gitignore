@@ -7,3 +7,26 @@ dist/
 .vscode/*
 !.vscode/extensions.json
 .DS_Store
+
+# PocketBase: dados locais, uploads e ficheiros SQLite
+pb_data/
+pb_data_*/
+**/pb_data/
+**/pb_data_*/
+*.db
+*.db-shm
+*.db-wal
+
+# Credenciais e executável local
+.credentials.xml
+*.credentials.xml
+pocketbase.exe
+pocketbase_*.exe
+
+# Dependências e builds
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Releases geradas localmente
+releases/

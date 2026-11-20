@@ -4,11 +4,11 @@ import { useRoute, useRouter } from "vue-router";
 import BaseEmptyState from "@/components/base/BaseEmptyState.vue";
 import BasePageHeader from "@/components/base/BasePageHeader.vue";
 import TitleArchiveDialog from "@/components/catalog/TitleArchiveDialog.vue";
+import TitleAvailabilityList from "@/components/vod/TitleAvailabilityList.vue";
 import { archiveTitle } from "@/domain/catalog/trash";
 import { titleRepository } from "@/domain/repositories";
 import { pb } from "@/infrastructure/pocketbase/client";
 import type { TitleRecord } from "@/types/records";
-import TitleAvailabilityList from "@/components/vod/TitleAvailabilityList.vue";
 
 type NamedRecord = {
   id: string;
@@ -153,12 +153,7 @@ onMounted(() => void load());
       :style="{ backgroundImage: `url(${backdropUrl})` }"
       aria-label="Imagem de fundo do título"
     >
-      <img
-        :src="backdropUrl"
-        alt=""
-        class="sr-only"
-        @error="markImageFailed(backdropUrl)"
-      />
+      <img :src="backdropUrl" alt="" class="sr-only" @error="markImageFailed(backdropUrl)" />
       <div class="title-backdrop-overlay" />
     </section>
 
@@ -168,63 +163,26 @@ onMounted(() => void load());
       :description="record.tagline || record.titulo_original || 'Detalhe do título'"
     >
       <template #actions>
-        <RouterLink class="button button-secondary" to="/catalogo">
-          ← Catálogo
-        </RouterLink>
-        <RouterLink
-          class="button button-primary"
-          :to="`/catalogo/${record.id}/editar`"
-        >
-          Editar
-        </RouterLink>
-        <button class="button button-danger" type="button" @click="archiveOpen = true">
-          Lixeira
-        </button>
+        <RouterLink class="button button-secondary" to="/catalogo">← Catálogo</RouterLink>
+        <RouterLink class="button button-primary" :to="`/catalogo/${record.id}/editar`">Editar</RouterLink>
+        <button class="button button-danger" type="button" @click="archiveOpen = true">Lixeira</button>
       </template>
     </BasePageHeader>
 
     <section class="title-detail">
       <aside class="title-poster">
-        <img
-          v-if="posterUrl"
-          :src="posterUrl"
-          :alt="`Poster de ${record.titulo}`"
-          @error="markImageFailed(posterUrl)"
-        />
-        <div v-else class="poster-placeholder">
-          <span>▶</span>
-          <small>Sem poster</small>
-        </div>
+        <img v-if="posterUrl" :src="posterUrl" :alt="`Poster de ${record.titulo}`" @error="markImageFailed(posterUrl)" />
+        <div v-else class="poster-placeholder"><span>▶</span><small>Sem poster</small></div>
       </aside>
 
       <div class="title-main">
-        <img
-          v-if="logoUrl"
-          class="title-logo"
-          :src="logoUrl"
-          :alt="`Logo de ${record.titulo}`"
-          @error="markImageFailed(logoUrl)"
-        />
+        <img v-if="logoUrl" class="title-logo" :src="logoUrl" :alt="`Logo de ${record.titulo}`" @error="markImageFailed(logoUrl)" />
 
         <div class="title-badges">
-          <span
-            v-if="record.expand?.midia"
-            class="detail-badge detail-badge-primary"
-          >
-            {{ relationNames(record.expand.midia)[0] }}
-          </span>
-          <span v-if="record.expand?.tipo" class="detail-badge">
-            {{ relationNames(record.expand.tipo)[0] }}
-          </span>
-          <span
-            v-if="record.expand?.estado"
-            class="detail-badge detail-badge-success"
-          >
-            {{ relationNames(record.expand.estado)[0] }}
-          </span>
-          <span v-if="record.adulto" class="detail-badge detail-badge-danger">
-            Adulto
-          </span>
+          <span v-if="record.expand?.midia" class="detail-badge detail-badge-primary">{{ relationNames(record.expand.midia)[0] }}</span>
+          <span v-if="record.expand?.tipo" class="detail-badge">{{ relationNames(record.expand.tipo)[0] }}</span>
+          <span v-if="record.expand?.estado" class="detail-badge detail-badge-success">{{ relationNames(record.expand.estado)[0] }}</span>
+          <span v-if="record.adulto" class="detail-badge detail-badge-danger">Adulto</span>
         </div>
 
         <dl class="title-facts">
@@ -238,37 +196,21 @@ onMounted(() => void load());
           <div><dt>Canónico</dt><dd>{{ record.canonico ? "Sim" : "Não" }}</dd></div>
         </dl>
 
-        <article v-if="record.sinopse" class="detail-section">
-          <h2>Sinopse</h2>
-          <p class="detail-copy">{{ record.sinopse }}</p>
-        </article>
-
-        <article v-if="record.notas_pessoais" class="detail-section">
-          <h2>Notas pessoais</h2>
-          <p class="detail-copy">{{ record.notas_pessoais }}</p>
-        </article>
+        <article v-if="record.sinopse" class="detail-section"><h2>Sinopse</h2><p class="detail-copy">{{ record.sinopse }}</p></article>
+        <article v-if="record.notas_pessoais" class="detail-section"><h2>Notas pessoais</h2><p class="detail-copy">{{ record.notas_pessoais }}</p></article>
       </div>
     </section>
+
+    <TitleAvailabilityList :title-id="record.id" />
 
     <section class="detail-grid">
       <article class="panel">
         <h2>Classificação e relações</h2>
         <div class="relation-groups">
-          <template
-            v-for="key in ['generos', 'tags', 'idiomas', 'pais_origem', 'plataformas', 'companhias']"
-            :key="key"
-          >
+          <template v-for="key in ['generos', 'tags', 'idiomas', 'pais_origem', 'plataformas', 'companhias']" :key="key">
             <div v-if="relationNames(record.expand?.[key]).length">
               <h3>{{ key.replace("_", " ") }}</h3>
-              <div class="chip-list">
-                <span
-                  v-for="item in relationNames(record.expand?.[key])"
-                  :key="item"
-                  class="chip"
-                >
-                  {{ item }}
-                </span>
-              </div>
+              <div class="chip-list"><span v-for="item in relationNames(record.expand?.[key])" :key="item" class="chip">{{ item }}</span></div>
             </div>
           </template>
         </div>
@@ -285,12 +227,6 @@ onMounted(() => void load());
       </article>
     </section>
 
-    <TitleArchiveDialog
-      :open="archiveOpen"
-      :title="record.titulo"
-      :saving="archiving"
-      @close="archiveOpen = false"
-      @confirm="archive"
-    />
+    <TitleArchiveDialog :open="archiveOpen" :title="record.titulo" :saving="archiving" @close="archiveOpen = false" @confirm="archive" />
   </template>
 </template>
