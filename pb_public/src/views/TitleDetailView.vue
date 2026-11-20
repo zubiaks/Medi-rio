@@ -8,6 +8,7 @@ import { archiveTitle } from "@/domain/catalog/trash";
 import { titleRepository } from "@/domain/repositories";
 import { pb } from "@/infrastructure/pocketbase/client";
 import type { TitleRecord } from "@/types/records";
+import TitleAvailabilityList from "@/components/vod/TitleAvailabilityList.vue";
 
 type NamedRecord = {
   id: string;

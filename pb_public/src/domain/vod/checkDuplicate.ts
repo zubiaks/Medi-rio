@@ -1,0 +1,2 @@
+import{availabilityRepository}from"@/domain/repositories";import type{AvailabilityRecord}from"@/types/records";import type{VodFormData}from"./models";import{duplicateFilter,sameProvider}from"./duplicate";
+export async function findVodDuplicate(form:VodFormData,currentId=""):Promise<AvailabilityRecord|null>{const result=await availabilityRepository.list({perPage:100,filter:duplicateFilter(form,currentId)});return sameProvider(result.items,form)||null}

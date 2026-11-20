@@ -1,264 +1,562 @@
 # Versões do Mediário
 
-Histórico e plano de versões, ordenado da versão mais recente para a mais antiga.
+Este documento regista as versões do **Mediário**, o objetivo de cada marco, as funcionalidades incluídas, o estado de validação e o trabalho ainda pendente.
 
-> Abrir cada secção para consultar objetivos, funcionalidades e validações.
+As versões estão ordenadas da **mais recente para a mais antiga**. No GitHub, cada bloco pode ser aberto ou fechado através da seta apresentada junto ao título.
 
-## Estado atual
+> **Versão atual:** `v0.2.0-alpha.1` — Fundação VOD, em desenvolvimento.
+
+## Resumo
 
 | Versão | Marco | Estado |
 |---|---|---|
 | `v1.0.0` | Primeira versão estável | Planeado |
-| `v0.9.0-rc.1` | Candidato estável | Planeado |
+| `v0.9.0-rc.1` | Candidato a versão estável | Planeado |
 | `v0.7.0-beta.1` | Providers e manutenção | Planeado |
 | `v0.6.0-beta.1` | Diário e reviews | Planeado |
 | `v0.5.0-alpha.1` | Biblioteca física | Planeado |
-| `v0.4.0-alpha.1` | TV e streams | Planeado |
+| `v0.4.0-alpha.1` | TV, IPTV e streams | Planeado |
 | `v0.3.0-alpha.1` | Podcasts | Planeado |
 | `v0.2.0-alpha.1` | Fundação VOD | **Em desenvolvimento** |
-| `v0.1.0-alpha.3` | Catálogo editável e imagens | Concluído |
-| `v0.1.0-alpha.2` | Fundação do catálogo | Concluído |
-| `v0.1.0-alpha.1` | Fundação Vue | Concluído |
+| `v0.1.0-alpha.3` | Catálogo editável, imagens e lixeira | **Concluído** |
+| `v0.1.0-alpha.2` | Fundação do catálogo | **Concluído** |
+| `v0.1.0-alpha.1` | Fundação Vue 3 + TypeScript | **Concluído** |
+
+---
+
+<details>
+<summary><strong>v1.0.0 — Primeira versão estável</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Publicar a primeira versão estável do Mediário, adequada a utilização pessoal continuada e instalação reproduzível.
+
+## Critérios previstos
+
+- catálogo, VOD, podcasts, TV, biblioteca, diário e reviews funcionais;
+- autenticação e regras PocketBase revistas para publicação;
+- migrations versionadas;
+- documentação de instalação e recuperação;
+- testes automáticos dos fluxos críticos;
+- backup e restauro validados;
+- consola sem erros da aplicação;
+- `npm audit` sem vulnerabilidades conhecidas;
+- `npm run type-check` e `npm run build` aprovados;
+- acessibilidade e comportamento responsivo revistos;
+- release notes e pacote de instalação preparados.
+
+## Estado
+
+Ainda não iniciado.
+
+</details>
+
+<details>
+<summary><strong>v0.9.0-rc.1 — Candidato a versão estável</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Congelar funcionalidades e concentrar o trabalho em regressões, segurança, desempenho, acessibilidade e documentação.
+
+## Trabalho previsto
+
+- congelamento do schema e das funcionalidades principais;
+- revisão de API Rules do PocketBase;
+- revisão de credenciais, chaves e configuração local;
+- testes ponta a ponta com Playwright;
+- testes unitários com Vitest;
+- validação de migrations numa base limpa;
+- teste de atualização a partir de versões anteriores;
+- revisão do Service Worker e da estratégia de cache;
+- revisão de desempenho para listas grandes;
+- revisão da documentação por outra pessoa.
+
+## Estado
+
+Ainda não iniciado.
+
+</details>
+
+<details>
+<summary><strong>v0.7.0-beta.1 — Providers e manutenção</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Centralizar providers externos, sincronizações, importações, diagnóstico e manutenção do sistema.
+
+## Trabalho previsto
+
+- painel de providers;
+- estado, latência e último sucesso de cada provider;
+- `sync_jobs` e respetivos erros;
+- `fontes_externas` por título;
+- TMDB, OMDb, RAWG, Open Library, Google Books, AniList, Jikan, MusicBrainz e outros providers configurados gradualmente;
+- centro de importação para CSV, JSON, NFO, M3U, RSS e XMLTV;
+- deteção de duplicados e records incompletos;
+- auditoria, backup e recuperação;
+- documentação de chaves, limites e contratos de dados.
+
+## Estado
+
+Ainda não iniciado.
+
+</details>
+
+<details>
+<summary><strong>v0.6.0-beta.1 — Diário e reviews</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Registar consumo real, progresso e opiniões sem misturar eventos de visualização com reviews.
+
+## Trabalho previsto
+
+- diário baseado em `visualizacoes`;
+- progresso por duração, episódios, páginas, capítulos, faixas ou horas jogadas;
+- revisualizações;
+- calendário de consumo;
+- reviews e avaliações pessoais;
+- estatísticas e resumo anual;
+- filtros por período, mídia, estado e plataforma;
+- integração com títulos, temporadas e episódios.
+
+## Estado
+
+Ainda não iniciado.
+
+</details>
+
+<details>
+<summary><strong>v0.5.0-alpha.1 — Biblioteca física</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Gerir exemplares físicos, edições, formatos, compras e empréstimos.
+
+## Trabalho previsto
+
+- listagem e detalhe de exemplares;
+- formatos físicos e tipos de edição;
+- condição, localização e notas do exemplar;
+- códigos de barras;
+- histórico de empréstimos;
+- devoluções;
+- filtros e estatísticas da coleção física;
+- ligação entre exemplares e títulos.
+
+## Estado
+
+A página inicial lê dados existentes, mas o domínio ainda não foi reconstruído na arquitetura Vue.
+
+</details>
+
+<details>
+<summary><strong>v0.4.0-alpha.1 — TV, IPTV e streams</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Migrar e consolidar televisão, rádios, webcams, IPTV e links alternativos.
+
+## Já validado no backend anterior
+
+- criação de canais em `canais_tv`;
+- criação de links em `stream_links`;
+- relação canal → links;
+- manifesto HLS válido;
+- tipo técnico `hls`;
+- qualidade normalizada;
+- criação, leitura e eliminação pela API.
+
+## Trabalho previsto na aplicação Vue
+
+- listagem e detalhe de canais;
+- importação M3U;
+- vários links e prioridades;
+- `referrer` e `user_agent`;
+- teste de disponibilidade;
+- estados online, instável, lento e offline;
+- player HLS;
+- filtros por país, idioma, categoria e qualidade;
+- integração EPG/XMLTV futura.
+
+## Estado
+
+A listagem inicial reutiliza a base atual. A gestão completa está planeada.
+
+</details>
+
+<details>
+<summary><strong>v0.3.0-alpha.1 — Podcasts</strong> · Planeado · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Migrar o domínio de podcasts para módulos Vue e TypeScript independentes.
+
+## Já validado no projeto anterior
+
+- parsing RSS;
+- namespaces iTunes através de `getElementsByTagNameNS`;
+- imagem geral e imagem por episódio;
+- duração, temporada, episódio e conteúdo explícito;
+- sincronização de episódios;
+- feed Omny real;
+- apresentação dos episódios existentes.
+
+## Trabalho previsto
+
+- parser TypeScript puro com fixtures;
+- repositório de podcasts;
+- sincronização sem duplicar GUIDs;
+- player de áudio;
+- progresso por episódio;
+- pesquisa e filtros;
+- estados de erro, loading e vazio;
+- testes para feeds sem namespace, XML inválido e imagens em falta.
+
+## Estado
+
+A página inicial reutiliza records existentes. A migração completa está planeada.
+
+</details>
 
 <details open>
-<summary><strong>v0.2.0-alpha.1 — Fundação VOD</strong> · Em desenvolvimento</summary>
+<summary><strong>v0.2.0-alpha.1 — Fundação VOD</strong> · Em desenvolvimento · [−] Ocultar detalhes</summary>
 
-### Representa
+## Objetivo
 
-Primeira implementação do domínio VOD, usando a coleção `disponibilidades` para relacionar títulos com providers e condições de acesso.
+Gerir onde cada título pode ser visto, alugado, comprado, ouvido, obtido gratuitamente ou encontrado numa biblioteca.
 
-### Implementado
+## Modelo de dados
 
-- listagem de disponibilidades ativas;
-- criação e edição;
-- relação com títulos e países;
+A área VOD utiliza a coleção PocketBase `disponibilidades`. Não existe uma coleção separada chamada `vod`.
+
+Campos utilizados:
+
+- `titulo`;
+- `provider_nome`;
+- `tipo`;
+- `url`;
+- `pais`;
+- `qualidade`;
+- `preco`;
+- `moeda`;
+- `incluido_subscricao`;
+- `data_inicio`;
+- `data_fim`;
+- `ativo`.
+
+## Concluído e testado
+
+- listagem de disponibilidades;
+- criação de uma disponibilidade;
+- edição de uma disponibilidade;
+- relação com título e país;
 - provider;
 - modalidade;
-- URL;
-- qualidade normalizada;
+- URL externa;
 - preço e moeda;
-- indicação de inclusão na subscrição;
-- datas de início e fim;
+- inclusão na subscrição;
+- data de início e fim;
 - estado ativo;
-- validação de URL, preço, moeda e datas;
-- aviso ao abandonar alterações não guardadas;
-- rotas e ligações no menu.
+- proteção contra alterações não guardadas;
+- rotas `/vod`, `/vod/novo` e `/vod/:id/editar`;
+- links VOD na navegação;
+- correção da qualidade para Select;
+- criação e edição aprovadas manualmente.
 
-### Valores de qualidade aceites
+## Valores técnicos de qualidade
 
-```text
-desconhecida
-sd
-hd
-fhd
-4k
-8k
-audio
-```
+| Valor guardado | Texto apresentado |
+|---|---|
+| `desconhecida` | Desconhecida |
+| `sd` | SD |
+| `hd` | HD |
+| `fhd` | Full HD |
+| `4k` | 4K |
+| `8k` | 8K |
+| `audio` | Áudio |
 
-### Validado
+Os valores são guardados em minúsculas para respeitar o Select do PocketBase.
 
-- criação de disponibilidade;
-- edição de disponibilidade;
-- qualidade `fhd` aceite pelo PocketBase;
-- navegação entre listagem, criação e edição.
+## Gestão VOD preparada, aguardando validação final
 
-### Falta concluir
+- pesquisa por título e provider;
+- filtros por país, modalidade, qualidade, estado e subscrição;
+- ofertas ativas, inativas, todas ou expiradas;
+- apresentação legível da qualidade;
+- preço formatado em `pt-PT`;
+- ativar e desativar ofertas;
+- eliminação definitiva com confirmação pelo provider;
+- abrir título relacionado;
+- abrir URL do provider;
+- integração “Onde ver” no detalhe do título;
+- deteção de duplicados por título, provider, país e modalidade;
+- normalização de valores antigos como `FHD` para `fhd`.
 
-- desativar e eliminar disponibilidades pela interface;
-- mostrar ofertas inativas;
-- filtros por título, provider, país, modalidade e qualidade;
-- impedir duplicados;
-- disponibilidades dentro do detalhe do título;
-- testes automáticos.
+## Falta validar para concluir a versão
 
-</details>
+- instalar e validar o pacote de gestão VOD;
+- testar filtros combinados;
+- testar ofertas ativas, inativas e expiradas;
+- testar ativação e desativação;
+- testar eliminação definitiva;
+- validar “Onde ver” no detalhe do título;
+- validar aviso de duplicado na criação e edição;
+- executar `npm run type-check`;
+- executar `npm run build`;
+- confirmar consola sem erros da aplicação.
 
-<details>
-<summary><strong>v0.1.0-alpha.3 — Catálogo editável e imagens</strong> · Concluído</summary>
+## Estado
 
-### Implementado
-
-- edição completa de títulos;
-- formulário partilhado entre criação e edição;
-- limpeza de campos e relações antigas;
-- relações múltiplas com pesquisa, checkboxes e chips;
-- poster, backdrop e logo por ficheiro local;
-- poster, backdrop e logo por URL externa;
-- prioridade de ficheiro local sobre URL externa;
-- redimensionamento antes do upload;
-- poster no catálogo;
-- poster, backdrop e logo no detalhe;
-- lixeira lógica;
-- motivo e data de eliminação;
-- restauro;
-- eliminação definitiva com confirmação pelo nome;
-- aviso de alterações não guardadas.
-
-### Regras de imagem
-
-| Campo | Dimensão máxima | Limite |
-|---|---:|---:|
-| Poster | `1200 × 1800` | 5 MiB |
-| Backdrop | `1920 × 1080` | 5 MiB |
-| Logo | `1600 × 600` | 2 MiB |
-
-### Validado
-
-- edição e limpeza de campos;
-- relações múltiplas;
-- URLs externas;
-- uploads locais;
-- lixeira, restauro e eliminação definitiva;
-- TMDB ID opcional sem valor `0` inválido.
+**Em desenvolvimento.** A fundação está funcional. A gestão avançada foi preparada, mas só deve ser marcada como concluída depois dos testes acima.
 
 </details>
 
 <details>
-<summary><strong>v0.1.0-alpha.2 — Fundação do catálogo</strong> · Concluído</summary>
+<summary><strong>v0.1.0-alpha.3 — Catálogo editável, imagens e lixeira</strong> · Concluído · [+] Mostrar detalhes</summary>
 
-### Implementado
+## Objetivo
 
-- lookups centralizados;
-- criação de títulos;
+Concluir o primeiro domínio funcional do Mediário: criação, leitura, edição, imagens, relações e ciclo de vida dos títulos.
+
+## Concluído e testado
+
+### Títulos
+
+- criação;
+- detalhe;
+- edição;
+- limpeza de campos existentes;
 - validação;
-- mapeamento entre domínio e PocketBase;
-- detalhe do título;
-- expansão de relações;
-- mensagens de sucesso e erro.
+- proteção contra alterações não guardadas;
+- relação com mídia, tipo e estado;
+- relações múltiplas para géneros, tags, idiomas, países, plataformas e companhias;
+- pesquisa nas relações extensas.
+
+### Imagens
+
+- poster, backdrop e logo como ficheiros PocketBase;
+- `poster_url`, `backdrop_url` e `logo_url` como URLs externas;
+- prioridade ficheiro local → URL externa → placeholder;
+- pré-visualização;
+- substituição;
+- remoção;
+- redimensionamento no browser;
+- thumbnails PocketBase no catálogo;
+- poster, backdrop e logo apresentados no detalhe.
+
+### Lixeira
+
+- arquivamento lógico;
+- motivo opcional;
+- data e origem da eliminação;
+- títulos arquivados escondidos do catálogo;
+- página `/lixeira`;
+- restauro;
+- eliminação definitiva com confirmação pelo nome exato.
+
+### Correções relevantes
+
+- `data_lancamento` convertido para `yyyy-MM-dd` no input HTML;
+- TMDB ID `0` tratado como campo vazio;
+- TMDB ID opcional validado apenas quando preenchido;
+- formulários reativos copiados sem `structuredClone` de Proxy Vue;
+- erros de validação apresentados no topo do formulário;
+- valores vazios enviados corretamente para limpar campos antigos.
+
+## Validação executada
+
+- criação de título;
+- detalhe;
+- edição;
+- limpeza de campos;
+- relações múltiplas;
+- imagem local;
+- imagem por URL;
+- prioridade de imagem local;
+- arquivamento;
+- restauro;
+- eliminação definitiva;
+- `npm run type-check`;
+- `npm run build`;
+- navegação sem erros da aplicação.
+
+## Limitações conhecidas
+
+- testes automáticos ainda não implementados;
+- listas muito extensas poderão precisar de virtualização;
+- créditos, temporadas e episódios ainda não estão integrados no detalhe Vue.
+
+## Estado
+
+**Concluído.** Serve como padrão arquitetural para os restantes domínios.
 
 </details>
 
 <details>
-<summary><strong>v0.1.0-alpha.1 — Fundação Vue</strong> · Concluído</summary>
+<summary><strong>v0.1.0-alpha.2 — Fundação do catálogo</strong> · Concluído · [+] Mostrar detalhes</summary>
 
-### Implementado
+## Objetivo
+
+Criar o primeiro fluxo real de negócio sobre o PocketBase existente.
+
+## Concluído
+
+- tipos TypeScript do catálogo;
+- mapper frontend ↔ PocketBase;
+- validação inicial;
+- carregamento de lookups;
+- formulário de criação;
+- criação real em `titulos`;
+- página de detalhe;
+- rotas de catálogo;
+- estados de loading, erro e vazio;
+- documentação inicial do domínio.
+
+## Estado
+
+**Concluído.** Foi expandido pela `v0.1.0-alpha.3`.
+
+</details>
+
+<details>
+<summary><strong>v0.1.0-alpha.1 — Fundação Vue 3 + TypeScript</strong> · Concluído · [+] Mostrar detalhes</summary>
+
+## Objetivo
+
+Criar uma reconstrução organizada do frontend, preservando a base PocketBase existente.
+
+## Stack
 
 - Vue 3;
 - TypeScript;
 - Vite;
 - Vue Router;
-- SDK PocketBase;
+- SDK oficial PocketBase;
 - CSS próprio;
-- componentes-base;
-- navegação responsiva;
-- temas;
-- repositórios;
-- páginas iniciais;
-- arranque local no Windows.
+- versões npm estáveis por padrão.
 
-### Validação
+## Concluído
 
-- `npm audit` sem vulnerabilidades na validação inicial;
+- starter Vue 3 + TypeScript;
+- router por hash;
+- layout e sidebar;
+- tema claro e escuro;
+- cliente PocketBase;
+- repositórios genéricos;
+- páginas iniciais para catálogo, VOD, podcasts, TV, biblioteca e diagnóstico;
+- carregamento por rota;
+- script `.bat` para iniciar PocketBase e Vite;
+- TypeScript compatível com `vue-tsc`;
+- build de produção;
+- `npm audit` sem vulnerabilidades no baseline inicial;
+- identidade Mediário;
+- licença MIT atribuída a Zubiaks;
+- Git e documentação inicial.
+
+## Decisões arquiteturais
+
+- Vue apenas na camada visual;
+- lógica de negócio em TypeScript puro;
+- PocketBase isolado por repositórios;
+- frontend e dados desacoplados;
+- desenvolvimento local sem login durante a estabilização;
+- dependências beta, RC, nightly ou canary apenas quando houver vantagem concreta e documentada.
+
+## Estado
+
+**Concluído.** É a fundação técnica das versões seguintes.
+
+</details>
+
+---
+
+<details>
+<summary><strong>Convenção de versões</strong> · [+] Mostrar detalhes</summary>
+
+O Mediário segue [Semantic Versioning](https://semver.org/):
+
+```text
+MAJOR.MINOR.PATCH
+```
+
+- **MAJOR**: alterações incompatíveis ou mudança estrutural importante;
+- **MINOR**: nova funcionalidade compatível;
+- **PATCH**: correção compatível.
+
+Durante o desenvolvimento:
+
+- `alpha`: funcionalidades ainda em construção;
+- `beta`: principais funcionalidades presentes, foco em integração e correções;
+- `rc`: candidato a versão estável;
+- sem sufixo: versão estável.
+
+Exemplos:
+
+```text
+v0.2.0-alpha.1
+v0.6.0-beta.1
+v0.9.0-rc.1
+v1.0.0
+```
+
+</details>
+
+<details>
+<summary><strong>Critérios para atualizar este documento</strong> · [+] Mostrar detalhes</summary>
+
+Atualizar `VERSIONS.md` quando:
+
+- uma funcionalidade relevante for concluída;
+- um marco mudar de estado;
+- uma versão for publicada;
+- uma limitação importante for descoberta;
+- uma decisão alterar o roadmap;
+- um teste funcional confirmar ou rejeitar uma implementação.
+
+Não marcar funcionalidades como concluídas apenas porque o código foi preparado. Uma funcionalidade só deve ser marcada como concluída depois de:
+
 - `npm run type-check` aprovado;
 - `npm run build` aprovado;
-- podcasts e canais existentes carregados da base real.
+- teste manual do fluxo principal;
+- ausência de erros da aplicação na consola;
+- documentação correspondente atualizada.
 
 </details>
 
 <details>
-<summary><strong>v0.3.0-alpha.1 — Podcasts</strong> · Planeado</summary>
+<summary><strong>Processo de release</strong> · [+] Mostrar detalhes</summary>
 
-- parser RSS em TypeScript puro;
-- namespaces iTunes e Media RSS;
-- sincronização e deduplicação;
-- episódios;
-- player e progresso;
-- paginação para feeds grandes;
-- fixtures e testes.
+1. Atualizar `package.json`.
+2. Atualizar `VERSIONS.md`.
+3. Atualizar `CHANGELOG.md`.
+4. Executar:
 
-</details>
+```powershell
+npm audit
+npm run type-check
+npm run build
+```
 
-<details>
-<summary><strong>v0.4.0-alpha.1 — TV e streams</strong> · Planeado</summary>
+5. Executar os testes manuais do marco.
+6. Criar commit com descrição.
+7. Fazer push da branch.
+8. Integrar na `main` através de Pull Request ou merge revisto.
+9. Criar tag anotada:
 
-- importação M3U;
-- canais e `stream_links`;
-- vários protocolos;
-- prioridade e fallback;
-- referrer e user agent;
-- monitorização;
-- player integrado.
+```powershell
+git tag -a v0.2.0-alpha.1 -m "Mediário v0.2.0-alpha.1 — Fundação VOD"
+git push origin v0.2.0-alpha.1
+```
 
-</details>
-
-<details>
-<summary><strong>v0.5.0-alpha.1 — Biblioteca física</strong> · Planeado</summary>
-
-- exemplares;
-- formatos e edições;
-- códigos de barras;
-- localização e estado físico;
-- empréstimos, renovações e devoluções.
+10. Criar uma Release no GitHub e marcar como **pre-release** enquanto a versão for alpha, beta ou RC.
 
 </details>
 
-<details>
-<summary><strong>v0.6.0-beta.1 — Diário e reviews</strong> · Planeado</summary>
+---
 
-- visualizações;
-- progresso;
-- revisualizações;
-- diário;
-- avaliações e reviews;
-- estatísticas pessoais.
+## Autor e licença
 
-</details>
+Desenvolvido por **Zubiaks**.
 
-<details>
-<summary><strong>v0.7.0-beta.1 — Providers e manutenção</strong> · Planeado</summary>
-
-- saúde dos providers;
-- jobs de sincronização;
-- fontes externas;
-- importações;
-- duplicados e órfãos;
-- auditoria;
-- backup e restauro.
-
-</details>
-
-<details>
-<summary><strong>v0.9.0-rc.1 — Candidato estável</strong> · Planeado</summary>
-
-- funcionalidades principais integradas;
-- testes unitários, integração e E2E;
-- documentação completa;
-- zero erros inesperados;
-- migrations reproduzíveis;
-- rollback documentado.
-
-</details>
-
-<details>
-<summary><strong>v1.0.0 — Primeira versão estável</strong> · Planeado</summary>
-
-- autenticação;
-- API Rules;
-- segredos fora do frontend;
-- HTTPS;
-- CORS e CSP;
-- backups automáticos;
-- recuperação testada;
-- acessibilidade e instalação reproduzível.
-
-</details>
-
-## Regras de atualização
-
-Cada alteração de versão deve atualizar:
-
-1. `package.json`;
-2. `VERSIONS.md`;
-3. `CHANGELOG.md`;
-4. documentação da funcionalidade;
-5. tag e Release no GitHub, quando aplicável.
-
-## Histórico resumido
-
-| Versão | Marco |
-|---|---|
-| `v0.2.0-alpha.1` | Fundação VOD |
-| `v0.1.0-alpha.3` | Catálogo editável, imagens e lixeira |
-| `v0.1.0-alpha.2` | Criação e detalhe do catálogo |
-| `v0.1.0-alpha.1` | Fundação Vue 3 + TypeScript |
+Distribuído sob a licença MIT. Consulta `LICENSE.md`.
