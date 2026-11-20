@@ -30,3 +30,11 @@ pocketbase_*.exe
 
 # Releases geradas localmente
 releases/
+
+# Credenciais locais
+.credentials.xml
+*.credentials.xml
+
+# Executável PocketBase
+pocketbase.exe
+pocketbase_*.exe
