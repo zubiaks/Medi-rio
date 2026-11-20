@@ -1,0 +1,47 @@
+name: Proposta de funcionalidade
+about: Sugerir uma melhoria ou nova capacidade
+title: "[Feature]: "
+labels: ["enhancement", "status: planned"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema a resolver
+      description: Explica a necessidade antes da solução.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options: [Catálogo, VOD, Podcasts, TV e streams, Biblioteca, Providers, Base de dados, Interface, Outra]
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceitação
+      placeholder: "- [ ] ...
+- [ ] ..."
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Impacto, riscos e compatibilidade
+      description: Schema, dados, providers, browsers, desempenho e segurança.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Procurei propostas semelhantes.
+          required: true
+        - label: A proposta não inclui credenciais nem dados pessoais.
+          required: true
