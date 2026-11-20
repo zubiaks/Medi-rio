@@ -1,7 +1,15 @@
 # Catálogo
 
-Primeiro incremento: criação real de títulos, lookups em cache, tipos filtrados por mídia, validação, relações múltiplas, mapper para PocketBase e redirecionamento após criação.
+O catálogo permite criar, consultar, editar, arquivar, restaurar e eliminar definitivamente títulos.
 
-Coleções: `titulos`, `midias`, `tipos_titulo`, `estados`, `generos`, `tags`, `idiomas`, `paises`, `plataformas`, `companhias`, `categorias_fonte`.
+## Lixeira
+- `apagado = true` remove o título do catálogo normal;
+- `apagado_em` regista o momento;
+- `motivo_eliminacao` é opcional;
+- `/lixeira` permite restaurar;
+- eliminação definitiva exige escrever o nome exato do título.
 
-Pendente: imagens, edição, detalhe, combobox pesquisável, testes e lixeira.
+## Próximos incrementos
+- imagens;
+- relações pesquisáveis;
+- testes unitários e E2E.
