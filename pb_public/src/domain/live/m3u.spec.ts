@@ -1,0 +1,3 @@
+/** Ficheiro: src/domain/live/m3u.spec.ts | Testa o parser M3U. */
+import { describe,expect,it } from "vitest";import { parseM3u } from "./m3u";
+describe("parseM3u",()=>{it("lê metadados IPTV",()=>{const result=parseM3u('#EXTM3U\n#EXTINF:-1 tvg-id="rtp1" tvg-name="RTP 1" group-title="Generalistas",RTP 1\nhttps://example.com/live.m3u8');expect(result[0]).toMatchObject({name:"RTP 1",tvgId:"rtp1",groupTitle:"Generalistas",selected:true})});it("rejeita ficheiro não M3U",()=>expect(()=>parseM3u("texto")).toThrow());it("marca URL inválido",()=>expect(parseM3u("#EXTM3U\n#EXTINF:-1,Canal\nerrado")[0].errors.length).toBeGreaterThan(0))});

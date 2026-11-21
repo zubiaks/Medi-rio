@@ -1,0 +1,2 @@
+/** Ficheiro: GridSizeSlider.a11y.spec.ts | Testa a barra de tamanho da grelha. */
+import { afterEach,describe,it } from "vitest";import { enableAutoUnmount,mount } from "@vue/test-utils";import { expectNoA11yViolations } from "@/test/accessibility";import GridSizeSlider from "./GridSizeSlider.vue";enableAutoUnmount(afterEach);describe("a11y: GridSizeSlider",()=>{it("não tem violações automáticas",async()=>{const w=mount(GridSizeSlider,{attachTo:document.body,props:{modelValue:250,"onUpdate:modelValue":()=>{}}});await expectNoA11yViolations(w.element)})});
