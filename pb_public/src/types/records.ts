@@ -1,9 +1,21 @@
-/**
- * Mediario
- * Copyright (c) 2026 Zubiaks.
- *
- * Source-available under the PolyForm Noncommercial License 1.0.0.
- * Commercial use requires prior written permission from Zubiaks.
- * See LICENSE.md.
- */
-import type{RecordModel}from"pocketbase";export interface BaseRecord extends RecordModel{id:string;created:string;updated:string;collectionId?:string;collectionName?:string}export interface TitleRecord extends BaseRecord{titulo:string;titulo_original?:string;ano?:number;tagline?:string;sinopse?:string;poster?:string;backdrop?:string;logo?:string;poster_url?:string;backdrop_url?:string;logo_url?:string;midia:string;tipo?:string;estado?:string;rating?:number;favorito?:boolean;apagado:boolean;apagado_em?:string;apagado_por?:string;motivo_eliminacao?:string}export interface StreamRecord extends BaseRecord{nome:string;tipo:"radio"|"webcam"|"podcast"|"tv"|"outro";url_stream?:string;rss_url?:string;logo?:string;logo_url?:string;qualidade?:"SD"|"HD"|"FHD"|"4K"|"Audio"|"Desconhecida";ativo?:boolean;cemiterio?:boolean}export interface PodcastEpisodeRecord extends BaseRecord{podcast:string;guid?:string;titulo:string;descricao?:string;audio_url?:string;audio_type?:string;duracao_seg?:number;publicado_em?:string;imagem_url?:string;numero_episodio?:number;numero_temporada?:number;explicito?:boolean;ouvido_ate_seg?:number;ouvido_completo?:boolean}export interface ChannelRecord extends BaseRecord{nome:string;url_stream?:string;logo?:string;logo_url?:string;qualidade?:string;ativo?:boolean;cemiterio?:boolean}export interface AvailabilityRecord extends BaseRecord{titulo:string;provider_nome:string;tipo:"streaming"|"aluguer"|"compra"|"gratuito"|"broadcast"|"biblioteca"|"fisico"|"outro";url?:string;pais?:string;qualidade?:string;preco?:number;moeda?:string;incluido_subscricao?:boolean;ativo?:boolean;expand?:{titulo?:TitleRecord;pais?:BaseRecord&{nome?:string;codigo?:string}}}
+export interface PodcastEpisodeRecord extends BaseRecord {
+  podcast: string;
+  guid?: string;
+  titulo: string;
+  descricao?: string;
+  numero_temporada?: number;
+  numero_episodio?: number;
+  audio_url?: string;
+  audio_type?: string;
+  duracao_seg?: number;
+  publicado_em?: string;
+  link?: string;
+  imagem?: string;
+  imagem_url?: string;
+  explicito?: unknown;
+  favorito?: boolean;
+  descarregado?: boolean;
+  ouvido_ate_seg?: number;
+  ouvido_completo?: boolean;
+  ultima_escuta_em?: string;
+}

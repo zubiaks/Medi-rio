@@ -20,6 +20,7 @@ import "@/styles/catalog-detail-media.css";
 import "@/styles/vod.css";
 import "@/styles/vod-management.css";
 import "@/styles/vod-delete-dialog.css";
+import "@/styles/podcasts.css";
 
 
 createApp(App).use(router).mount("#app");

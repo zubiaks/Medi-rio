@@ -7,11 +7,19 @@
   See LICENSE.md.
 -->
 <script setup lang="ts">
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 
-const props = defineProps<{ open: boolean }>();
-const emit = defineEmits<{ close: [] }>();
+defineProps<{
+  open: boolean;
+}>();
+
+const emit = defineEmits<{
+  close: [];
+}>();
+
 const route = useRoute();
+const iconFailed = ref(false);
 
 const groups = [
   {
@@ -48,13 +56,23 @@ const groups = [
 ] as const;
 
 function isActive(path: string): boolean {
-  if (path === "/") return route.path === "/";
+  if (path === "/") {
+    return route.path === "/";
+  }
 
-  // Evita que “VOD” e “Adicionar VOD” fiquem ativos ao mesmo tempo.
-  if (path === "/vod") return route.path === "/vod";
-  if (path === "/vod/novo") return route.path === "/vod/novo";
+  if (path === "/vod") {
+    return route.path === "/vod";
+  }
+
+  if (path === "/vod/novo") {
+    return route.path === "/vod/novo";
+  }
 
   return route.path.startsWith(path);
+}
+
+function closeSidebar(): void {
+  emit("close");
 }
 </script>
 
@@ -62,20 +80,45 @@ function isActive(path: string): boolean {
   <aside
     id="sidebar"
     class="sidebar"
-    :class="{ 'is-open': props.open }"
+    :class="{ 'is-open': open }"
     aria-label="Navegação principal"
   >
-    <RouterLink class="brand" to="/" @click="emit('close')">
-      <span class="brand-mark">▶</span>
-      <span>
-        <strong>Mediario</strong>
-        <small>a tua vida multimédia</small>
+    <RouterLink
+      class="brand"
+      to="/"
+      aria-label="Mediário — página inicial"
+      @click="closeSidebar"
+    >
+      <span class="brand-icon-wrap" aria-hidden="true">
+        <img
+          v-if="!iconFailed"
+          class="brand-icon"
+          src="/brand/mediario-icon.png"
+          alt=""
+          width="52"
+          height="52"
+          @error="iconFailed = true"
+        />
+
+        <span v-else class="brand-icon-fallback">
+          M
+        </span>
+      </span>
+
+      <span class="brand-copy">
+        <strong>Mediário</strong>
+        <small>A tua vida multimédia</small>
       </span>
     </RouterLink>
 
     <nav class="nav" aria-label="Áreas da aplicação">
-      <template v-for="group in groups" :key="group.label">
-        <p class="nav-label">{{ group.label }}</p>
+      <template
+        v-for="group in groups"
+        :key="group.label"
+      >
+        <p class="nav-label">
+          {{ group.label }}
+        </p>
 
         <RouterLink
           v-for="item in group.items"
@@ -83,10 +126,14 @@ function isActive(path: string): boolean {
           class="nav-item"
           :class="{ 'is-active': isActive(item[0]) }"
           :to="item[0]"
-          @click="emit('close')"
+          :aria-current="isActive(item[0]) ? 'page' : undefined"
+          @click="closeSidebar"
         >
-          <span aria-hidden="true">{{ item[1] }}</span>
-          {{ item[2] }}
+          <span class="nav-item-icon" aria-hidden="true">
+            {{ item[1] }}
+          </span>
+
+          <span>{{ item[2] }}</span>
         </RouterLink>
       </template>
     </nav>
