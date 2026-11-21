@@ -1,14 +1,14 @@
-﻿/**
+/**
  * Ficheiro: src/types/records.ts
- * Tipo: DefiniÃ§Ãµes TypeScript dos records PocketBase.
+ * Tipo: Definições TypeScript dos records PocketBase.
  *
- * FunÃ§Ã£o:
- * Centraliza os tipos usados pelos mÃ³dulos CatÃ¡logo, VOD, Podcasts,
+ * Função:
+ * Centraliza os tipos usados pelos módulos Catálogo, VOD, Podcasts,
  * TV/Streams e Biblioteca.
  *
  * Nota:
- * Este ficheiro descreve os campos existentes no PocketBase. NÃ£o executa
- * consultas nem contÃ©m lÃ³gica de negÃ³cio.
+ * Este ficheiro descreve os campos existentes no PocketBase. Não executa
+ * consultas nem contém lógica de negócio.
  *
  * Mediario
  * Copyright (c) 2026 Zubiaks.
@@ -30,7 +30,7 @@ export interface NamedRecord extends BaseRecord {
   slug?: string;
 }
 
-/** Record da coleÃ§Ã£o `titulos`. */
+/** Record da coleção `titulos`. */
 export interface TitleRecord extends BaseRecord {
   titulo: string;
   titulo_original?: string;
@@ -55,8 +55,8 @@ export interface TitleRecord extends BaseRecord {
 }
 
 /**
- * Record da coleÃ§Ã£o `streams`.
- * Usado por podcasts, rÃ¡dios, webcams, TV genÃ©rica e outros streams.
+ * Record da coleção `streams`.
+ * Usado por podcasts, rádios, webcams, TV genérica e outros streams.
  */
 export interface StreamRecord extends BaseRecord {
   nome: string;
@@ -108,7 +108,7 @@ export interface StreamRecord extends BaseRecord {
   };
 }
 
-/** Record da coleÃ§Ã£o `podcast_episodios`. */
+/** Record da coleção `podcast_episodios`. */
 export interface PodcastEpisodeRecord extends BaseRecord {
   podcast: string;
   guid?: string;
@@ -136,7 +136,7 @@ export interface PodcastEpisodeRecord extends BaseRecord {
 }
 
 /**
- * Record da coleÃ§Ã£o `canais_tv`.
+ * Record da coleção `canais_tv`.
  * Representa o canal; fontes alternativas pertencem a StreamLinkRecord.
  */
 export interface ChannelRecord extends BaseRecord {
@@ -170,7 +170,7 @@ export interface ChannelRecord extends BaseRecord {
 }
 
 /**
- * Record da coleÃ§Ã£o `stream_links`.
+ * Record da coleção `stream_links`.
  * Um link deve preencher `canal_tv` ou `stream`, nunca ambos.
  */
 export interface StreamLinkRecord extends BaseRecord {
@@ -202,14 +202,14 @@ export interface StreamLinkRecord extends BaseRecord {
   };
 }
 
-/** Record da coleÃ§Ã£o `categorias_tv`. */
+/** Record da coleção `categorias_tv`. */
 export interface TvCategoryRecord extends BaseRecord {
   nome: string;
   ativo?: boolean;
   ordem?: number;
 }
 
-/** Record da coleÃ§Ã£o `disponibilidades`. */
+/** Record da coleção `disponibilidades`. */
 export interface AvailabilityRecord extends BaseRecord {
   titulo: string;
   provider_nome: string;

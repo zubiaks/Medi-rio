@@ -1,4 +1,4 @@
-﻿<!--
+<!--
   Mediario
   Copyright (c) 2026 Zubiaks.
 
@@ -44,7 +44,7 @@ const typeOptions = [
   { value: "gratuito", label: "Gratuito" },
   
   { value: "biblioteca", label: "Biblioteca" },
-  { value: "fisico", label: "FÃ­sico" },
+  { value: "fisico", label: "Físico" },
   { value: "outro", label: "Outro" },
 ] as const;
 
@@ -55,7 +55,7 @@ const qualityOptions = [
   { value: "fhd", label: "Full HD" },
   { value: "4k", label: "4K" },
   { value: "8k", label: "8K" },
-  { value: "audio", label: "Ãudio" },
+  { value: "audio", label: "Áudio" },
 ] as const;
 
 const activeFilterCount = computed(() =>
@@ -72,13 +72,13 @@ const activeFilterCount = computed(() =>
 const advancedSummary = computed(() => {
   const parts: string[] = [];
 
-  if (country.value) parts.push("paÃ­s");
+  if (country.value) parts.push("país");
   if (type.value) parts.push("modalidade");
   if (quality.value) parts.push("qualidade");
   if (status.value !== "active") parts.push("estado");
-  if (subscription.value) parts.push("subscriÃ§Ã£o");
+  if (subscription.value) parts.push("subscrição");
 
-  return parts.length ? parts.join(", ") : "sem filtros avanÃ§ados";
+  return parts.length ? parts.join(", ") : "sem filtros avançados";
 });
 
 function clearSearch(): void {
@@ -128,7 +128,7 @@ function clearSearch(): void {
             name="vod_filter_search"
             type="search"
             autocomplete="off"
-            placeholder="TÃ­tulo ou provider"
+            placeholder="Título ou provider"
           />
           <button
             v-if="search"
@@ -137,7 +137,7 @@ function clearSearch(): void {
             aria-label="Limpar pesquisa"
             @click="clearSearch"
           >
-            Ã—
+            ×
           </button>
         </div>
       </label>
@@ -153,9 +153,9 @@ function clearSearch(): void {
       :class="{ 'is-expanded': expanded }"
     >
       <label class="form-field" for="vod-filter-country">
-        <span>PaÃ­s</span>
+        <span>País</span>
         <select id="vod-filter-country" v-model="country" name="vod_filter_country">
-          <option value="">Todos os paÃ­ses</option>
+          <option value="">Todos os países</option>
           <option
             v-for="countryOption in countries"
             :key="countryOption.id"
@@ -209,15 +209,15 @@ function clearSearch(): void {
       </label>
 
       <label class="form-field" for="vod-filter-subscription">
-        <span>SubscriÃ§Ã£o</span>
+        <span>Subscrição</span>
         <select
           id="vod-filter-subscription"
           v-model="subscription"
           name="vod_filter_subscription"
         >
           <option value="">Todas as ofertas</option>
-          <option value="yes">IncluÃ­das na subscriÃ§Ã£o</option>
-          <option value="no">NÃ£o incluÃ­das</option>
+          <option value="yes">Incluídas na subscrição</option>
+          <option value="no">Não incluídas</option>
         </select>
       </label>
     </div>
