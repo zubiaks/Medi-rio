@@ -3,10 +3,10 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/views/IptvView.vue
-  Versão do ficheiro: 1.0.0
+  Versão do ficheiro: 2.1.0
   Tipo: Página Vue 3 com TypeScript
   Domínio: IPTV
-  Estado: Em migração de Live para IPTV
+  Estado: Em desenvolvimento
   Última revisão: 2026-11-21
 
   Compatibilidade:
@@ -97,7 +97,7 @@
 
   Fluxo de dados:
   1. A rota carrega IptvView.
-  2. LiveView solicita records aos repositórios.
+  2. IptvView solicita records aos repositórios.
   3. Os repositórios comunicam com PocketBase.
   4. IptvView passa records tipados aos componentes.
   5. Os componentes emitem eventos de abertura, edição ou alteração.
@@ -116,7 +116,7 @@
   - Alterar nomes de campos exige migração PocketBase.
   - A rota antiga /tv deve continuar a redirecionar para /iptv.
   - Alterar a chave localStorage pode perder preferências existentes.
-  - Alterar componentes, domÃ­nio ou estilos IPTV exige atualizar os imports relacionados.
+  - Alterar componentes, domínio ou estilos IPTV exige atualizar os imports relacionados.
   - Alterações de compatibilidade exigem atualizar este cabeçalho.
 
   Regras:

@@ -89,6 +89,7 @@ export const availabilityRepository =
  */
 export const exemplarRepository =
   new PocketBaseRepository("exemplares");
+
 /**
  * Aliases públicos do domínio IPTV.
  *

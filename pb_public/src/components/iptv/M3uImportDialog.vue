@@ -1,7 +1,7 @@
 <!--
   Ficheiro: src/components/iptv/M3uImportDialog.vue
   Tipo: Diálogo Vue.
-  Função: Lê, pré-visualiza, seleciona e importa canais M3U.
+  Função: Lê, pré-visualiza, seleciona e importa canais IPTV a partir de playlists M3U.
 -->
 <script setup lang="ts">
 import { computed,ref } from "vue";import { iptvChannelRepository,iptvSourceRepository } from "@/domain/repositories";import { parseM3u,type M3uItem } from "@/domain/iptv/m3u";import { findM3uDuplicate } from "@/domain/iptv/m3uDuplicate";import type { IptvChannelRecord } from "@/types/records";
