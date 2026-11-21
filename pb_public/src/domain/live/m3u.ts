@@ -1,9 +1,0 @@
-/**
- * Ficheiro: src/domain/live/m3u.ts
- * Tipo: Parser TypeScript puro.
- * Função: Analisa playlists M3U/M3U8 sem executar URLs.
- */
-export interface M3uItem { name:string;url:string;tvgId:string;tvgName:string;tvgLogo:string;groupTitle:string;language:string;country:string;adult:boolean;selected:boolean;errors:string[] }
-const attr=/([\w-]+)="([^"]*)"/g;
-export function parseM3u(text:string):M3uItem[]{const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!lines[0]?.startsWith("#EXTM3U"))throw new Error("O ficheiro não é uma playlist M3U válida.");const out:M3uItem[]=[];for(let i=1;i<lines.length;i++){if(!lines[i].startsWith("#EXTINF"))continue;const info=lines[i],attrs:Record<string,string>={};for(const match of info.matchAll(attr))attrs[match[1].toLowerCase()]=match[2].trim();let j=i+1;while(j<lines.length&&lines[j].startsWith("#"))j++;const url=lines[j]||"";const comma=info.indexOf(",");const name=(comma>=0?info.slice(comma+1):attrs["tvg-name"]||"Sem nome").trim();const group=attrs["group-title"]||"";const errors:string[]=[];if(!name)errors.push("Nome em falta");try{const parsed=new URL(url);if(!["http:","https:","rtmp:","rtmps:","rtsp:","udp:","rtp:"].includes(parsed.protocol))errors.push("Protocolo não suportado")}catch{errors.push("URL inválido")}out.push({name,url,tvgId:attrs["tvg-id"]||"",tvgName:attrs["tvg-name"]||"",tvgLogo:attrs["tvg-logo"]||"",groupTitle:group,language:attrs["tvg-language"]||attrs.language||"",country:attrs["tvg-country"]||attrs.country||"",adult:/adult|xxx|18\+/i.test(`${group} ${name}`),selected:errors.length===0,errors});i=j}return out}
-export function normalizeM3uName(value:string){return value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("pt-PT").replace(/[^a-z0-9]+/g," ").trim()}

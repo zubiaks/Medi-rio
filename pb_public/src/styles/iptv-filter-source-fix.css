@@ -1,0 +1,2 @@
+/* Ficheiro: src/styles/iptv-filter-source-fix.css | Filtros sem zero e diálogo autónomo de fontes. */
+.channel-sources-dialog{width:min(1050px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.source-main-card{display:grid;gap:.35rem;margin-bottom:1rem;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--surface-2)}.source-main-card span{font-weight:700}.source-main-card code{overflow:hidden;color:var(--muted);text-overflow:ellipsis;white-space:nowrap}.source-main-card small{color:var(--muted)}

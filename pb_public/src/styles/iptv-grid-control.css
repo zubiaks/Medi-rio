@@ -1,0 +1,69 @@
+/*
+ * Ficheiro: src/styles/iptv-grid-control.css
+ * Tipo: Estilos do controlo de densidade da grelha TV.
+ * Função: Reduz os cartões e mantém adaptação responsiva.
+ */
+.live-view-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.grid-density-control {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface);
+}
+
+.grid-density-control legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.grid-density-control small { color: var(--muted); white-space: nowrap; }
+.grid-density-buttons { display: flex; gap: 0.2rem; }
+.grid-density-option input { position: absolute; opacity: 0; pointer-events: none; }
+.grid-density-option span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.55rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.grid-density-option input:checked + span { color: white; background: var(--primary); }
+.grid-density-option input:focus-visible + span { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.live-collection.is-grid {
+  grid-template-columns: repeat(var(--grid-columns, 5), minmax(0, 1fr));
+}
+.live-collection.is-grid .live-logo { max-height: 150px; }
+.live-collection.is-grid .live-card-body { padding: 0.8rem; }
+.live-collection.is-grid .live-card-title h3 { font-size: 1rem; line-height: 1.25; }
+.live-collection.is-grid .live-actions .button { padding: 0.55rem 0.7rem; font-size: 0.78rem; }
+
+@media (max-width: 1300px) {
+  .live-collection.is-grid { grid-template-columns: repeat(min(var(--grid-columns, 4), 4), minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .live-collection.is-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .live-view-controls { align-items: stretch; flex-direction: column; width: 100%; }
+  .grid-density-control { display: none; }
+  .live-collection.is-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 430px) {
+  .live-collection.is-grid { grid-template-columns: 1fr; }
+}
