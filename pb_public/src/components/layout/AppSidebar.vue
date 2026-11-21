@@ -37,7 +37,7 @@ const groups = [
     label: "Acompanhar",
     items: [
       ["/podcasts", "◉", "Podcasts"],
-      ["/tv", "▣", "IPTV"],
+      ["/iptv", "▣", "IPTV"],
       ["/diario", "◷", "Diário"],
       ["/biblioteca", "▤", "Biblioteca"],
       ["/reviews", "☆", "Reviews"],

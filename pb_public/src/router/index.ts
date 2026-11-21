@@ -62,16 +62,20 @@ const router = createRouter({
       component: () => import("@/views/VodView.vue"),
     },
 
-    // Podcasts, televisão e biblioteca
+    // Podcasts, IPTV e biblioteca
     {
       path: "/podcasts",
       name: "podcasts",
       component: () => import("@/views/PodcastsView.vue"),
     },
     {
-      path: "/tv",
-      name: "live",
+      path: "/iptv",
+      name: "iptv",
       component: () => import("@/views/LiveView.vue"),
+    },
+    {
+      path: "/tv",
+      redirect: "/iptv",
     },
     {
       path: "/biblioteca",

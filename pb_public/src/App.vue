@@ -129,7 +129,7 @@ onMounted(() => {
         </RouterLink>
 
         <RouterLink
-          to="/tv"
+          to="/iptv"
           @click="closeCommandDialog"
         >
           <span aria-hidden="true">▣</span>

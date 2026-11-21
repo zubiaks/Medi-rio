@@ -30,9 +30,9 @@
   Relações e dependências:
   - Rota:
     src/router/index.ts
-    URL atual: /tv
-    Nome atual: live
-    Migração prevista: /iptv com redirect de /tv
+    URL principal: /iptv
+    Nome da rota: iptv
+    Compatibilidade: /tv redireciona para /iptv
 
   - Navegação:
     src/components/layout/AppSidebar.vue
@@ -104,7 +104,7 @@
 
   Usado por:
   - src/router/index.ts
-  - Rota /tv
+  - Rota /iptv
   - Navegação de src/components/layout/AppSidebar.vue
   - Ação rápida de src/App.vue
 
@@ -113,7 +113,7 @@
   - Alterar IptvChannelRecord afeta cartões, filtros e diálogos.
   - Alterar IptvSourceRecord afeta detalhes, player e gestão de fontes.
   - Alterar nomes de campos exige migração PocketBase.
-  - Alterar a rota deve preservar /tv através de redirect.
+  - A rota antiga /tv deve continuar a redirecionar para /iptv.
   - Alterar a chave localStorage pode perder preferências existentes.
   - Renomear components/live ou domain/live exige atualizar todos os imports.
   - Alterações de compatibilidade exigem atualizar este cabeçalho.
