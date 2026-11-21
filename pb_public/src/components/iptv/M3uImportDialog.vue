@@ -3,7 +3,7 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 2.0.1
+  Versão do ficheiro: 2.1.0
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
@@ -34,6 +34,8 @@
   - Não importar duplicados fortes por URL ou TVG-ID.
   - Criar o canal antes da respetiva fonte técnica.
   - Remover o canal criado quando a criação da fonte falhar.
+  - Continuar o lote depois de falhas individuais.
+  - Apresentar um resumo final de importados, ignorados e falhados.
   - Manter a seleção limitada às entradas válidas.
   - Preservar os nomes reais dos campos PocketBase.
   - Manter acessibilidade por teclado e leitor de ecrã.
@@ -75,6 +77,20 @@ const importing = ref(false);
 const progress = ref(0);
 const query = ref("");
 
+interface ImportFailure {
+  name: string;
+  message: string;
+}
+
+interface ImportSummary {
+  imported: number;
+  skipped: number;
+  failed: number;
+  failures: ImportFailure[];
+}
+
+const summary = ref<ImportSummary | null>(null);
+
 const visible = computed(() => {
   const normalizedQuery = query.value.toLocaleLowerCase("pt-PT");
 
@@ -104,6 +120,7 @@ async function readFile(event: Event): Promise<void> {
   fileName.value = file.name;
   error.value = "";
   progress.value = 0;
+  summary.value = null;
 
   try {
     items.value = parseM3u(await file.text());
@@ -131,77 +148,89 @@ async function run(): Promise<void> {
   importing.value = true;
   progress.value = 0;
   error.value = "";
+  summary.value = null;
 
   let importedCount = 0;
+  let skippedCount = 0;
+  const failures: ImportFailure[] = [];
 
-  try {
-    for (const item of entries) {
-      const duplicate = findM3uDuplicate(item, props.existing);
+  for (const item of entries) {
+    const duplicate = findM3uDuplicate(item, props.existing);
 
-      if (duplicate.kind && duplicate.kind !== "name") {
-        progress.value += 1;
-        continue;
-      }
-
-      let channel: IptvChannelRecord | null = null;
-
-      try {
-        channel = (await iptvChannelRepository.create({
-          nome: item.name,
-          url_stream: item.url,
-          tvg_id: item.tvgId,
-          tvg_name: item.tvgName,
-          tvg_logo_url: item.tvgLogo,
-          playlist_origem: fileName.value,
-          adulto: item.adult,
-          ativo: true,
-          cemiterio: false,
-          qualidade: "Desconhecida",
-        })) as IptvChannelRecord;
-
-        await iptvSourceRepository.create({
-          canal_tv: channel.id,
-          url: item.url,
-          rotulo: "Importado da playlist",
-          tipo: sourceType(item.url),
-          qualidade: "Desconhecida",
-          prioridade: 0,
-          ativo: true,
-        });
-
-        importedCount += 1;
-      } catch (cause) {
-        if (channel?.id) {
-          try {
-            await iptvChannelRepository.delete(channel.id);
-          } catch (rollbackCause) {
-            const importMessage =
-              cause instanceof Error ? cause.message : String(cause);
-            const rollbackMessage =
-              rollbackCause instanceof Error
-                ? rollbackCause.message
-                : String(rollbackCause);
-
-            throw new Error(
-              `A fonte não foi criada e não foi possível remover o canal "${item.name}". ` +
-                `Importação: ${importMessage}. Rollback: ${rollbackMessage}.`,
-            );
-          }
-        }
-
-        throw cause;
-      } finally {
-        progress.value += 1;
-      }
+    if (duplicate.kind && duplicate.kind !== "name") {
+      skippedCount += 1;
+      progress.value += 1;
+      continue;
     }
 
+    let channel: IptvChannelRecord | null = null;
+
+    try {
+      channel = (await iptvChannelRepository.create({
+        nome: item.name,
+        url_stream: item.url,
+        tvg_id: item.tvgId,
+        tvg_name: item.tvgName,
+        tvg_logo_url: item.tvgLogo,
+        playlist_origem: fileName.value,
+        adulto: item.adult,
+        ativo: true,
+        cemiterio: false,
+        qualidade: "Desconhecida",
+      })) as IptvChannelRecord;
+
+      await iptvSourceRepository.create({
+        canal_tv: channel.id,
+        url: item.url,
+        rotulo: "Importado da playlist",
+        tipo: sourceType(item.url),
+        qualidade: "Desconhecida",
+        prioridade: 0,
+        ativo: true,
+      });
+
+      importedCount += 1;
+    } catch (cause) {
+      let message = cause instanceof Error ? cause.message : String(cause);
+
+      if (channel?.id) {
+        try {
+          await iptvChannelRepository.delete(channel.id);
+        } catch (rollbackCause) {
+          const rollbackMessage =
+            rollbackCause instanceof Error
+              ? rollbackCause.message
+              : String(rollbackCause);
+
+          message =
+            `${message} O canal criado não pôde ser removido: ` +
+            rollbackMessage;
+        }
+      }
+
+      failures.push({
+        name: item.name,
+        message,
+      });
+    } finally {
+      progress.value += 1;
+    }
+  }
+
+  summary.value = {
+    imported: importedCount,
+    skipped: skippedCount,
+    failed: failures.length,
+    failures,
+  };
+
+  importing.value = false;
+
+  if (importedCount > 0) {
     emit("imported", importedCount);
-  } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : String(cause);
-  } finally {
-    importing.value = false;
   }
 }
+
 </script>
 
 <template>
@@ -252,6 +281,33 @@ async function run(): Promise<void> {
         >
           {{ error }}
         </div>
+
+        <section
+          v-if="summary"
+          class="m3u-summary"
+          aria-labelledby="m3u-result-title"
+          aria-live="polite"
+        >
+          <h3 id="m3u-result-title">Resultado da importação</h3>
+          <p>
+            <strong>{{ summary.imported }}</strong> importadas ·
+            <strong>{{ summary.skipped }}</strong> ignoradas ·
+            <strong>{{ summary.failed }}</strong> falhadas
+          </p>
+
+          <details v-if="summary.failures.length">
+            <summary>Ver falhas</summary>
+            <ul>
+              <li
+                v-for="failure in summary.failures"
+                :key="`${failure.name}-${failure.message}`"
+              >
+                <strong>{{ failure.name }}:</strong>
+                {{ failure.message }}
+              </li>
+            </ul>
+          </details>
+        </section>
 
         <template v-if="items.length">
           <div class="m3u-summary" aria-live="polite">
