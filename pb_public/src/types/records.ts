@@ -237,4 +237,17 @@ export interface AvailabilityRecord extends BaseRecord {
   };
 }
 
+/**
+ * IPTV aliases
+ *
+ * Mantêm compatibilidade com o código atual enquanto a
+ * migração de Live -> IPTV decorre gradualmente.
+ */
+
+export type IptvChannelRecord = ChannelRecord;
+
+export type IptvSourceRecord = StreamLinkRecord;
+
+export type IptvCategoryRecord = TvCategoryRecord;
+
 
