@@ -80,11 +80,11 @@
     Finalidade: guardar a largura escolhida para os cartões IPTV.
 
   - Estilos relacionados:
-    src/styles/live.css
-    src/styles/live-all.css
-    src/styles/live-grid-control.css
-    src/styles/live-links-player.css
-    src/styles/live-ux-fixes.css
+    src/styles/iptv.css
+    src/styles/iptv-all.css
+    src/styles/iptv-grid-control.css
+    src/styles/iptv-links-player.css
+    src/styles/iptv-ux-fixes.css
 
   - Testes relacionados:
     src/components/iptv/ChannelCard.a11y.spec.ts

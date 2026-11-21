@@ -8,8 +8,8 @@ Copy-Item -LiteralPath (Join-Path $packageRoot "vitest.config.ts") -Destination 
 $mainPath = Join-Path $ProjectPath "src\main.ts"
 $main = [IO.File]::ReadAllText($mainPath)
 $main = $main -replace '(?m)^import "@/styles/live(?:-links-player)?\.css";\r?\n?', ''
-if ($main -notmatch 'import "@/styles/live-all\.css";') {
-  $main = $main.TrimEnd() + "`r`nimport `"@/styles/live-all.css`";`r`n"
+if ($main -notmatch 'import "@/styles/iptv-all\.css";') {
+  $main = $main.TrimEnd() + "`r`nimport `"@/styles/iptv-all.css`";`r`n"
 }
 [IO.File]::WriteAllText($mainPath, $main, [Text.UTF8Encoding]::new($false))
 Push-Location $ProjectPath

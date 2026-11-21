@@ -1,6 +1,34 @@
 /*
+ * Projeto: Mediário
  * Ficheiro: src/styles/iptv-all.css
- * Função: Ponto único de importação dos estilos do módulo IPTV.
+ * Versão do ficheiro: 2.0.0
+ * Tipo: Agregador de estilos CSS
+ * Domínio: IPTV
+ * Estado: Em desenvolvimento
+ * Última revisão: 2026-11-21
+ *
+ * Finalidade:
+ * Centraliza todos os estilos específicos do domínio IPTV.
+ *
+ * Relações:
+ * - Importado por: src/main.ts
+ * - Agrega: iptv.css
+ * - Agrega: iptv-filter-source-fix.css
+ * - Agrega: iptv-grid-control.css
+ * - Agrega: iptv-links-player.css
+ * - Agrega: iptv-ux-fixes.css
+ *
+ * Autor: Zubiaks
+ *
+ * Copyright (c) 2026 Zubiaks.
+ *
+ * Source-available under the PolyForm Noncommercial License 1.0.0.
+ * Commercial use requires prior written permission from Zubiaks.
+ * See LICENSE.md.
  */
+
 @import "./iptv.css";
+@import "./iptv-filter-source-fix.css";
+@import "./iptv-grid-control.css";
 @import "./iptv-links-player.css";
+@import "./iptv-ux-fixes.css";
