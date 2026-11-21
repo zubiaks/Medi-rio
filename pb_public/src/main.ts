@@ -21,6 +21,7 @@ import "@/styles/vod.css";
 import "@/styles/vod-management.css";
 import "@/styles/vod-delete-dialog.css";
 import "@/styles/podcasts.css";
+import "@/styles/live.css";
 
 
 createApp(App).use(router).mount("#app");
