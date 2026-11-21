@@ -51,7 +51,7 @@ export const episodeRepository =
 export const channelRepository =
   new PocketBaseRepository<ChannelRecord>("canais_tv");
 
-/** Links principais e alternativos de canais e streams. */
+/** Fontes principais e alternativas de canais IPTV e streams genÃ©ricos. */
 export const streamLinkRepository =
   new PocketBaseRepository<StreamLinkRecord>(
     "stream_links",
@@ -89,3 +89,12 @@ export const availabilityRepository =
  */
 export const exemplarRepository =
   new PocketBaseRepository("exemplares");
+/**
+ * Aliases pÃºblicos do domÃ­nio IPTV.
+ *
+ * Reutilizam as instÃ¢ncias existentes e preservam compatibilidade com
+ * channelRepository, streamLinkRepository e tvCategoryRepository.
+ */
+export const iptvChannelRepository = channelRepository;
+export const iptvSourceRepository = streamLinkRepository;
+export const iptvCategoryRepository = tvCategoryRepository;

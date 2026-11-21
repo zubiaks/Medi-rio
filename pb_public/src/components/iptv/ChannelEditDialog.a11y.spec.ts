@@ -5,7 +5,7 @@ import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
 import { expectNoA11yViolations } from "@/test/accessibility";
 import ChannelEditDialog from "./ChannelEditDialog.vue";
 enableAutoUnmount(afterEach);
-vi.mock("@/domain/repositories",()=>({channelRepository:{update:vi.fn(),list:vi.fn(async()=>({page:1,perPage:1,totalItems:0,totalPages:0,items:[]}))}}));
+vi.mock("@/domain/repositories",()=>({iptvChannelRepository:{update:vi.fn(),list:vi.fn(async()=>({page:1,perPage:1,totalItems:0,totalPages:0,items:[]}))}}));
 const channel={id:"channel-test-1",collectionId:"pbc_2614173453",collectionName:"canais_tv",created:"2026-11-21 00:00:00.000Z",updated:"2026-11-21 00:00:00.000Z",nome:"Canal de teste",url_stream:"https://example.com/live.m3u8",qualidade:"HD" as const,ativo:true,cemiterio:false};
 function mountDialog(){return mount(ChannelEditDialog,{attachTo:document.body,props:{channel,countries:[],languages:[],tags:[],categories:[]}})}
 describe("a11y: ChannelEditDialog",()=>{

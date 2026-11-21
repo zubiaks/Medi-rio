@@ -270,6 +270,7 @@ Coleções PocketBase principais:
 - `broadcast` removido dos filtros VOD;
 - `broadcast` removido da apresentação das modalidades;
 - `broadcast` removido de `AvailabilityRecord`;
+- aliases de repositÃ³rios IPTV adotados nos mÃ³dulos IPTV;
 - aliases TypeScript adicionados:
   - `IptvChannelRecord`;
   - `IptvSourceRecord`;

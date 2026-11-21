@@ -50,12 +50,12 @@
 
   - Repositórios utilizados:
     src/domain/repositories.ts
-    channelRepository
-    streamLinkRepository
+    iptvChannelRepository
+    iptvSourceRepository
     countryRepository
     languageRepository
     tagRepository
-    tvCategoryRepository
+    iptvCategoryRepository
 
   - Domínio utilizado:
     src/domain/iptv/filterOptions.ts
@@ -169,12 +169,12 @@ import ChannelFilters from "@/components/iptv/ChannelFilters.vue";
 import GridSizeSlider from "@/components/iptv/GridSizeSlider.vue";
 
 import {
-  channelRepository,
+  iptvChannelRepository,
   countryRepository,
   languageRepository,
-  streamLinkRepository,
+  iptvSourceRepository,
   tagRepository,
-  tvCategoryRepository,
+  iptvCategoryRepository,
 } from "@/domain/repositories";
 
 import {
@@ -319,7 +319,7 @@ async function loadLibrary(): Promise<void> {
   error.value = "";
 
   try {
-    const result = await channelRepository.list({
+    const result = await iptvChannelRepository.list({
       page: page.value,
       perPage: CHANNELS_PER_PAGE,
       filter: buildChannelFilter(),
@@ -351,7 +351,7 @@ async function loadAllChannels(): Promise<void> {
   let totalPages = 1;
 
   do {
-    const response = await channelRepository.list({
+    const response = await iptvChannelRepository.list({
       page: currentPage,
       perPage: 500,
       filter: "cemiterio = false",
@@ -380,7 +380,7 @@ async function loadLookups(): Promise<void> {
       filter: "ativo = true",
       sort: "ordem,nome",
     }),
-    tvCategoryRepository.list({
+    iptvCategoryRepository.list({
       page: 1,
       perPage: 100,
       filter: "ativo = true",
@@ -414,7 +414,7 @@ async function openChannel(
   sourcesLoading.value = true;
 
   try {
-    const result = await streamLinkRepository.list({
+    const result = await iptvSourceRepository.list({
       page: 1,
       perPage: 100,
       filter: `canal_tv = "${channel.id}"`,
