@@ -3,7 +3,7 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 2.0.0
+  Versão do ficheiro: 2.0.1
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
@@ -33,6 +33,7 @@
   - Não importar entradas inválidas.
   - Não importar duplicados fortes por URL ou TVG-ID.
   - Criar o canal antes da respetiva fonte técnica.
+  - Remover o canal criado quando a criação da fonte falhar.
   - Manter a seleção limitada às entradas válidas.
   - Preservar os nomes reais dos campos PocketBase.
   - Manter acessibilidade por teclado e leitor de ecrã.
@@ -142,31 +143,56 @@ async function run(): Promise<void> {
         continue;
       }
 
-      const channel = (await iptvChannelRepository.create({
-        nome: item.name,
-        url_stream: item.url,
-        tvg_id: item.tvgId,
-        tvg_name: item.tvgName,
-        tvg_logo_url: item.tvgLogo,
-        playlist_origem: fileName.value,
-        adulto: item.adult,
-        ativo: true,
-        cemiterio: false,
-        qualidade: "Desconhecida",
-      })) as IptvChannelRecord;
+      let channel: IptvChannelRecord | null = null;
 
-      await iptvSourceRepository.create({
-        canal_tv: channel.id,
-        url: item.url,
-        rotulo: "Importado da playlist",
-        tipo: sourceType(item.url),
-        qualidade: "Desconhecida",
-        prioridade: 0,
-        ativo: true,
-      });
+      try {
+        channel = (await iptvChannelRepository.create({
+          nome: item.name,
+          url_stream: item.url,
+          tvg_id: item.tvgId,
+          tvg_name: item.tvgName,
+          tvg_logo_url: item.tvgLogo,
+          playlist_origem: fileName.value,
+          adulto: item.adult,
+          ativo: true,
+          cemiterio: false,
+          qualidade: "Desconhecida",
+        })) as IptvChannelRecord;
 
-      importedCount += 1;
-      progress.value += 1;
+        await iptvSourceRepository.create({
+          canal_tv: channel.id,
+          url: item.url,
+          rotulo: "Importado da playlist",
+          tipo: sourceType(item.url),
+          qualidade: "Desconhecida",
+          prioridade: 0,
+          ativo: true,
+        });
+
+        importedCount += 1;
+      } catch (cause) {
+        if (channel?.id) {
+          try {
+            await iptvChannelRepository.delete(channel.id);
+          } catch (rollbackCause) {
+            const importMessage =
+              cause instanceof Error ? cause.message : String(cause);
+            const rollbackMessage =
+              rollbackCause instanceof Error
+                ? rollbackCause.message
+                : String(rollbackCause);
+
+            throw new Error(
+              `A fonte não foi criada e não foi possível remover o canal "${item.name}". ` +
+                `Importação: ${importMessage}. Rollback: ${rollbackMessage}.`,
+            );
+          }
+        }
+
+        throw cause;
+      } finally {
+        progress.value += 1;
+      }
     }
 
     emit("imported", importedCount);
