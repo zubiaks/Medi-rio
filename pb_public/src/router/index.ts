@@ -71,7 +71,7 @@ const router = createRouter({
     {
       path: "/iptv",
       name: "iptv",
-      component: () => import("@/views/LiveView.vue"),
+      component: () => import("@/views/IptvView.vue"),
     },
     {
       path: "/tv",

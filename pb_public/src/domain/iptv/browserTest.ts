@@ -1,5 +1,5 @@
 /**
- * Ficheiro: src/domain/live/browserTest.ts
+ * Ficheiro: src/domain/iptv/browserTest.ts
  * Tipo: Diagnóstico técnico no navegador.
  * Função: Faz teste leve de HTTP/HLS e classifica o resultado.
  * Limite: CORS, User-Agent, Referrer, RTMP, RTSP e UDP exigem backend.

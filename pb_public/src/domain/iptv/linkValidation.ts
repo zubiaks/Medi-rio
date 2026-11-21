@@ -1,5 +1,5 @@
 /**
- * Ficheiro: src/domain/live/linkValidation.ts
+ * Ficheiro: src/domain/iptv/linkValidation.ts
  * Tipo: Validação TypeScript pura.
  * Função: Valida e normaliza formulários da coleção stream_links.
  */

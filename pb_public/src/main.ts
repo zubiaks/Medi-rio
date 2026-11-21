@@ -21,8 +21,8 @@ import "@/styles/vod.css";
 import "@/styles/vod-management.css";
 import "@/styles/vod-delete-dialog.css";
 import "@/styles/podcasts.css";
-import "@/styles/live.css";
-import "@/styles/live-grid-control.css";
+import "@/styles/iptv.css";
+import "@/styles/iptv-grid-control.css";
 
 
 createApp(App).use(router).mount("#app");

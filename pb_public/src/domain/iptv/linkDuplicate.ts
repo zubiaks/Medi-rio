@@ -1,5 +1,5 @@
 /**
- * Ficheiro: src/domain/live/linkDuplicate.ts
+ * Ficheiro: src/domain/iptv/linkDuplicate.ts
  * Tipo: Serviço de domínio.
  * Função: Impede URLs repetidos no mesmo canal TV.
  */

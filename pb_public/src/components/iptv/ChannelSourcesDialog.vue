@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/ChannelSourcesDialog.vue
+  Ficheiro: src/components/iptv/ChannelSourcesDialog.vue
   Tipo: Diálogo Vue autónomo.
   Função: Carrega e gere fontes alternativas sem depender do detalhe do canal.
 -->

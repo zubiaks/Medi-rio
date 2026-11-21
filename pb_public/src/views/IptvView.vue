@@ -2,7 +2,7 @@
   Projeto: Mediário
   Versão do projeto: 0.3.0-alpha.1
 
-  Ficheiro: src/views/LiveView.vue
+  Ficheiro: src/views/IptvView.vue
   Versão do ficheiro: 1.0.0
   Tipo: Página Vue 3 com TypeScript
   Domínio: IPTV
@@ -39,11 +39,11 @@
     src/App.vue
 
   - Componentes utilizados:
-    src/components/live/ChannelCard.vue
-    src/components/live/ChannelFilters.vue
-    src/components/live/GridSizeSlider.vue
-    src/components/live/ChannelDetailDialog.vue
-    src/components/live/ChannelEditDialog.vue
+    src/components/iptv/ChannelCard.vue
+    src/components/iptv/ChannelFilters.vue
+    src/components/iptv/GridSizeSlider.vue
+    src/components/iptv/ChannelDetailDialog.vue
+    src/components/iptv/ChannelEditDialog.vue
     src/components/base/BasePageHeader.vue
     src/components/base/BaseEmptyState.vue
     src/components/base/BasePagination.vue
@@ -58,7 +58,7 @@
     tvCategoryRepository
 
   - Domínio utilizado:
-    src/domain/live/filterOptions.ts
+    src/domain/iptv/filterOptions.ts
 
   - Tipos utilizados:
     src/types/records.ts
@@ -87,12 +87,12 @@
     src/styles/live-ux-fixes.css
 
   - Testes relacionados:
-    src/components/live/ChannelCard.a11y.spec.ts
-    src/components/live/ChannelEditDialog.a11y.spec.ts
-    src/components/live/GridSizeSlider.a11y.spec.ts
-    src/domain/live/validation.spec.ts
-    src/domain/live/linkValidation.spec.ts
-    src/domain/live/m3u.spec.ts
+    src/components/iptv/ChannelCard.a11y.spec.ts
+    src/components/iptv/ChannelEditDialog.a11y.spec.ts
+    src/components/iptv/GridSizeSlider.a11y.spec.ts
+    src/domain/iptv/validation.spec.ts
+    src/domain/iptv/linkValidation.spec.ts
+    src/domain/iptv/m3u.spec.ts
 
   Fluxo de dados:
   1. A rota carrega LiveView.
@@ -147,7 +147,7 @@
   See LICENSE.md.
 -->
 <!--
-  Ficheiro: src/views/LiveView.vue
+  Ficheiro: src/views/IptvView.vue
   Tipo: Página Vue.
   Função: Gere a biblioteca IPTV, os canais configurados e as respetivas fontes.
 
@@ -162,11 +162,11 @@ import BaseEmptyState from "@/components/base/BaseEmptyState.vue";
 import BasePageHeader from "@/components/base/BasePageHeader.vue";
 import BasePagination from "@/components/base/BasePagination.vue";
 
-import ChannelCard from "@/components/live/ChannelCard.vue";
-import ChannelDetailDialog from "@/components/live/ChannelDetailDialog.vue";
-import ChannelEditDialog from "@/components/live/ChannelEditDialog.vue";
-import ChannelFilters from "@/components/live/ChannelFilters.vue";
-import GridSizeSlider from "@/components/live/GridSizeSlider.vue";
+import ChannelCard from "@/components/iptv/ChannelCard.vue";
+import ChannelDetailDialog from "@/components/iptv/ChannelDetailDialog.vue";
+import ChannelEditDialog from "@/components/iptv/ChannelEditDialog.vue";
+import ChannelFilters from "@/components/iptv/ChannelFilters.vue";
+import GridSizeSlider from "@/components/iptv/GridSizeSlider.vue";
 
 import {
   channelRepository,
@@ -181,7 +181,7 @@ import {
   usedCategories,
   usedCountries,
   usedQualities,
-} from "@/domain/live/filterOptions";
+} from "@/domain/iptv/filterOptions";
 
 import type {
   IptvCategoryRecord,

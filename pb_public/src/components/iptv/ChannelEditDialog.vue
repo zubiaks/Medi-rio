@@ -1,10 +1,10 @@
 <!--
-  Ficheiro: src/components/live/ChannelEditDialog.vue
+  Ficheiro: src/components/iptv/ChannelEditDialog.vue
   Tipo: Formulário modal Vue.
   Função: Edita canais_tv com validação acessível, duplicados e upload de logótipo.
 -->
 <script setup lang="ts">
-import { computed,nextTick,ref,watch } from "vue";import LookupMultiSelect from "./LookupMultiSelect.vue";import { channelRepository } from "@/domain/repositories";import type { ChannelRecord,NamedRecord,TvCategoryRecord } from "@/types/records";import { channelToForm,hasErrors,validateChannelForm,type ChannelFormErrors } from "@/domain/live/validation";import { checkChannelDuplicate } from "@/domain/live/duplicate";
+import { computed,nextTick,ref,watch } from "vue";import LookupMultiSelect from "./LookupMultiSelect.vue";import { channelRepository } from "@/domain/repositories";import type { ChannelRecord,NamedRecord,TvCategoryRecord } from "@/types/records";import { channelToForm,hasErrors,validateChannelForm,type ChannelFormErrors } from "@/domain/iptv/validation";import { checkChannelDuplicate } from "@/domain/iptv/duplicate";
 const props=defineProps<{channel:ChannelRecord|null;countries:NamedRecord[];languages:NamedRecord[];tags:NamedRecord[];categories:TvCategoryRecord[]}>();const emit=defineEmits<{close:[];saved:[ChannelRecord];archived:[string]}>();const form=ref(channelToForm({id:"",created:"",updated:"",nome:"",url_stream:""} as ChannelRecord));const errors=ref<ChannelFormErrors>({});const submitError=ref("");const warning=ref("");const logo=ref<File|null>(null);const removeLogo=ref(false);const saving=ref(false);const errorSummary=ref<HTMLElement|null>(null);const firstInput=ref<HTMLInputElement|null>(null);const errorEntries=computed(()=>Object.entries(errors.value));
 watch(()=>props.channel,async c=>{if(c){form.value=channelToForm(c);errors.value={};submitError.value="";warning.value="";logo.value=null;removeLogo.value=false;await nextTick();firstInput.value?.focus()}},{immediate:true});
 function described(field: keyof ChannelFormErrors, hasHint = true): string | undefined {

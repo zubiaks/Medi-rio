@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/ChannelSourcesButton.vue
+  Ficheiro: src/components/iptv/ChannelSourcesButton.vue
   Tipo: Componente Vue autónomo.
   Função: Botão visível para abrir a gestão de streams alternativos.
 -->

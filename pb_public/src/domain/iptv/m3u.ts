@@ -1,5 +1,5 @@
 /**
- * Ficheiro: src/domain/live/m3u.ts
+ * Ficheiro: src/domain/iptv/m3u.ts
  * Tipo: Parser TypeScript puro.
  * Função: Analisa playlists M3U/M3U8 sem executar URLs.
  */

@@ -1,6 +1,0 @@
-/*
- * Ficheiro: src/styles/live-all.css
- * Função: Ponto único de importação dos estilos do módulo TV.
- */
-@import "./live.css";
-@import "./live-links-player.css";

@@ -1,0 +1,6 @@
+/*
+ * Ficheiro: src/styles/iptv-all.css
+ * Função: Ponto único de importação dos estilos do módulo IPTV.
+ */
+@import "./iptv.css";
+@import "./iptv-links-player.css";

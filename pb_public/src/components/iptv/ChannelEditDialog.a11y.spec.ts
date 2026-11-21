@@ -1,4 +1,4 @@
-/** Ficheiro: src/components/live/ChannelEditDialog.a11y.spec.ts | Testa diálogo e erros ARIA. */
+/** Ficheiro: src/components/iptv/ChannelEditDialog.a11y.spec.ts | Testa diálogo e erros ARIA. */
 import { nextTick } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";

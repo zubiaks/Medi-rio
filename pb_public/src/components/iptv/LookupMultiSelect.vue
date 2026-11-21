@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/LookupMultiSelect.vue
+  Ficheiro: src/components/iptv/LookupMultiSelect.vue
   Tipo: Multisseleção Vue acessível.
   Função: Seleciona várias opções por clique normal, sem Ctrl.
 -->

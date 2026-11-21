@@ -1,5 +1,5 @@
 /**
- * Ficheiro: src/domain/live/filterOptions.ts
+ * Ficheiro: src/domain/iptv/filterOptions.ts
  * Tipo: Transformação TypeScript pura.
  * Função: Gera filtros exclusivamente com valores realmente usados.
  */

@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/ChannelDetailDialog.vue
+  Ficheiro: src/components/iptv/ChannelDetailDialog.vue
   Tipo: Diálogo Vue.
   Função: Mostra detalhes, gere fontes e abre o player do canal.
 -->
@@ -7,7 +7,7 @@
 import { nextTick, ref, watch } from "vue";
 import { pb } from "@/infrastructure/pocketbase/client";
 import type { ChannelRecord, StreamLinkRecord } from "@/types/records";
-import { qualityLabel } from "@/domain/live/format";
+import { qualityLabel } from "@/domain/iptv/format";
 import StreamLinkManager from "./StreamLinkManager.vue";
 import StreamPlayerDialog from "./StreamPlayerDialog.vue";
 

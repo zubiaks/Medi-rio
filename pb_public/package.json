@@ -18,7 +18,7 @@
     "audit:prod": "npm audit --omit=dev",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "vitest run src/components/base/BasePagination.a11y.spec.ts src/components/live/ChannelEditDialog.a11y.spec.ts src/components/live/StreamLinkEditDialog.a11y.spec.ts",
+    "test:a11y": "vitest run src/components/base/BasePagination.a11y.spec.ts src/components/iptv/ChannelEditDialog.a11y.spec.ts src/components/iptv/StreamLinkEditDialog.a11y.spec.ts",
     "test:coverage": "vitest run --coverage",
     "audit:all": "npm audit"
   },

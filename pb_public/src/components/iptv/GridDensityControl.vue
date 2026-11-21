@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/GridDensityControl.vue
+  Ficheiro: src/components/iptv/GridDensityControl.vue
   Tipo: Componente Vue acessível.
   Função: Permite escolher 2 a 6 cartões por linha na vista Grelha.
 -->

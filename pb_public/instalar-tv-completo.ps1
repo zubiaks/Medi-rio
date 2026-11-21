@@ -14,7 +14,7 @@ if ($main -notmatch 'import "@/styles/live-all\.css";') {
 [IO.File]::WriteAllText($mainPath, $main, [Text.UTF8Encoding]::new($false))
 Push-Location $ProjectPath
 try {
-  npm pkg set 'scripts.test:a11y=vitest run src/components/base/BasePagination.a11y.spec.ts src/components/live/ChannelEditDialog.a11y.spec.ts src/components/live/StreamLinkEditDialog.a11y.spec.ts'
+  npm pkg set 'scripts.test:a11y=vitest run src/components/base/BasePagination.a11y.spec.ts src/components/iptv/ChannelEditDialog.a11y.spec.ts src/components/iptv/StreamLinkEditDialog.a11y.spec.ts'
   npm run type-check
   npm run test
   npm run build

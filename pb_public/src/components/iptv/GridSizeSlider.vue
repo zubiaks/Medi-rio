@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/GridSizeSlider.vue
+  Ficheiro: src/components/iptv/GridSizeSlider.vue
   Tipo: Controlo Vue acessível.
   Função: Ajusta dinamicamente a largura dos cartões da grelha.
 -->

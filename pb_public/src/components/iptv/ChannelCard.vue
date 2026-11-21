@@ -1,10 +1,10 @@
 <!--
-  Ficheiro: src/components/live/ChannelCard.vue
+  Ficheiro: src/components/iptv/ChannelCard.vue
   Tipo: Componente Vue.
   Função: Mostra um canal nas vistas Grelha, Logos, Lista ou Compacta.
 -->
 <script setup lang="ts">
-import { computed } from "vue";import { pb } from "@/infrastructure/pocketbase/client";import type { ChannelRecord } from "@/types/records";import { qualityLabel } from "@/domain/live/format";
+import { computed } from "vue";import { pb } from "@/infrastructure/pocketbase/client";import type { ChannelRecord } from "@/types/records";import { qualityLabel } from "@/domain/iptv/format";
 const props=defineProps<{channel:ChannelRecord;view:"grid"|"logos"|"list"|"compact"}>();const emit=defineEmits<{open:[ChannelRecord];edit:[ChannelRecord]}>();const logo=computed(()=>props.channel.logo?pb.files.getURL(props.channel,props.channel.logo,{thumb:"256x256"}):props.channel.tvg_logo_url||"");const initials=computed(()=>props.channel.nome.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]?.toLocaleUpperCase("pt-PT")).join("")||"TV");const hue=computed(()=>[...props.channel.nome].reduce((n,c)=>n+c.charCodeAt(0),0)%360);
 </script>
 <template>

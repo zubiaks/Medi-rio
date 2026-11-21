@@ -1,5 +1,5 @@
 <!--
-  Ficheiro: src/components/live/StreamSourcesSummary.vue
+  Ficheiro: src/components/iptv/StreamSourcesSummary.vue
   Tipo: Componente Vue.
   Função: Explica o stream principal e abre a gestão das alternativas.
 -->
