@@ -231,12 +231,7 @@ onBeforeUnmount(() => { clearTimeout(podcastTimer); clearTimeout(episodeTimer); 
       </button>
     </div>
     <BaseEmptyState v-else icon="◉" title="Sem podcasts" description="Ainda não existem feeds RSS na biblioteca." />
-    <PodcastPagination
-      :page="podcastPage"
-      :pages="podcastPages"
-      label="Paginação dos podcasts"
-      @change="podcastPage = $event; loadPodcasts()"
-    />
+    <nav v-if="podcastPages > 1" class="pagination" aria-label="Paginação dos podcasts"><button class="button button-secondary" type="button" :disabled="podcastPage <= 1" @click="podcastPage--; loadPodcasts()">Anterior</button><span>Página {{ podcastPage }} de {{ podcastPages }}</span><button class="button button-secondary" type="button" :disabled="podcastPage >= podcastPages" @click="podcastPage++; loadPodcasts()">Seguinte</button></nav>
   </section>
 
   <article v-if="selectedPodcast" class="panel selected-podcast-detail">
@@ -265,12 +260,7 @@ onBeforeUnmount(() => { clearTimeout(podcastTimer); clearTimeout(episodeTimer); 
       </article>
     </div>
     <BaseEmptyState v-else icon="◉" title="Sem episódios" description="Não existem episódios para estes filtros." />
-    <PodcastPagination
-      :page="episodePage"
-      :pages="episodePages"
-      label="Paginação dos episódios"
-      @change="episodePage = $event; loadEpisodes()"
-    />
+    <nav v-if="episodePages > 1" class="pagination" aria-label="Paginação dos episódios"><button class="button button-secondary" type="button" :disabled="episodePage <= 1" @click="episodePage--; loadEpisodes()">Anterior</button><span>Página {{ episodePage }} de {{ episodePages }}</span><button class="button button-secondary" type="button" :disabled="episodePage >= episodePages" @click="episodePage++; loadEpisodes()">Seguinte</button></nav>
   </section>
 
   <Teleport to="body">
