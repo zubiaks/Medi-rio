@@ -13,6 +13,8 @@ import PodcastEpisodeEditDialog from "@/components/podcasts/PodcastEpisodeEditDi
 import { episodeRepository, streamRepository } from "@/domain/repositories";
 import { pb } from "@/infrastructure/pocketbase/client";
 import type { PodcastEpisodeRecord, StreamRecord } from "@/types/records";
+import PodcastSyncAllButton from "@/components/podcasts/PodcastSyncAllButton.vue";
+import PodcastPagination from "@/components/podcasts/PodcastPagination.vue";
 
 type Episode = PodcastEpisodeRecord & {
   imagem?: string;
@@ -229,7 +231,12 @@ onBeforeUnmount(() => { clearTimeout(podcastTimer); clearTimeout(episodeTimer); 
       </button>
     </div>
     <BaseEmptyState v-else icon="◉" title="Sem podcasts" description="Ainda não existem feeds RSS na biblioteca." />
-    <nav v-if="podcastPages > 1" class="pagination" aria-label="Paginação dos podcasts"><button class="button button-secondary" type="button" :disabled="podcastPage <= 1" @click="podcastPage--; loadPodcasts()">Anterior</button><span>Página {{ podcastPage }} de {{ podcastPages }}</span><button class="button button-secondary" type="button" :disabled="podcastPage >= podcastPages" @click="podcastPage++; loadPodcasts()">Seguinte</button></nav>
+    <PodcastPagination
+      :page="podcastPage"
+      :pages="podcastPages"
+      label="Paginação dos podcasts"
+      @change="podcastPage = $event; loadPodcasts()"
+    />
   </section>
 
   <article v-if="selectedPodcast" class="panel selected-podcast-detail">
@@ -258,7 +265,12 @@ onBeforeUnmount(() => { clearTimeout(podcastTimer); clearTimeout(episodeTimer); 
       </article>
     </div>
     <BaseEmptyState v-else icon="◉" title="Sem episódios" description="Não existem episódios para estes filtros." />
-    <nav v-if="episodePages > 1" class="pagination" aria-label="Paginação dos episódios"><button class="button button-secondary" type="button" :disabled="episodePage <= 1" @click="episodePage--; loadEpisodes()">Anterior</button><span>Página {{ episodePage }} de {{ episodePages }}</span><button class="button button-secondary" type="button" :disabled="episodePage >= episodePages" @click="episodePage++; loadEpisodes()">Seguinte</button></nav>
+    <PodcastPagination
+      :page="episodePage"
+      :pages="episodePages"
+      label="Paginação dos episódios"
+      @change="episodePage = $event; loadEpisodes()"
+    />
   </section>
 
   <Teleport to="body">

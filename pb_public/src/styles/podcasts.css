@@ -273,3 +273,131 @@
 
 
 .podcast-edit-complete{width:min(980px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.podcast-edit-layout{display:grid;grid-template-columns:180px minmax(0,1fr);gap:1.25rem}.podcast-edit-preview{position:sticky;top:0;display:grid;width:180px;height:180px;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:1.15rem;background:var(--surface-2);font-size:3rem}.podcast-edit-preview img{width:100%;height:100%;object-fit:cover}.podcast-edit-fields{display:grid;gap:1rem}.podcast-edit-fields fieldset{margin:0;padding:1rem;border:1px solid var(--line);border-radius:1rem}.podcast-edit-fields legend{padding:0 .4rem;font-weight:800}.podcast-inline-actions{display:flex;grid-column:1/-1;flex-wrap:wrap;gap:.55rem}.podcast-diagnostics{display:flex;flex-wrap:wrap;gap:.65rem;margin:1rem 0;color:var(--muted);font-size:.78rem}.podcast-diagnostics span{padding:.4rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface-2)}@media(max-width:720px){.podcast-edit-layout{grid-template-columns:1fr}.podcast-edit-preview{position:static;width:140px;height:140px}.podcast-inline-actions .button{width:100%}}
+
+/* More breathing room between the library heading, search and cards. */
+.podcast-library {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.podcast-library .section-heading {
+  margin-bottom: 0;
+}
+
+.podcast-search {
+  max-width: 52rem;
+  margin: 0;
+}
+
+.podcast-grid {
+  margin-top: 0.25rem;
+}
+
+.podcast-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.podcast-pagination-main,
+.podcast-page-numbers,
+.podcast-page-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.podcast-page-numbers {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.podcast-page-button {
+  display: inline-grid;
+  width: 2.45rem;
+  height: 2.45rem;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  color: var(--text);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.podcast-page-button:hover,
+.podcast-page-button:focus-visible {
+  border-color: var(--primary);
+}
+
+.podcast-page-button.is-current {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--primary), var(--pink));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--primary), transparent 70%);
+}
+
+.podcast-page-gap {
+  color: var(--muted);
+}
+
+.podcast-page-jump {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.podcast-page-jump input {
+  width: 4.5rem;
+  min-height: 42px;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  color: var(--text);
+  background: var(--surface-2);
+  text-align: center;
+}
+
+@media (max-width: 980px) {
+  .podcast-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .podcast-pagination-main {
+    justify-content: space-between;
+  }
+
+  .podcast-page-jump {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .podcast-pagination-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .podcast-page-numbers {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .podcast-pagination-main > .button {
+    width: 100%;
+  }
+
+  .podcast-page-button {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .podcast-page-jump {
+    flex-wrap: wrap;
+  }
+}
