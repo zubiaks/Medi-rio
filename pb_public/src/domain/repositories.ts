@@ -4,7 +4,7 @@
  *
  * Função:
  * Disponibiliza instâncias tipadas e reutilizáveis para as coleções
- * utilizadas pelos módulos Catálogo, VOD, Podcasts, TV e Biblioteca.
+ * utilizadas pelos módulos Catálogo, VOD, Podcasts, IPTV e Biblioteca.
  *
  * Responsabilidades:
  * - associar cada interface TypeScript à coleção PocketBase;
@@ -22,13 +22,13 @@
  */
 import type {
   AvailabilityRecord,
-  ChannelRecord,
+  IptvCategoryRecord,
+  IptvChannelRecord,
+  IptvSourceRecord,
   NamedRecord,
   PodcastEpisodeRecord,
-  StreamLinkRecord,
   StreamRecord,
   TitleRecord,
-  TvCategoryRecord,
 } from "@/types/records";
 
 import { PocketBaseRepository } from "@/infrastructure/pocketbase/repository";
@@ -89,3 +89,13 @@ export const availabilityRepository =
  */
 export const exemplarRepository =
   new PocketBaseRepository("exemplares");
+/**
+ * Aliases públicos do domínio IPTV.
+ *
+ * Preservam uma única instância por coleção e mantêm compatibilidade
+ * temporária com channelRepository, streamLinkRepository e
+ * tvCategoryRepository.
+ */
+export const iptvChannelRepository = channelRepository;
+export const iptvSourceRepository = streamLinkRepository;
+export const iptvCategoryRepository = tvCategoryRepository;

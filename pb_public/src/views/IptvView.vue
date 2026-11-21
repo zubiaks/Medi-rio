@@ -44,18 +44,19 @@
     src/components/iptv/GridSizeSlider.vue
     src/components/iptv/ChannelDetailDialog.vue
     src/components/iptv/ChannelEditDialog.vue
+    src/components/iptv/M3uImportDialog.vue
     src/components/base/BasePageHeader.vue
     src/components/base/BaseEmptyState.vue
     src/components/base/BasePagination.vue
 
   - Repositórios utilizados:
     src/domain/repositories.ts
-    channelRepository
-    streamLinkRepository
+    iptvChannelRepository
+    iptvSourceRepository
     countryRepository
     languageRepository
     tagRepository
-    tvCategoryRepository
+    iptvCategoryRepository
 
   - Domínio utilizado:
     src/domain/iptv/filterOptions.ts
@@ -95,12 +96,12 @@
     src/domain/iptv/m3u.spec.ts
 
   Fluxo de dados:
-  1. A rota carrega LiveView.
+  1. A rota carrega IptvView.
   2. LiveView solicita records aos repositórios.
   3. Os repositórios comunicam com PocketBase.
-  4. LiveView passa records tipados aos componentes.
+  4. IptvView passa records tipados aos componentes.
   5. Os componentes emitem eventos de abertura, edição ou alteração.
-  6. LiveView atualiza os canais, o canal selecionado e as fontes.
+  6. IptvView atualiza os canais, o canal selecionado e as fontes.
 
   Usado por:
   - src/router/index.ts
@@ -115,7 +116,7 @@
   - Alterar nomes de campos exige migração PocketBase.
   - A rota antiga /tv deve continuar a redirecionar para /iptv.
   - Alterar a chave localStorage pode perder preferências existentes.
-  - Renomear components/live ou domain/live exige atualizar todos os imports.
+  - Alterar componentes, domÃ­nio ou estilos IPTV exige atualizar os imports relacionados.
   - Alterações de compatibilidade exigem atualizar este cabeçalho.
 
   Regras:
@@ -167,14 +168,15 @@ import ChannelDetailDialog from "@/components/iptv/ChannelDetailDialog.vue";
 import ChannelEditDialog from "@/components/iptv/ChannelEditDialog.vue";
 import ChannelFilters from "@/components/iptv/ChannelFilters.vue";
 import GridSizeSlider from "@/components/iptv/GridSizeSlider.vue";
+import M3uImportDialog from "@/components/iptv/M3uImportDialog.vue";
 
 import {
-  channelRepository,
+  iptvChannelRepository,
   countryRepository,
   languageRepository,
-  streamLinkRepository,
+  iptvSourceRepository,
   tagRepository,
-  tvCategoryRepository,
+  iptvCategoryRepository,
 } from "@/domain/repositories";
 
 import {
@@ -241,6 +243,7 @@ const editingChannel = ref<IptvChannelRecord | null>(null);
 
 const channelSources = ref<IptvSourceRecord[]>([]);
 const sourcesLoading = ref(false);
+const importDialogOpen = ref(false);
 
 let filterTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -319,7 +322,7 @@ async function loadLibrary(): Promise<void> {
   error.value = "";
 
   try {
-    const result = await channelRepository.list({
+    const result = await iptvChannelRepository.list({
       page: page.value,
       perPage: CHANNELS_PER_PAGE,
       filter: buildChannelFilter(),
@@ -351,7 +354,7 @@ async function loadAllChannels(): Promise<void> {
   let totalPages = 1;
 
   do {
-    const response = await channelRepository.list({
+    const response = await iptvChannelRepository.list({
       page: currentPage,
       perPage: 500,
       filter: "cemiterio = false",
@@ -380,7 +383,7 @@ async function loadLookups(): Promise<void> {
       filter: "ativo = true",
       sort: "ordem,nome",
     }),
-    tvCategoryRepository.list({
+    iptvCategoryRepository.list({
       page: 1,
       perPage: 100,
       filter: "ativo = true",
@@ -414,7 +417,7 @@ async function openChannel(
   sourcesLoading.value = true;
 
   try {
-    const result = await streamLinkRepository.list({
+    const result = await iptvSourceRepository.list({
       page: 1,
       perPage: 100,
       filter: `canal_tv = "${channel.id}"`,
@@ -479,6 +482,18 @@ function handleChannelArchived(id: string): void {
   total.value = Math.max(0, total.value - 1);
 }
 
+
+async function handleM3uImported(count: number): Promise<void> {
+  importDialogOpen.value = false;
+
+  if (count <= 0) return;
+
+  page.value = 1;
+  await Promise.all([
+    loadAllChannels(),
+    loadLibrary(),
+  ]);
+}
 function clearFilters(): void {
   search.value = "";
   country.value = "";
@@ -581,9 +596,9 @@ onMounted(async () => {
       <button
         class="button button-primary"
         type="button"
-        disabled
+        @click="importDialogOpen = true"
       >
-        ⇩ Importar M3U, em breve
+        ⇩ Importar M3U
       </button>
     </template>
   </BasePageHeader>
@@ -718,6 +733,12 @@ onMounted(async () => {
     @change="changePage"
   />
 
+  <M3uImportDialog
+    :open="importDialogOpen"
+    :existing="allChannels"
+    @close="importDialogOpen = false"
+    @imported="handleM3uImported"
+  />
   <ChannelDetailDialog
     :channel="selectedChannel"
     :links="channelSources"
