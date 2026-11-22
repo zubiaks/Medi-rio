@@ -169,6 +169,7 @@ import ChannelEditDialog from "@/components/iptv/ChannelEditDialog.vue";
 import ChannelFilters from "@/components/iptv/ChannelFilters.vue";
 import GridSizeSlider from "@/components/iptv/GridSizeSlider.vue";
 import M3uImportDialog from "@/components/iptv/M3uImportDialog.vue";
+import IptvEpgManager from "@/components/iptv/IptvEpgManager.vue";
 
 import {
   iptvChannelRepository,
