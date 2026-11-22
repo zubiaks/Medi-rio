@@ -3,7 +3,7 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 2.5.0
+  Versão do ficheiro: 3.0.0
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
@@ -54,6 +54,12 @@ import {
   buildM3uImportPlan,
   type M3uImportMode,
 } from "@/domain/iptv/m3uImportPlan";
+import {
+  addM3uImportHistory,
+  downloadM3uReport,
+  getM3uImportHistory,
+  type M3uImportHistoryEntry,
+} from "@/domain/iptv/m3uImportHistory";
 
 import type {
   IptvCategoryRecord,
@@ -97,6 +103,8 @@ const batchTotal = ref(0);
 const query = ref("");
 const summary = ref<ImportSummary | null>(null);
 const importMode = ref<M3uImportMode>("sync");
+const history = ref<M3uImportHistoryEntry[]>(getM3uImportHistory());
+const startedAt = ref(0);
 
 const visible = computed(() => {
   const normalizedQuery = query.value.toLocaleLowerCase("pt-PT");
@@ -298,6 +306,7 @@ async function run(): Promise<void> {
   if (!entries.length) return;
 
   importing.value = true;
+  startedAt.value = Date.now();
   progress.value = 0;
   batchTotal.value = entries.length;
   error.value = "";
@@ -414,6 +423,16 @@ async function run(): Promise<void> {
       internalDuplicates: duplicateItems.size,
       sourcesAdded,
     };
+
+    const historyEntry: M3uImportHistoryEntry = {
+      id: `${Date.now()}-${fileName.value}`,
+      date: new Date().toISOString(),
+      fileName: fileName.value || "playlist.m3u",
+      mode: importMode.value,
+      durationMs: Date.now() - startedAt.value,
+      ...summary.value,
+    };
+    history.value = addM3uImportHistory(historyEntry);
     importing.value = false;
   }
 
@@ -553,6 +572,22 @@ async function run(): Promise<void> {
           >
             Importar outra playlist
           </button>
+
+          <button
+            class="button button-secondary"
+            type="button"
+            @click="downloadM3uReport(history[0], 'json')"
+          >
+            Exportar JSON
+          </button>
+
+          <button
+            class="button button-secondary"
+            type="button"
+            @click="downloadM3uReport(history[0], 'csv')"
+          >
+            Exportar CSV
+          </button>
         </section>
 
         <template v-if="items.length && !summary">
@@ -646,6 +681,16 @@ async function run(): Promise<void> {
             </button>
           </div>
         </template>
+        <details v-if="history.length" class="m3u-history">
+          <summary>Histórico recente ({{ history.length }})</summary>
+          <ol>
+            <li v-for="entry in history" :key="entry.id">
+              <strong>{{ entry.fileName }}</strong>
+              <span>{{ new Date(entry.date).toLocaleString("pt-PT") }}</span>
+              <span>{{ entry.imported }} criadas · {{ entry.updated }} atualizadas · {{ entry.failed }} falhadas</span>
+            </li>
+          </ol>
+        </details>
       </section>
     </div>
   </Teleport>
