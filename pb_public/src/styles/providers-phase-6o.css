@@ -1,0 +1,5 @@
+/** Mediário | Fase 6O — configuração operacional TMDB. */
+.tmdb-operational-settings { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-operational-settings-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-operational-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.75rem; }
+@media (max-width:640px) { .tmdb-operational-settings-header { display:grid; } }

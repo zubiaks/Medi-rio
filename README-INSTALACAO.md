@@ -1,17 +1,27 @@
-# Aplicar a licença não comercial
+# ZIP 1 — Fases 6O e 6P
 
-1. Copia `LICENSE.md`, `LICENSE-TRANSITION.md` e `docs/LICENSING.md` para a raiz do repositório.
-2. Substitui a secção Licença do `README.md` pelo conteúdo de `README-LICENSE-SECTION.md`.
-3. Em `pb_public/package.json`, usa:
+## Instalação
 
-```json
-"license": "SEE LICENSE IN ../LICENSE.md"
-```
+Extrair sobre `D:\Mediário` e confirmar a integração dos ficheiros.
 
-Se o pacote npm tiver como raiz `pb_public`, esta referência aponta para o `LICENSE.md` da raiz.
-4. Confirma que o repositório já não apresenta MIT como licença atual.
-5. Só depois executa `scripts/adicionar-copyright.ps1`.
-6. Executa `npm run type-check` e `npm run build`.
-7. Faz um único commit jurídico com licença, documentação e cabeçalhos.
+## Fase 6O
 
-Não alteres o corpo oficial da PolyForm Noncommercial 1.0.0. Os únicos acréscimos próprios são as linhas `Required Notice:`.
+Adiciona `tmdb_operational_settings` em `app_settings`, sem migração de esquema. O registo é criado ao guardar pela primeira vez.
+
+Valores recomendados:
+
+- antiguidade: 90 dias;
+- tarefa bloqueada: 30 minutos;
+- lote predefinido: 10;
+- lote máximo: 25;
+- créditos: 50;
+- imagens: 40;
+- pedidos por minuto: 30;
+- execução global: 25;
+- repetições: 3;
+- idioma principal: pt-PT;
+- idioma alternativo: en.
+
+## Fase 6P
+
+Inclui teste de encerramento, checklist funcional e documentação de segurança. A suite completa deve ser executada localmente porque o ZIP contém apenas os ficheiros alterados do projeto, não `node_modules` nem toda a aplicação.

@@ -1,0 +1,14 @@
+/** Mediário | Fase 6N — relatórios e tendências TMDB. */
+.tmdb-report { display:grid; gap:.9rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-report-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-report-header .form-field { min-width:9rem; }
+.tmdb-report-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; margin:0; }
+.tmdb-report-summary div { padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-report-summary dt { color:var(--muted); font-size:.74rem; }
+.tmdb-report-summary dd { margin:.2rem 0 0; font-size:1.2rem; font-weight:800; }
+.tmdb-report-bars { display:grid; gap:.35rem; max-height:20rem; overflow:auto; }
+.tmdb-report-day { display:grid; grid-template-columns:3.5rem minmax(0,1fr) 2rem; gap:.55rem; align-items:center; }
+.tmdb-report-day > div { height:.55rem; overflow:hidden; border-radius:999px; background:var(--surface); }
+.tmdb-report-day i { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--primary),var(--cyan)); }
+.tmdb-report-day span,.tmdb-report-day strong { font-size:.76rem; }
+@media (max-width:700px) { .tmdb-report-header { display:grid; } .tmdb-report-summary { grid-template-columns:repeat(2,1fr); } }
