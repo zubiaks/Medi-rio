@@ -1,3 +1,13 @@
+/**
+ * Projeto: Mediário
+ * Ficheiro: src/domain/library/records.ts
+ * Tipo: Contratos TypeScript dos records PocketBase.
+ * Domínio: Biblioteca física.
+ *
+ * Finalidade:
+ * Define exemplares, formatos físicos, tipos de edição e histórico de
+ * empréstimos sem executar consultas ou regras de negócio.
+ */
 import type { BaseRecord, NamedRecord, TitleRecord } from "@/types/records";
 
 export interface PhysicalFormatRecord extends BaseRecord {
@@ -45,18 +55,30 @@ export interface LibraryCopyRecord extends BaseRecord {
   };
 }
 
+export type LoanHistoryState =
+  | "Emprestado"
+  | "Atrasado"
+  | "Devolvido"
+  | "Perdido"
+  | "Danificado"
+  | "Cancelado";
+
 export interface LoanHistoryRecord extends BaseRecord {
   titulo: string;
   exemplar: string;
   pessoa: string;
-  estado: "Emprestado" | "Atrasado" | "Devolvido" | "Perdido" | "Danificado" | "Cancelado";
+  estado: LoanHistoryState;
   data_emprestimo: string;
   data_prevista?: string;
   data_devolucao?: string;
   renovacoes?: number;
   devolvido_em_bom_estado?: boolean;
   notas?: string;
-  expand?: { titulo?: TitleRecord; exemplar?: LibraryCopyRecord; pessoa?: NamedRecord };
+  expand?: {
+    titulo?: TitleRecord;
+    exemplar?: LibraryCopyRecord;
+    pessoa?: NamedRecord;
+  };
 }
 
 export interface LibraryCopyForm {
