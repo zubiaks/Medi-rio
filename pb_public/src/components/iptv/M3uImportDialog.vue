@@ -3,7 +3,7 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 2.2.0
+  Versão do ficheiro: 2.3.0
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
@@ -29,6 +29,8 @@
   - Apresentar um resumo final de importados, ignorados e falhados.
   - Permitir iniciar outra importação sem fechar o diálogo.
   - Reiniciar o estado quando o diálogo voltar a abrir.
+  - Criar ou reutilizar categorias a partir de group-title.
+  - Detetar duplicados dentro da própria playlist.
   - Preservar os nomes reais dos campos PocketBase.
 
   Autor: Zubiaks
@@ -42,13 +44,17 @@
 import { computed, nextTick, ref, watch } from "vue";
 
 import {
+  iptvCategoryRepository,
   iptvChannelRepository,
   iptvSourceRepository,
 } from "@/domain/repositories";
 import { parseM3u, type M3uItem } from "@/domain/iptv/m3u";
 import { findM3uDuplicate } from "@/domain/iptv/m3uDuplicate";
 
-import type { IptvChannelRecord } from "@/types/records";
+import type {
+  IptvCategoryRecord,
+  IptvChannelRecord,
+} from "@/types/records";
 
 interface ImportFailure {
   name: string;
@@ -60,6 +66,8 @@ interface ImportSummary {
   skipped: number;
   failed: number;
   failures: ImportFailure[];
+  categoriesCreated: number;
+  internalDuplicates: number;
 }
 
 const props = defineProps<{
@@ -154,6 +162,68 @@ function sourceType(url: string): "hls" | "http" {
   return /\.m3u8(?:$|[?#])/i.test(url) ? "hls" : "http";
 }
 
+function normalizedKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-PT")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function internalDuplicateKeys(entries: M3uItem[]): Set<M3uItem> {
+  const seenUrls = new Set<string>();
+  const seenTvgIds = new Set<string>();
+  const duplicates = new Set<M3uItem>();
+
+  for (const item of entries) {
+    const url = item.url.trim();
+    const tvgId = normalizedKey(item.tvgId);
+
+    if (seenUrls.has(url) || (tvgId && seenTvgIds.has(tvgId))) {
+      duplicates.add(item);
+      continue;
+    }
+
+    seenUrls.add(url);
+    if (tvgId) seenTvgIds.add(tvgId);
+  }
+
+  return duplicates;
+}
+
+async function loadCategoryMap(): Promise<Map<string, IptvCategoryRecord>> {
+  const result = await iptvCategoryRepository.list({
+    page: 1,
+    perPage: 500,
+    sort: "ordem,nome",
+  });
+
+  return new Map(
+    result.items.map((category) => [normalizedKey(category.nome), category]),
+  );
+}
+
+async function categoryFor(
+  groupTitle: string,
+  categories: Map<string, IptvCategoryRecord>,
+): Promise<{ id?: string; created: boolean }> {
+  const name = groupTitle.trim();
+  if (!name) return { created: false };
+
+  const key = normalizedKey(name);
+  const existing = categories.get(key);
+  if (existing) return { id: existing.id, created: false };
+
+  const created = await iptvCategoryRepository.create({
+    nome: name,
+    ativo: true,
+    ordem: 0,
+  });
+  categories.set(key, created);
+  return { id: created.id, created: true };
+}
+
 async function run(): Promise<void> {
   const entries = [...selected.value];
 
@@ -167,9 +237,17 @@ async function run(): Promise<void> {
 
   let importedCount = 0;
   let skippedCount = 0;
+  let categoriesCreated = 0;
   const failures: ImportFailure[] = [];
+  const duplicateItems = internalDuplicateKeys(entries);
+  const categories = await loadCategoryMap();
 
   for (const item of entries) {
+    if (duplicateItems.has(item)) {
+      skippedCount += 1;
+      progress.value += 1;
+      continue;
+    }
     const duplicate = findM3uDuplicate(item, props.existing);
 
     if (duplicate.kind && duplicate.kind !== "name") {
@@ -181,6 +259,9 @@ async function run(): Promise<void> {
     let channel: IptvChannelRecord | null = null;
 
     try {
+      const category = await categoryFor(item.groupTitle, categories);
+      if (category.created) categoriesCreated += 1;
+
       channel = (await iptvChannelRepository.create({
         nome: item.name,
         url_stream: item.url,
@@ -191,6 +272,7 @@ async function run(): Promise<void> {
         adulto: item.adult,
         ativo: true,
         cemiterio: false,
+        categoria: category.id,
         qualidade: "Desconhecida",
       })) as IptvChannelRecord;
 
@@ -236,6 +318,8 @@ async function run(): Promise<void> {
     skipped: skippedCount,
     failed: failures.length,
     failures,
+    categoriesCreated,
+    internalDuplicates: duplicateItems.size,
   };
 
   importing.value = false;
@@ -307,6 +391,10 @@ async function run(): Promise<void> {
             <strong>{{ summary.imported }}</strong> importadas ·
             <strong>{{ summary.skipped }}</strong> ignoradas ·
             <strong>{{ summary.failed }}</strong> falhadas
+          </p>
+          <p>
+            <strong>{{ summary.categoriesCreated }}</strong> categorias criadas ·
+            <strong>{{ summary.internalDuplicates }}</strong> duplicados internos
           </p>
 
           <details v-if="summary.failures.length">
