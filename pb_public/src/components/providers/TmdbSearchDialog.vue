@@ -20,6 +20,7 @@ import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
 import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
 import TmdbSyncSchedulerPanel from "./TmdbSyncSchedulerPanel.vue";
+import TmdbJobExecutorPanel from "./TmdbJobExecutorPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -28,6 +29,7 @@ import { buildSelectedTmdbPayload, type TmdbEnrichmentField } from "@/domain/pro
 import { applyTmdbRelations, type RelationMode, type TmdbRelationField } from "@/domain/providers/tmdbRelations";
 import { tmdbSourcePayload } from "@/domain/providers/tmdbMapping";
 import { prepareProtectedSync } from "@/domain/providers/protectedSync";
+import type { TmdbJobExecutionResult } from "@/domain/providers/tmdbJobExecutor";
 import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCredits";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
@@ -110,6 +112,15 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
     emit("saved", saved);
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
   finally { saving.value = false; }
+}
+
+async function jobPrepared(result: TmdbJobExecutionResult): Promise<void> {
+  if (!selectedTitle.value || selectedTitle.value.id !== result.titleId) {
+    error.value = `A tarefa de ${result.titleName} foi executada. Abre esse título para rever os metadados carregados.`;
+    return;
+  }
+  details.value = result.details;
+  await writeAuditLog({ entidade: "titulos", entidade_id: result.titleId, entidade_nome: result.titleName, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "execucao_tarefa", sync_job_id: result.job.id, modo: "revisao_manual" } });
 }
 
 async function syncScheduled(job: { id: string }): Promise<void> {
@@ -205,6 +216,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TitleVersionPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @restored="versionRestored" @snapshot="snapshotCreated" />
     <TmdbSyncHealthPanel v-if="selectedTitle" :title="selectedTitle" :details="details" :loading="saving" @refresh="refreshTitle" />
     <TmdbSyncSchedulerPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @scheduled="syncScheduled" />
+    <TmdbJobExecutorPanel @prepared="jobPrepared" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>
