@@ -1,3 +1,3 @@
-# Biblioteca física, Fase 3
+# Biblioteca física — Fases 4 e 5
 
-Detalhe completo do exemplar e histórico individual, integrado na listagem existente.
+Pacote completo com todos os ficheiros alterados, formatados e documentados em português europeu.
