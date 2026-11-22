@@ -1,264 +1,122 @@
-/**
- * Projeto: Mediário
- * Ficheiro: src/styles/diary.css
- * Versão do ficheiro: 1.0.0
- * Tipo: Folha de estilos CSS
- * Domínio: Diário e avaliações
- * Estado: Em desenvolvimento
- * Última revisão: 2026-11-22
- *
- * Finalidade:
- * Define a apresentação da navegação do Diário, filtros, lista de registos,
- * calendário mensal, formulários e cartões de avaliações.
- *
- * Relações:
- * - Importado por: src/main.ts
- * - Aplicado a: src/views/DiaryView.vue
- * - Aplicado a: src/components/diary/DiaryCalendar.vue
- * - Aplicado a: src/components/diary/DiaryEntryDialog.vue
- * - Aplicado a: src/components/diary/ReviewCard.vue
- * - Aplicado a: src/components/diary/ReviewDialog.vue
- *
- * Regras:
- * - Utilizar os tokens visuais globais do Mediário.
- * - Preservar contraste, foco visível e utilização por teclado.
- * - Manter o calendário legível em ecrãs largos e linealizá-lo em móvel.
- * - Guardar como UTF-8 sem BOM.
- *
- * Autor: Zubiaks
- * Copyright (c) 2026 Zubiaks.
- *
- * Source-available under the PolyForm Noncommercial License 1.0.0.
- * Commercial use requires prior written permission from Zubiaks.
- * See LICENSE.md.
- */
+/** Estilos do domínio Diário e avaliações. */
+.diary-tabs{margin-bottom:1.5rem}.diary-section{display:grid;gap:1rem}.diary-filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:1rem}.diary-list{display:grid;gap:.75rem}.diary-entry{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--surface)}.diary-entry h3{margin:.2rem 0}.diary-entry p{margin:.2rem 0;color:var(--muted)}.diary-entry-dialog,.review-dialog{width:min(900px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.diary-title-results{display:grid;max-height:15rem;padding:0;margin:0;overflow:auto;border:1px solid var(--line);border-radius:.75rem;list-style:none}.diary-title-results button{display:flex;width:100%;justify-content:space-between;padding:.65rem;color:inherit;background:var(--surface-2);border:0;border-bottom:1px solid var(--line)}.diary-calendar{display:grid;gap:1rem}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem}.calendar-weekdays span{text-align:center;color:var(--muted);font-size:.75rem}.calendar-grid article{min-height:7rem;padding:.55rem;border:1px solid var(--line);border-radius:.6rem;background:var(--surface)}.calendar-grid article.is-outside{opacity:.4}.calendar-grid ul{padding-left:1rem;font-size:.75rem}.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}.review-card{display:grid;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--surface)}.review-card header,.review-card footer{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}.review-text{white-space:pre-line;line-height:1.65}@media(max-width:760px){.diary-filters{grid-template-columns:1fr}.calendar-weekdays{display:none}.calendar-grid{grid-template-columns:1fr}.calendar-grid article{min-height:auto}.diary-entry{align-items:flex-start;flex-direction:column}}
 
-/* Navegação entre Diário, Calendário e Avaliações. */
-.diary-tabs {
-  margin-bottom: 1.5rem;
-}
 
-/* Estrutura geral do separador Diário. */
-.diary-section {
+/* Fase 3: estatísticas e resumo anual. */
+.diary-statistics {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-/* Pesquisa e filtros dos registos de consumo. */
-.diary-filters {
-  display: grid;
-  grid-template-columns: minmax(240px, 2fr) repeat(2, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-/* Lista cronológica dos registos. */
-.diary-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.diary-entry {
+.diary-statistics-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: var(--surface);
-}
-
-.diary-entry h3 {
-  margin: 0.2rem 0;
-}
-
-.diary-entry p {
-  margin: 0.2rem 0;
-  color: var(--muted);
-}
-
-/* Diálogos de registo e avaliação. */
-.diary-entry-dialog,
-.review-dialog {
-  width: min(900px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
-  overflow: auto;
-}
-
-/* Resultados da pesquisa de títulos. */
-.diary-title-results {
-  display: grid;
-  max-height: 15rem;
-  padding: 0;
-  margin: 0;
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  list-style: none;
-}
-
-.diary-title-results li:last-child button {
-  border-bottom: 0;
-}
-
-.diary-title-results button {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.65rem;
-  color: inherit;
-  text-align: left;
-  background: var(--surface-2);
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-}
-
-.diary-title-results button:hover {
-  background: color-mix(in srgb, var(--primary), transparent 90%);
-}
-
-.diary-title-results button:focus-visible {
-  position: relative;
-  z-index: 1;
-  outline: 3px solid var(--primary);
-  outline-offset: -3px;
-}
-
-.diary-title-results button span {
-  flex: 0 0 auto;
-  color: var(--muted);
-  font-size: 0.82rem;
-}
-
-/* Calendário mensal. */
-.diary-calendar {
-  display: grid;
-  gap: 1rem;
-}
-
-.calendar-weekdays,
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.4rem;
-}
-
-.calendar-weekdays span {
-  padding: 0.25rem;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-align: center;
-}
-
-.calendar-grid article {
-  min-width: 0;
-  min-height: 7rem;
-  padding: 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: 0.6rem;
-  background: var(--surface);
-}
-
-.calendar-grid article.is-outside {
-  opacity: 0.45;
-}
-
-.calendar-grid article > strong {
-  display: block;
-  margin-bottom: 0.35rem;
-}
-
-.calendar-grid ul {
-  display: grid;
-  gap: 0.25rem;
-  padding: 0;
-  margin: 0;
-  font-size: 0.75rem;
-  list-style: none;
-}
-
-.calendar-grid li {
-  overflow: hidden;
-  padding: 0.25rem 0.35rem;
-  border-radius: 0.35rem;
-  background: var(--surface-2);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Grelha e cartões de avaliações. */
-.review-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.review-card {
-  display: grid;
-  gap: 1rem;
-  min-width: 0;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: var(--surface);
-}
-
-.review-card header,
-.review-card footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  align-items: flex-end;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
 
-.review-card h3 {
-  margin: 0.2rem 0 0;
+.diary-statistics-actions .form-field {
+  min-width: 8rem;
 }
 
-.review-text {
+.diary-statistics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 1rem;
+}
+
+.monthly-bars {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.monthly-bar-row {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr) 2.5rem 3.5rem;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.monthly-bar-row > span {
+  text-transform: capitalize;
+}
+
+.monthly-bar-row small {
+  color: var(--muted);
+  text-align: right;
+}
+
+.monthly-bar-track,
+.distribution-track {
+  height: 0.7rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.monthly-bar-track > span,
+.distribution-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary), var(--cyan));
+}
+
+.media-distribution-list {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0;
   margin: 0;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-  line-height: 1.65;
+  list-style: none;
 }
 
-/* Adaptação para tablets e telemóveis. */
-@media (max-width: 760px) {
-  .diary-filters {
+.media-distribution-list li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(5rem, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.media-distribution-list li > div:first-child {
+  display: grid;
+}
+
+.media-distribution-list li span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 900px) {
+  .diary-statistics-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .calendar-weekdays {
-    display: none;
-  }
-
-  .calendar-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .calendar-grid article {
-    min-height: auto;
-  }
-
-  .calendar-grid article.is-outside {
-    display: none;
-  }
-
-  .diary-entry {
-    align-items: flex-start;
+@media (max-width: 620px) {
+  .diary-statistics-actions {
+    align-items: stretch;
     flex-direction: column;
-  }
-
-  .diary-entry .button {
     width: 100%;
   }
 
-  .review-grid {
-    grid-template-columns: 1fr;
+  .diary-statistics-actions .button,
+  .diary-statistics-actions .form-field {
+    width: 100%;
+  }
+
+  .monthly-bar-row {
+    grid-template-columns: 3rem minmax(0, 1fr) 2rem;
+  }
+
+  .monthly-bar-row small {
+    display: none;
+  }
+
+  .media-distribution-list li {
+    grid-template-columns: 1fr auto;
+  }
+
+  .distribution-track {
+    grid-column: 1 / -1;
   }
 }
