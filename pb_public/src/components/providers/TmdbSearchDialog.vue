@@ -17,6 +17,7 @@ import TmdbSeasonsPanel from "./TmdbSeasonsPanel.vue";
 import TmdbAlternativeTitlesPanel from "./TmdbAlternativeTitlesPanel.vue";
 import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
+import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -24,6 +25,7 @@ import { loadTmdbDetails, searchTmdb, type TmdbDetails, type TmdbDetailType, typ
 import { buildSelectedTmdbPayload, type TmdbEnrichmentField } from "@/domain/providers/tmdbEnrichment";
 import { applyTmdbRelations, type RelationMode, type TmdbRelationField } from "@/domain/providers/tmdbRelations";
 import { tmdbSourcePayload } from "@/domain/providers/tmdbMapping";
+import { prepareProtectedSync } from "@/domain/providers/protectedSync";
 import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCredits";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
@@ -93,6 +95,12 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
   if (!selectedTitle.value || !selectedResult.value || !details.value) return;
   saving.value = true; error.value = "";
   try {
+    const protection = await prepareProtectedSync(
+      selectedTitle.value,
+      "aplicar metadados TMDB",
+      fields,
+    );
+    selectedTitle.value = protection.current;
     const values = buildSelectedTmdbPayload(details.value, fields);
     await titleRepository.update(selectedTitle.value.id, { ...values, tmdb_id: selectedResult.value.id, tipo_tmdb: selectedResult.value.media_type === "tv" ? "tv" : "movie", fonte_principal: "tmdb", sync_estado: "atualizado", ultima_sincronizacao: new Date().toISOString() });
     const saved = await saveSource();
@@ -145,6 +153,12 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
   if (!selectedTitle.value || !details.value) return;
   saving.value = true; error.value = "";
   try {
+    const protection = await prepareProtectedSync(
+      selectedTitle.value,
+      "aplicar relações TMDB",
+      fields,
+    );
+    selectedTitle.value = protection.current;
     const values = await applyTmdbRelations(selectedTitle.value, details.value, fields, mode);
     const saved = await saveSource();
     await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "relacoes_estruturais", modo: mode, relacoes_aplicadas: fields, valores_novos: values } });
@@ -161,6 +175,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <form class="tmdb-search-form" @submit.prevent="runSearch"><label class="form-field"><span>Pesquisa TMDB</span><input v-model.trim="query" type="search" required /></label><label class="form-field"><span>Tipo</span><select v-model="mediaType"><option value="multi">Filmes e séries</option><option value="movie">Filmes</option><option value="tv">Séries</option></select></label><button class="button button-secondary" type="submit" :disabled="loading">{{ loading ? "A pesquisar…" : "Pesquisar" }}</button></form>
     <div v-if="results.length" class="tmdb-result-grid"><button v-for="result in results" :key="`${result.media_type}-${result.id}`" type="button" class="tmdb-result-card" :class="{ 'is-selected': selectedResult?.id === result.id }" @click="selectResult(result)"><img v-if="result.poster_url" :src="result.poster_url" :alt="`Capa de ${result.title}`" /><span v-else class="tmdb-poster-fallback" aria-hidden="true">◇</span><strong>{{ result.title }}</strong><small>{{ result.media_type === "tv" ? "Série" : "Filme" }} · {{ result.date?.slice(0, 4) || "—" }}</small></button></div>
     <section v-if="selectedResult" class="tmdb-association"><h3>Selecionar título do catálogo</h3><label class="form-field"><span>Título existente *</span><input v-model.trim="titleQuery" type="search" /></label><ul v-if="titleResults.length" class="provider-title-results"><li v-for="title in titleResults" :key="title.id"><button type="button" @click="selectTitle(title)">{{ title.titulo }}<span>{{ title.ano || "—" }}</span></button></li></ul><p v-if="selectedTitle">Selecionado: <strong>{{ selectedTitle.titulo }}</strong></p><button v-if="selectedTitle && !details" class="button button-primary" type="button" :disabled="saving" @click="prepare">{{ saving ? "A preparar…" : "Comparar metadados" }}</button></section>
+    <TmdbProtectionNotice v-if="selectedTitle && details" />
     <TmdbEnrichmentPreview v-if="selectedTitle && details" :title="selectedTitle" :details="details" :disabled="saving" @apply="applyFields" />
     <TmdbRelationsPreview v-if="selectedTitle && details" :details="details" :disabled="saving" @apply="applyRelations" />
     <TmdbCreditsPreview v-if="selectedTitle && details" :details="details" :disabled="saving" @apply="applyCredits" />
