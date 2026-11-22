@@ -23,6 +23,7 @@ import TmdbSyncSchedulerPanel from "./TmdbSyncSchedulerPanel.vue";
 import TmdbJobExecutorPanel from "./TmdbJobExecutorPanel.vue";
 import TmdbBatchExecutorPanel from "./TmdbBatchExecutorPanel.vue";
 import TmdbJobRecoveryPanel from "./TmdbJobRecoveryPanel.vue";
+import TmdbOperationsPanel from "./TmdbOperationsPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -115,6 +116,10 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
     emit("saved", saved);
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
   finally { saving.value = false; }
+}
+
+async function stuckJobResolved(result: { id: string; ageMinutes: number }): Promise<void> {
+  await writeAuditLog({ entidade: "sync_jobs", entidade_id: result.id, entidade_nome: "Tarefa TMDB bloqueada", acao: "erro", origem: "manutencao", sucesso: true, detalhes: { provider: "tmdb", operacao: "encerrar_tarefa_bloqueada", minutos_em_execucao: result.ageMinutes } });
 }
 
 async function recoveryRetried(result: { created: number; failed: number }): Promise<void> {
@@ -230,6 +235,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbJobExecutorPanel @prepared="jobPrepared" />
     <TmdbBatchExecutorPanel @completed="batchCompleted" />
     <TmdbJobRecoveryPanel @retried="recoveryRetried" />
+    <TmdbOperationsPanel @resolved="stuckJobResolved" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>
