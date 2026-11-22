@@ -165,3 +165,53 @@ routerAdd("GET", "/api/mediario/providers/tmdb/images/{type}/{id}", (e) => {
     logos: (response.json.logos || []).slice(0, 40).map((item) => mapImage(item, "original")),
   });
 });
+
+
+routerAdd("GET", "/api/mediario/providers/tmdb/discovery/{type}/{id}/{mode}", (e) => {
+  const mediaType = e.request.pathValue("type");
+  const externalId = e.request.pathValue("id");
+  const mode = e.request.pathValue("mode");
+  const page = Math.max(1, parseInt(e.request.url.query().get("page") || "1", 10));
+  if (["movie", "tv"].indexOf(mediaType) < 0 || !/^\d+$/.test(externalId)) {
+    throw new BadRequestError("Identificador ou tipo TMDB inválido.");
+  }
+  if (["recommendations", "similar"].indexOf(mode) < 0) {
+    throw new BadRequestError("Modo de descoberta TMDB inválido.");
+  }
+  const setting = $app.findFirstRecordByFilter("app_settings", 'chave = "tmdb_api_key_v3"');
+  const rawValue = setting.get("valor");
+  let decodedValue = rawValue;
+  if (rawValue && typeof rawValue !== "string" && typeof rawValue.length === "number") {
+    let jsonText = "";
+    for (let index = 0; index < rawValue.length; index += 1) jsonText += String.fromCharCode(rawValue[index]);
+    try { decodedValue = JSON.parse(jsonText); } catch (_) { decodedValue = jsonText; }
+  }
+  let apiKey = typeof decodedValue === "string" ? decodedValue : decodedValue && (decodedValue.key || decodedValue.value || decodedValue.api_key || decodedValue.tmdb_api_key_v3);
+  apiKey = String(apiKey || "").trim().replace(/^"|"$/g, "");
+  if (!/^[a-fA-F0-9]{32}$/.test(apiKey)) throw new BadRequestError("A chave TMDB v3 configurada tem um formato inválido.");
+  const response = $http.send({
+    url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "/" + mode + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT&page=" + page,
+    method: "GET",
+    headers: { accept: "application/json" },
+    timeout: 30,
+  });
+  if (response.statusCode !== 200) throw new BadRequestError("O TMDB respondeu com o estado HTTP " + response.statusCode + ".");
+  const results = (response.json.results || []).slice(0, 20).map((item) => ({
+    id: item.id,
+    media_type: mediaType,
+    title: item.title || item.name || "Sem título",
+    original_title: item.original_title || item.original_name || "",
+    date: item.release_date || item.first_air_date || "",
+    overview: item.overview || "",
+    poster_url: item.poster_path ? "https:" + "//image.tmdb.org/t/p/w342" + item.poster_path : "",
+    backdrop_url: item.backdrop_path ? "https:" + "//image.tmdb.org/t/p/w780" + item.backdrop_path : "",
+    vote_average: item.vote_average || 0,
+    popularity: item.popularity || 0,
+  }));
+  return e.json(200, {
+    page: response.json.page || page,
+    total_pages: response.json.total_pages || 1,
+    total_results: response.json.total_results || results.length,
+    results,
+  });
+});

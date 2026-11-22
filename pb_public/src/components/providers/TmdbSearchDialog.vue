@@ -26,6 +26,7 @@ import TmdbJobRecoveryPanel from "./TmdbJobRecoveryPanel.vue";
 import TmdbOperationsPanel from "./TmdbOperationsPanel.vue";
 import TmdbOperationsReportPanel from "./TmdbOperationsReportPanel.vue";
 import TmdbOperationalSettingsPanel from "@/components/maintenance/TmdbOperationalSettingsPanel.vue";
+import TmdbAdvancedAutomationPanel from "./TmdbAdvancedAutomationPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -240,6 +241,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbOperationsPanel @resolved="stuckJobResolved" />
     <TmdbOperationsReportPanel />
     <TmdbOperationalSettingsPanel />
+    <TmdbAdvancedAutomationPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>

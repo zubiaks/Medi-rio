@@ -1,27 +1,31 @@
-# ZIP 1 — Fases 6O e 6P
+# ZIP 2 — Fases 6Q, 6R, 6S e 6T
 
 ## Instalação
 
-Extrair sobre `D:\Mediário` e confirmar a integração dos ficheiros.
+Extrair sobre `D:\Mediário` depois de instalar e validar o ZIP 1.
 
-## Fase 6O
+## Segurança
 
-Adiciona `tmdb_operational_settings` em `app_settings`, sem migração de esquema. O registo é criado ao guardar pela primeira vez.
+- A automação backend está desativada por predefinição.
+- A sincronização global apenas cria tarefas.
+- A descoberta é apenas de leitura.
+- As imagens locais exigem seleção e URL explícitos.
+- Não existe importação automática de recomendações.
 
-Valores recomendados:
+## Testes
 
-- antiguidade: 90 dias;
-- tarefa bloqueada: 30 minutos;
-- lote predefinido: 10;
-- lote máximo: 25;
-- créditos: 50;
-- imagens: 40;
-- pedidos por minuto: 30;
-- execução global: 25;
-- repetições: 3;
-- idioma principal: pt-PT;
-- idioma alternativo: en.
+```powershell
+Set-Location "D:\Mediário\pb_public"
+npx vitest run src/domain/providers/tmdbZip2.spec.ts
+npm run type-check
+npm run build
+git diff --check
+```
 
-## Fase 6P
+Reiniciar o PocketBase devido aos hooks novos:
 
-Inclui teste de encerramento, checklist funcional e documentação de segurança. A suite completa deve ser executada localmente porque o ZIP contém apenas os ficheiros alterados do projeto, não `node_modules` nem toda a aplicação.
+```powershell
+Stop-Process -Name pocketbase -Force
+Set-Location "D:\Mediário"
+.\pocketbase.exe serve
+```
