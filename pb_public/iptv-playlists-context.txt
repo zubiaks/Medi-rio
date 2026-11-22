@@ -1,0 +1,1605 @@
+﻿===== IptvView.vue =====
+<!--
+  Projeto: Mediário
+  Versão do projeto: 0.3.0-alpha.1
+
+  Ficheiro: src/views/IptvView.vue
+  Versão do ficheiro: 2.1.0
+  Tipo: Página Vue 3 com TypeScript
+  Domínio: IPTV
+  Estado: Em desenvolvimento
+  Última revisão: 2026-11-21
+
+  Compatibilidade:
+  - Vue 3
+  - TypeScript 5.9.2 em modo strict
+  - Vite 8
+  - Vue Router
+  - PocketBase JavaScript SDK
+  - Coleções PocketBase existentes, sem alteração de esquema
+
+  Finalidade:
+  Apresenta e gere a biblioteca de canais IPTV.
+
+  Responsabilidades:
+  - Carregar, pesquisar, filtrar e paginar canais IPTV.
+  - Alternar entre grelha, logótipos, lista e vista compacta.
+  - Abrir detalhes e edição de canais.
+  - Carregar a fonte principal e as fontes alternativas.
+  - Atualizar o estado local depois de editar ou arquivar um canal.
+
+  Relações e dependências:
+  - Rota:
+    src/router/index.ts
+    URL principal: /iptv
+    Nome da rota: iptv
+    Compatibilidade: /tv redireciona para /iptv
+
+  - Navegação:
+    src/components/layout/AppSidebar.vue
+    src/App.vue
+
+  - Componentes utilizados:
+    src/components/iptv/ChannelCard.vue
+    src/components/iptv/ChannelFilters.vue
+    src/components/iptv/GridSizeSlider.vue
+    src/components/iptv/ChannelDetailDialog.vue
+    src/components/iptv/ChannelEditDialog.vue
+    src/components/iptv/M3uImportDialog.vue
+    src/components/base/BasePageHeader.vue
+    src/components/base/BaseEmptyState.vue
+    src/components/base/BasePagination.vue
+
+  - Repositórios utilizados:
+    src/domain/repositories.ts
+    iptvChannelRepository
+    iptvSourceRepository
+    countryRepository
+    languageRepository
+    tagRepository
+    iptvCategoryRepository
+
+  - Domínio utilizado:
+    src/domain/iptv/filterOptions.ts
+
+  - Tipos utilizados:
+    src/types/records.ts
+    IptvChannelRecord
+    IptvSourceRecord
+    IptvCategoryRecord
+    NamedRecord
+
+  - Coleções PocketBase:
+    canais_tv
+    stream_links
+    categorias_tv
+    paises
+    idiomas
+    tags
+
+  - Preferências locais:
+    Chave: mediario-iptv-grid-width
+    Finalidade: guardar a largura escolhida para os cartões IPTV.
+
+  - Estilos relacionados:
+    src/styles/iptv.css
+    src/styles/iptv-all.css
+    src/styles/iptv-grid-control.css
+    src/styles/iptv-links-player.css
+    src/styles/iptv-ux-fixes.css
+
+  - Testes relacionados:
+    src/components/iptv/ChannelCard.a11y.spec.ts
+    src/components/iptv/ChannelEditDialog.a11y.spec.ts
+    src/components/iptv/GridSizeSlider.a11y.spec.ts
+    src/domain/iptv/validation.spec.ts
+    src/domain/iptv/linkValidation.spec.ts
+    src/domain/iptv/m3u.spec.ts
+
+  Fluxo de dados:
+  1. A rota carrega IptvView.
+  2. IptvView solicita records aos repositórios.
+  3. Os repositórios comunicam com PocketBase.
+  4. IptvView passa records tipados aos componentes.
+  5. Os componentes emitem eventos de abertura, edição ou alteração.
+  6. IptvView atualiza os canais, o canal selecionado e as fontes.
+
+  Usado por:
+  - src/router/index.ts
+  - Rota /iptv
+  - Navegação de src/components/layout/AppSidebar.vue
+  - Ação rápida de src/App.vue
+
+  Impacto de alterações:
+  - Alterar props ou eventos afeta os componentes relacionados.
+  - Alterar IptvChannelRecord afeta cartões, filtros e diálogos.
+  - Alterar IptvSourceRecord afeta detalhes, player e gestão de fontes.
+  - Alterar nomes de campos exige migração PocketBase.
+  - A rota antiga /tv deve continuar a redirecionar para /iptv.
+  - Alterar a chave localStorage pode perder preferências existentes.
+  - Alterar componentes, domínio ou estilos IPTV exige atualizar os imports relacionados.
+  - Alterações de compatibilidade exigem atualizar este cabeçalho.
+
+  Regras:
+  - Não consultar PocketBase diretamente nesta página.
+  - Usar repositórios de src/domain/repositories.ts.
+  - Manter validações e transformações na camada de domínio.
+  - Usar aliases Iptv* nesta área.
+  - Tratar fontes como detalhes técnicos dos canais.
+  - Não alterar coleções ou campos sem migração documentada.
+  - Preservar acessibilidade, TypeScript strict e vue-tsc.
+  - Guardar o ficheiro como UTF-8 sem BOM.
+  - Atualizar a versão do ficheiro em mudanças relevantes.
+  - Validar com type-check, testes, build e git diff --check.
+
+  Política de versão do ficheiro:
+  - PATCH: correções internas, texto, acessibilidade ou documentação.
+  - MINOR: novas funcionalidades compatíveis ou novas relações.
+  - MAJOR: alteração incompatível de props, eventos, rota ou fluxo de dados.
+
+  Autor:
+  Zubiaks
+
+  Copyright:
+  Copyright (c) 2026 Zubiaks.
+
+  Licença:
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
+<!--
+  Ficheiro: src/views/IptvView.vue
+  Tipo: Página Vue.
+  Função: Gere a biblioteca IPTV, os canais configurados e as respetivas fontes.
+
+  Mediario
+  Copyright (c) 2026 Zubiaks.
+  See LICENSE.md.
+-->
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
+
+import BaseEmptyState from "@/components/base/BaseEmptyState.vue";
+import BasePageHeader from "@/components/base/BasePageHeader.vue";
+import BasePagination from "@/components/base/BasePagination.vue";
+
+import ChannelCard from "@/components/iptv/ChannelCard.vue";
+import ChannelDetailDialog from "@/components/iptv/ChannelDetailDialog.vue";
+import ChannelEditDialog from "@/components/iptv/ChannelEditDialog.vue";
+import ChannelFilters from "@/components/iptv/ChannelFilters.vue";
+import GridSizeSlider from "@/components/iptv/GridSizeSlider.vue";
+import M3uImportDialog from "@/components/iptv/M3uImportDialog.vue";
+
+import {
+  iptvChannelRepository,
+  countryRepository,
+  languageRepository,
+  iptvSourceRepository,
+  tagRepository,
+  iptvCategoryRepository,
+} from "@/domain/repositories";
+
+import {
+  usedCategories,
+  usedCountries,
+  usedQualities,
+} from "@/domain/iptv/filterOptions";
+
+import type {
+  IptvCategoryRecord,
+  IptvChannelRecord,
+  IptvSourceRecord,
+  NamedRecord,
+} from "@/types/records";
+
+type IptvViewMode = "grid" | "logos" | "list" | "compact";
+
+const IPTV_GRID_WIDTH_STORAGE_KEY = "mediario-iptv-grid-width";
+const MIN_GRID_CARD_WIDTH = 170;
+const MAX_GRID_CARD_WIDTH = 420;
+const DEFAULT_GRID_CARD_WIDTH = 250;
+const CHANNELS_PER_PAGE = 18;
+
+const channels = ref<IptvChannelRecord[]>([]);
+const allChannels = ref<IptvChannelRecord[]>([]);
+
+const page = ref(1);
+const pages = ref(1);
+const total = ref(0);
+
+const loading = ref(true);
+const error = ref("");
+
+const search = ref("");
+const country = ref("");
+const category = ref("");
+const quality = ref("");
+const status = ref("");
+const favorite = ref("");
+
+const view = ref<IptvViewMode>("grid");
+
+const storedGridCardWidth = Number(
+  localStorage.getItem(IPTV_GRID_WIDTH_STORAGE_KEY),
+);
+
+const gridCardWidth = ref<number>(
+  Math.min(
+    MAX_GRID_CARD_WIDTH,
+    Math.max(
+      MIN_GRID_CARD_WIDTH,
+      storedGridCardWidth || DEFAULT_GRID_CARD_WIDTH,
+    ),
+  ),
+);
+
+const countries = ref<NamedRecord[]>([]);
+const languages = ref<NamedRecord[]>([]);
+const tags = ref<NamedRecord[]>([]);
+const categories = ref<IptvCategoryRecord[]>([]);
+
+const selectedChannel = ref<IptvChannelRecord | null>(null);
+const editingChannel = ref<IptvChannelRecord | null>(null);
+
+const channelSources = ref<IptvSourceRecord[]>([]);
+const sourcesLoading = ref(false);
+const importDialogOpen = ref(false);
+
+let filterTimer: ReturnType<typeof setTimeout> | undefined;
+
+const countryOptions = computed(() =>
+  usedCountries(allChannels.value, countries.value),
+);
+
+const categoryOptions = computed(() =>
+  usedCategories(allChannels.value, categories.value),
+);
+
+const qualityOptions = computed(() =>
+  usedQualities(allChannels.value),
+);
+
+const filterCount = computed(() =>
+  [
+    search.value,
+    country.value,
+    category.value,
+    quality.value,
+    status.value,
+    favorite.value,
+  ].filter(Boolean).length,
+);
+
+const channelCountDescription = computed(() =>
+  total.value === 1
+    ? "1 canal configurado"
+    : `${total.value} canais configurados`,
+);
+
+function escapeFilter(value: string): string {
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll('"', '\\"');
+}
+
+function buildChannelFilter(): string {
+  const terms = ["cemiterio = false"];
+  const searchTerm = search.value.trim();
+
+  if (searchTerm) {
+    const escapedSearch = escapeFilter(searchTerm);
+
+    terms.push(
+      `(nome ~ "${escapedSearch}" || tvg_name ~ "${escapedSearch}" || tvg_id ~ "${escapedSearch}" || epg_id ~ "${escapedSearch}" || playlist_origem ~ "${escapedSearch}")`,
+    );
+  }
+
+  if (country.value) {
+    terms.push(`pais = "${escapeFilter(country.value)}"`);
+  }
+
+  if (category.value) {
+    terms.push(`categoria = "${escapeFilter(category.value)}"`);
+  }
+
+  if (quality.value) {
+    terms.push(`qualidade = "${escapeFilter(quality.value)}"`);
+  }
+
+  if (status.value) {
+    terms.push(`ativo = ${status.value === "active"}`);
+  }
+
+  if (favorite.value) {
+    terms.push(`favorito = ${favorite.value === "yes"}`);
+  }
+
+  return terms.join(" && ");
+}
+
+async function loadLibrary(): Promise<void> {
+  loading.value = true;
+  error.value = "";
+
+  try {
+    const result = await iptvChannelRepository.list({
+      page: page.value,
+      perPage: CHANNELS_PER_PAGE,
+      filter: buildChannelFilter(),
+      sort: "ordem,nome",
+      expand: "pais,categoria,idiomas,tags",
+    });
+
+    channels.value = result.items;
+    pages.value = result.totalPages || 1;
+    total.value = result.totalItems;
+  } catch (cause) {
+    error.value =
+      cause instanceof Error
+        ? cause.message
+        : String(cause);
+
+    channels.value = [];
+    pages.value = 1;
+    total.value = 0;
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function loadAllChannels(): Promise<void> {
+  const result: IptvChannelRecord[] = [];
+
+  let currentPage = 1;
+  let totalPages = 1;
+
+  do {
+    const response = await iptvChannelRepository.list({
+      page: currentPage,
+      perPage: 500,
+      filter: "cemiterio = false",
+      sort: "nome",
+    });
+
+    result.push(...response.items);
+
+    totalPages = response.totalPages || 1;
+    currentPage += 1;
+  } while (currentPage <= totalPages);
+
+  allChannels.value = result;
+}
+
+async function loadLookups(): Promise<void> {
+  const [
+    countryResult,
+    categoryResult,
+    languageResult,
+    tagResult,
+  ] = await Promise.all([
+    countryRepository.list({
+      page: 1,
+      perPage: 250,
+      filter: "ativo = true",
+      sort: "ordem,nome",
+    }),
+    iptvCategoryRepository.list({
+      page: 1,
+      perPage: 100,
+      filter: "ativo = true",
+      sort: "ordem,nome",
+    }),
+    languageRepository.list({
+      page: 1,
+      perPage: 100,
+      filter: "ativo = true",
+      sort: "ordem,nome",
+    }),
+    tagRepository.list({
+      page: 1,
+      perPage: 200,
+      filter: "ativo = true",
+      sort: "ordem,nome",
+    }),
+  ]);
+
+  countries.value = countryResult.items;
+  categories.value = categoryResult.items;
+  languages.value = languageResult.items;
+  tags.value = tagResult.items;
+}
+
+async function openChannel(
+  channel: IptvChannelRecord,
+): Promise<void> {
+  selectedChannel.value = channel;
+  channelSources.value = [];
+  sourcesLoading.value = true;
+
+  try {
+    const result = await iptvSourceRepository.list({
+      page: 1,
+      perPage: 100,
+      filter: `canal_tv = "${channel.id}"`,
+      sort: "prioridade",
+    });
+
+    channelSources.value = result.items;
+  } catch (cause) {
+    error.value =
+      cause instanceof Error
+        ? cause.message
+        : String(cause);
+
+    channelSources.value = [];
+  } finally {
+    sourcesLoading.value = false;
+  }
+}
+
+function updateChannel(
+  channel: IptvChannelRecord,
+): void {
+  channels.value = channels.value.map((currentChannel) =>
+    currentChannel.id === channel.id
+      ? channel
+      : currentChannel,
+  );
+
+  allChannels.value = allChannels.value.map((currentChannel) =>
+    currentChannel.id === channel.id
+      ? channel
+      : currentChannel,
+  );
+
+  if (selectedChannel.value?.id === channel.id) {
+    selectedChannel.value = channel;
+  }
+}
+
+function handleChannelSaved(
+  channel: IptvChannelRecord,
+): void {
+  updateChannel(channel);
+  editingChannel.value = null;
+}
+
+function handleChannelArchived(id: string): void {
+  channels.value = channels.value.filter(
+    (channel) => channel.id !== id,
+  );
+
+  allChannels.value = allChannels.value.filter(
+    (channel) => channel.id !== id,
+  );
+
+  if (selectedChannel.value?.id === id) {
+    selectedChannel.value = null;
+    channelSources.value = [];
+  }
+
+  editingChannel.value = null;
+  total.value = Math.max(0, total.value - 1);
+}
+
+
+async function handleM3uImported(count: number): Promise<void> {
+  importDialogOpen.value = false;
+
+  if (count <= 0) return;
+
+  page.value = 1;
+  await Promise.all([
+    loadAllChannels(),
+    loadLibrary(),
+  ]);
+}
+function clearFilters(): void {
+  search.value = "";
+  country.value = "";
+  category.value = "";
+  quality.value = "";
+  status.value = "";
+  favorite.value = "";
+
+  page.value = 1;
+
+  void loadLibrary();
+}
+
+function changePage(nextPage: number): void {
+  page.value = nextPage;
+  void loadLibrary();
+}
+
+watch(gridCardWidth, (value) => {
+  localStorage.setItem(
+    IPTV_GRID_WIDTH_STORAGE_KEY,
+    String(value),
+  );
+});
+
+watch(
+  [
+    search,
+    country,
+    category,
+    quality,
+    status,
+    favorite,
+  ],
+  () => {
+    if (filterTimer) {
+      clearTimeout(filterTimer);
+    }
+
+    filterTimer = setTimeout(() => {
+      page.value = 1;
+      void loadLibrary();
+    }, 250);
+  },
+);
+
+watch(countryOptions, (options) => {
+  if (
+    country.value &&
+    !options.some((option) => option.value === country.value)
+  ) {
+    country.value = "";
+  }
+});
+
+watch(categoryOptions, (options) => {
+  if (
+    category.value &&
+    !options.some((option) => option.value === category.value)
+  ) {
+    category.value = "";
+  }
+});
+
+watch(qualityOptions, (options) => {
+  if (
+    quality.value &&
+    !options.some((option) => option.value === quality.value)
+  ) {
+    quality.value = "";
+  }
+});
+
+onMounted(async () => {
+  try {
+    await Promise.all([
+      loadLookups(),
+      loadAllChannels(),
+    ]);
+
+    await loadLibrary();
+  } catch (cause) {
+    error.value =
+      cause instanceof Error
+        ? cause.message
+        : String(cause);
+
+    loading.value = false;
+  }
+});
+</script>
+
+<template>
+  <BasePageHeader
+    eyebrow="Televisão IP"
+    title="IPTV"
+    :description="channelCountDescription"
+  >
+    <template #actions>
+      <button
+        class="button button-primary"
+        type="button"
+        @click="importDialogOpen = true"
+      >
+        ⇩ Importar M3U
+      </button>
+    </template>
+  </BasePageHeader>
+
+  <div
+    v-if="error"
+    class="form-alert form-alert-error"
+    role="alert"
+  >
+    {{ error }}
+  </div>
+
+  <ChannelFilters
+    v-model:search="search"
+    v-model:country="country"
+    v-model:category="category"
+    v-model:quality="quality"
+    v-model:status="status"
+    v-model:favorite="favorite"
+    :countries="countryOptions"
+    :categories="categoryOptions"
+    :qualities="qualityOptions"
+    :count="filterCount"
+    @clear="clearFilters"
+  />
+
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Biblioteca</p>
+      <h2>Canais IPTV</h2>
+    </div>
+
+    <div class="live-view-tools">
+      <GridSizeSlider
+        v-if="view === 'grid' || view === 'logos'"
+        v-model="gridCardWidth"
+      />
+
+      <div
+        class="view-switch"
+        role="group"
+        aria-label="Vista dos canais IPTV"
+      >
+        <button
+          type="button"
+          :class="{ 'is-active': view === 'grid' }"
+          :aria-pressed="view === 'grid'"
+          @click="view = 'grid'"
+        >
+          ▦ Grelha
+        </button>
+
+        <button
+          type="button"
+          :class="{ 'is-active': view === 'logos' }"
+          :aria-pressed="view === 'logos'"
+          @click="view = 'logos'"
+        >
+          ▦ Logos
+        </button>
+
+        <button
+          type="button"
+          :class="{ 'is-active': view === 'list' }"
+          :aria-pressed="view === 'list'"
+          @click="view = 'list'"
+        >
+          ☰ Lista
+        </button>
+
+        <button
+          type="button"
+          :class="{ 'is-active': view === 'compact' }"
+          :aria-pressed="view === 'compact'"
+          @click="view = 'compact'"
+        >
+          ≡ Compacta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    v-if="loading"
+    class="page-loading"
+    aria-live="polite"
+  >
+    <span
+      class="loader"
+      aria-hidden="true"
+    />
+
+    <span class="sr-only">
+      A carregar canais IPTV.
+    </span>
+  </div>
+
+  <div
+    v-else-if="channels.length"
+    class="live-collection"
+    :class="`is-${view}`"
+    :style="
+      view === 'grid' || view === 'logos'
+        ? {
+            gridTemplateColumns:
+              `repeat(auto-fill, minmax(min(${gridCardWidth}px, 100%), 1fr))`,
+          }
+        : undefined
+    "
+  >
+    <ChannelCard
+      v-for="channel in channels"
+      :key="channel.id"
+      :channel="channel"
+      :view="view"
+      @open="openChannel"
+      @edit="editingChannel = $event"
+    />
+  </div>
+
+  <BaseEmptyState
+    v-else
+    icon="▣"
+    title="Sem canais IPTV"
+    description="Não existem canais IPTV para os filtros selecionados."
+  />
+
+  <BasePagination
+    :page="page"
+    :pages="pages"
+    label="Paginação dos canais IPTV"
+    @change="changePage"
+  />
+
+  <M3uImportDialog
+    :open="importDialogOpen"
+    :existing="allChannels"
+    @close="importDialogOpen = false"
+    @imported="handleM3uImported"
+  />
+  <ChannelDetailDialog
+    :channel="selectedChannel"
+    :links="channelSources"
+    :loading="sourcesLoading"
+    @close="selectedChannel = null"
+    @edit="editingChannel = $event"
+    @links-changed="channelSources = $event"
+    @channel-changed="updateChannel"
+  />
+
+  <ChannelEditDialog
+    :channel="editingChannel"
+    :countries="countries"
+    :languages="languages"
+    :tags="tags"
+    :categories="categories"
+    @close="editingChannel = null"
+    @saved="handleChannelSaved"
+    @archived="handleChannelArchived"
+  />
+</template>
+
+<style scoped>
+.live-view-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .live-view-tools {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+}
+</style>
+
+===== ChannelFilters.vue =====
+<!-- Ficheiro: src/components/iptv/ChannelFilters.vue | Filtros apenas com valores usados. -->
+<script setup lang="ts">
+import { computed } from "vue";import type { UsedFilterOption } from "@/domain/iptv/filterOptions";
+const search=defineModel<string>("search",{required:true}),country=defineModel<string>("country",{required:true}),category=defineModel<string>("category",{required:true}),quality=defineModel<string>("quality",{required:true}),status=defineModel<string>("status",{required:true}),favorite=defineModel<string>("favorite",{required:true});const props=defineProps<{countries:UsedFilterOption[];categories:UsedFilterOption[];qualities:UsedFilterOption[];count:number}>();const emit=defineEmits<{clear:[]}>();const countries=computed(()=>props.countries.filter(x=>x.count>0)),categories=computed(()=>props.categories.filter(x=>x.count>0)),qualities=computed(()=>props.qualities.filter(x=>x.count>0));
+</script>
+<template><section class="panel live-filters" aria-labelledby="live-filters-title"><div class="live-filter-header"><div><p class="eyebrow">Pesquisa avançada</p><h2 id="live-filters-title">Filtrar canais</h2></div><button v-if="count" class="button button-secondary" type="button" @click="emit('clear')">Limpar filtros ({{count}})</button></div><div class="live-filter-grid"><label class="form-field field-wide"><span>Pesquisar</span><input v-model.trim="search" type="search" placeholder="Nome, TVG-ID, EPG-ID ou playlist"/></label><label v-if="countries.length" class="form-field"><span>País</span><select v-model="country"><option value="">Todos os usados</option><option v-for="x in countries" :key="x.value" :value="x.value">{{x.label}} ({{x.count}})</option></select></label><label v-if="categories.length" class="form-field"><span>Categoria</span><select v-model="category"><option value="">Todas as usadas</option><option v-for="x in categories" :key="x.value" :value="x.value">{{x.label}} ({{x.count}})</option></select></label><label v-if="qualities.length" class="form-field"><span>Qualidade</span><select v-model="quality"><option value="">Todas as usadas</option><option v-for="x in qualities" :key="x.value" :value="x.value">{{x.label}} ({{x.count}})</option></select></label><label class="form-field"><span>Estado</span><select v-model="status"><option value="">Todos</option><option value="active">Ativos</option><option value="inactive">Inativos</option></select></label><label class="form-field"><span>Favoritos</span><select v-model="favorite"><option value="">Todos</option><option value="yes">Favoritos</option><option value="no">Não favoritos</option></select></label></div></section></template>
+
+===== filterOptions.ts =====
+/**
+ * Ficheiro: src/domain/iptv/filterOptions.ts
+ * Tipo: Transformação TypeScript pura.
+ * Função: Gera filtros exclusivamente com valores realmente usados.
+ */
+import type { ChannelRecord, NamedRecord, TvCategoryRecord } from "@/types/records";
+export interface UsedFilterOption { value:string; label:string; count:number }
+function count(channels:ChannelRecord[],field:"pais"|"categoria"){const map=new Map<string,number>();for(const item of channels){const id=item[field];if(id)map.set(id,(map.get(id)||0)+1)}return map}
+function clean(items:UsedFilterOption[]){return items.filter(x=>x.value&&x.label.trim()&&x.count>0).sort((a,b)=>a.label.localeCompare(b.label,"pt-PT"))}
+export function usedCountries(channels:ChannelRecord[],lookups:NamedRecord[]){const map=count(channels,"pais");return clean(lookups.map(x=>({value:x.id,label:x.nome||x.codigo||"",count:map.get(x.id)||0})))}
+export function usedCategories(channels:ChannelRecord[],lookups:TvCategoryRecord[]){const map=count(channels,"categoria");return clean(lookups.map(x=>({value:x.id,label:x.nome||"",count:map.get(x.id)||0})))}
+export function usedQualities(channels:ChannelRecord[]){const map=new Map<string,number>();for(const item of channels){const value=item.qualidade||"Desconhecida";map.set(value,(map.get(value)||0)+1)}return clean([...map].map(([value,count])=>({value,label:value==="FHD"?"Full HD":value,count})))}
+
+===== repositories.ts =====
+/**
+ * Ficheiro: src/domain/repositories.ts
+ * Tipo: Registo central de repositórios PocketBase.
+ *
+ * Função:
+ * Disponibiliza instâncias tipadas e reutilizáveis para as coleções
+ * utilizadas pelos módulos Catálogo, VOD, Podcasts, IPTV e Biblioteca.
+ *
+ * Responsabilidades:
+ * - associar cada interface TypeScript à coleção PocketBase;
+ * - evitar a criação repetida de repositórios em páginas e componentes;
+ * - manter os nomes das coleções centralizados.
+ *
+ * Não contém:
+ * - regras de negócio;
+ * - filtros específicos das páginas;
+ * - transformação ou validação de records.
+ *
+ * Mediario
+ * Copyright (c) 2026 Zubiaks.
+ * See LICENSE.md.
+ */
+import type {
+  AvailabilityRecord,
+  IptvCategoryRecord,
+  IptvChannelRecord,
+  IptvSourceRecord,
+  NamedRecord,
+  PodcastEpisodeRecord,
+  StreamRecord,
+  TitleRecord,
+} from "@/types/records";
+
+import { PocketBaseRepository } from "@/infrastructure/pocketbase/repository";
+
+/** Catálogo principal de títulos. */
+export const titleRepository =
+  new PocketBaseRepository<TitleRecord>("titulos");
+
+/** Podcasts, rádios, webcams e streams genéricos. */
+export const streamRepository =
+  new PocketBaseRepository<StreamRecord>("streams");
+
+/** Episódios sincronizados de podcasts RSS e Atom. */
+export const episodeRepository =
+  new PocketBaseRepository<PodcastEpisodeRecord>(
+    "podcast_episodios",
+  );
+
+/** Canais de televisão e IPTV. */
+export const channelRepository =
+  new PocketBaseRepository<ChannelRecord>("canais_tv");
+
+/** Links principais e alternativos de canais e streams. */
+export const streamLinkRepository =
+  new PocketBaseRepository<StreamLinkRecord>(
+    "stream_links",
+  );
+
+/** Categorias específicas dos canais de televisão. */
+export const tvCategoryRepository =
+  new PocketBaseRepository<TvCategoryRecord>(
+    "categorias_tv",
+  );
+
+/** Países utilizados em títulos, canais e streams. */
+export const countryRepository =
+  new PocketBaseRepository<NamedRecord>("paises");
+
+/** Idiomas utilizados em títulos, canais e streams. */
+export const languageRepository =
+  new PocketBaseRepository<NamedRecord>("idiomas");
+
+/** Tags partilhadas entre os vários domínios. */
+export const tagRepository =
+  new PocketBaseRepository<NamedRecord>("tags");
+
+/** Ofertas e disponibilidades VOD dos títulos. */
+export const availabilityRepository =
+  new PocketBaseRepository<AvailabilityRecord>(
+    "disponibilidades",
+  );
+
+/**
+ * Exemplares físicos.
+ *
+ * Ainda não tem uma interface própria porque o módulo Biblioteca
+ * será tipado durante a respetiva migração.
+ */
+export const exemplarRepository =
+  new PocketBaseRepository("exemplares");
+
+/**
+ * Aliases públicos do domínio IPTV.
+ *
+ * Preservam uma única instância por coleção e mantêm compatibilidade
+ * temporária com channelRepository, streamLinkRepository e
+ * tvCategoryRepository.
+ */
+export const iptvChannelRepository = channelRepository;
+export const iptvSourceRepository = streamLinkRepository;
+export const iptvCategoryRepository = tvCategoryRepository;
+
+===== M3uImportDialog.vue =====
+<!--
+  Projeto: Mediário
+  Versão do projeto: 0.3.0-alpha.1
+
+  Ficheiro: src/components/iptv/M3uImportDialog.vue
+  Versão do ficheiro: 2.3.0
+  Tipo: Diálogo Vue 3 com TypeScript
+  Domínio: IPTV
+  Estado: Em desenvolvimento
+  Última revisão: 2026-11-22
+
+  Finalidade:
+  Lê, pré-visualiza, filtra, seleciona e importa canais IPTV a partir
+  de playlists M3U ou M3U8.
+
+  Entradas:
+  - open: controla a apresentação do diálogo.
+  - existing: canais IPTV existentes, usados para detetar duplicados.
+
+  Saídas e eventos:
+  - close: solicita o fecho do diálogo.
+  - imported: informa quantos canais foram importados com sucesso.
+
+  Regras:
+  - Não importar entradas inválidas.
+  - Não importar duplicados fortes por URL ou TVG-ID.
+  - Continuar o lote depois de falhas individuais.
+  - Remover o canal criado quando a criação da fonte falhar.
+  - Apresentar um resumo final de importados, ignorados e falhados.
+  - Permitir iniciar outra importação sem fechar o diálogo.
+  - Reiniciar o estado quando o diálogo voltar a abrir.
+  - Criar ou reutilizar categorias a partir de group-title.
+  - Detetar duplicados dentro da própria playlist.
+  - Preservar os nomes reais dos campos PocketBase.
+
+  Autor: Zubiaks
+  Copyright (c) 2026 Zubiaks.
+
+  Source-available under the PolyForm Noncommercial License 1.0.0.
+  Commercial use requires prior written permission from Zubiaks.
+  See LICENSE.md.
+-->
+<script setup lang="ts">
+import { computed, nextTick, ref, watch } from "vue";
+
+import {
+  iptvCategoryRepository,
+  iptvChannelRepository,
+  iptvSourceRepository,
+} from "@/domain/repositories";
+import { parseM3u, type M3uItem } from "@/domain/iptv/m3u";
+import { findM3uDuplicate } from "@/domain/iptv/m3uDuplicate";
+
+import type {
+  IptvCategoryRecord,
+  IptvChannelRecord,
+} from "@/types/records";
+
+interface ImportFailure {
+  name: string;
+  message: string;
+}
+
+interface ImportSummary {
+  imported: number;
+  skipped: number;
+  failed: number;
+  failures: ImportFailure[];
+  categoriesCreated: number;
+  internalDuplicates: number;
+}
+
+const props = defineProps<{
+  open: boolean;
+  existing: IptvChannelRecord[];
+}>();
+
+const emit = defineEmits<{
+  close: [];
+  imported: [count: number];
+}>();
+
+const firstInput = ref<HTMLInputElement | null>(null);
+const items = ref<M3uItem[]>([]);
+const fileName = ref("");
+const error = ref("");
+const importing = ref(false);
+const progress = ref(0);
+const batchTotal = ref(0);
+const query = ref("");
+const summary = ref<ImportSummary | null>(null);
+
+const visible = computed(() => {
+  const normalizedQuery = query.value.toLocaleLowerCase("pt-PT");
+
+  return items.value.filter((item) => {
+    if (!normalizedQuery) return true;
+
+    return [item.name, item.groupTitle, item.tvgId].some((value) =>
+      value.toLocaleLowerCase("pt-PT").includes(normalizedQuery),
+    );
+  });
+});
+
+const selected = computed(() =>
+  items.value.filter((item) => item.selected && !item.errors.length),
+);
+
+const invalidCount = computed(() =>
+  items.value.filter((item) => item.errors.length).length,
+);
+
+function reset(): void {
+  items.value = [];
+  fileName.value = "";
+  error.value = "";
+  importing.value = false;
+  progress.value = 0;
+  batchTotal.value = 0;
+  query.value = "";
+  summary.value = null;
+}
+
+watch(
+  () => props.open,
+  async (open) => {
+    if (!open) return;
+
+    reset();
+    await nextTick();
+    firstInput.value?.focus();
+  },
+);
+
+async function readFile(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+
+  if (!file) return;
+
+  fileName.value = file.name;
+  error.value = "";
+  progress.value = 0;
+  batchTotal.value = 0;
+  summary.value = null;
+
+  try {
+    items.value = parseM3u(await file.text());
+  } catch (cause) {
+    items.value = [];
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  }
+}
+
+function selectAll(value: boolean): void {
+  for (const item of visible.value) {
+    item.selected = value && !item.errors.length;
+  }
+}
+
+function sourceType(url: string): "hls" | "http" {
+  return /\.m3u8(?:$|[?#])/i.test(url) ? "hls" : "http";
+}
+
+function normalizedKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-PT")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function internalDuplicateKeys(entries: M3uItem[]): Set<M3uItem> {
+  const seenUrls = new Set<string>();
+  const seenTvgIds = new Set<string>();
+  const duplicates = new Set<M3uItem>();
+
+  for (const item of entries) {
+    const url = item.url.trim();
+    const tvgId = normalizedKey(item.tvgId);
+
+    if (seenUrls.has(url) || (tvgId && seenTvgIds.has(tvgId))) {
+      duplicates.add(item);
+      continue;
+    }
+
+    seenUrls.add(url);
+    if (tvgId) seenTvgIds.add(tvgId);
+  }
+
+  return duplicates;
+}
+
+async function loadCategoryMap(): Promise<Map<string, IptvCategoryRecord>> {
+  const result = await iptvCategoryRepository.list({
+    page: 1,
+    perPage: 500,
+    sort: "ordem,nome",
+  });
+
+  return new Map(
+    result.items.map((category) => [normalizedKey(category.nome), category]),
+  );
+}
+
+async function categoryFor(
+  groupTitle: string,
+  categories: Map<string, IptvCategoryRecord>,
+): Promise<{ id?: string; created: boolean }> {
+  const name = groupTitle.trim();
+  if (!name) return { created: false };
+
+  const key = normalizedKey(name);
+  const existing = categories.get(key);
+  if (existing) return { id: existing.id, created: false };
+
+  const created = await iptvCategoryRepository.create({
+    nome: name,
+    ativo: true,
+    ordem: 0,
+  });
+  categories.set(key, created);
+  return { id: created.id, created: true };
+}
+
+async function run(): Promise<void> {
+  const entries = [...selected.value];
+
+  if (!entries.length) return;
+
+  importing.value = true;
+  progress.value = 0;
+  batchTotal.value = entries.length;
+  error.value = "";
+  summary.value = null;
+
+  let importedCount = 0;
+  let skippedCount = 0;
+  let categoriesCreated = 0;
+  const failures: ImportFailure[] = [];
+  const duplicateItems = internalDuplicateKeys(entries);
+  const categories = await loadCategoryMap();
+
+  for (const item of entries) {
+    if (duplicateItems.has(item)) {
+      skippedCount += 1;
+      progress.value += 1;
+      continue;
+    }
+    const duplicate = findM3uDuplicate(item, props.existing);
+
+    if (duplicate.kind && duplicate.kind !== "name") {
+      skippedCount += 1;
+      progress.value += 1;
+      continue;
+    }
+
+    let channel: IptvChannelRecord | null = null;
+
+    try {
+      const category = await categoryFor(item.groupTitle, categories);
+      if (category.created) categoriesCreated += 1;
+
+      channel = (await iptvChannelRepository.create({
+        nome: item.name,
+        url_stream: item.url,
+        tvg_id: item.tvgId,
+        tvg_name: item.tvgName,
+        tvg_logo_url: item.tvgLogo,
+        playlist_origem: fileName.value,
+        adulto: item.adult,
+        ativo: true,
+        cemiterio: false,
+        categoria: category.id,
+        qualidade: "Desconhecida",
+      })) as IptvChannelRecord;
+
+      await iptvSourceRepository.create({
+        canal_tv: channel.id,
+        url: item.url,
+        rotulo: "Importado da playlist",
+        tipo: sourceType(item.url),
+        qualidade: "Desconhecida",
+        prioridade: 0,
+        ativo: true,
+      });
+
+      importedCount += 1;
+    } catch (cause) {
+      let message = cause instanceof Error ? cause.message : String(cause);
+
+      if (channel?.id) {
+        try {
+          await iptvChannelRepository.delete(channel.id);
+        } catch (rollbackCause) {
+          const rollbackMessage =
+            rollbackCause instanceof Error
+              ? rollbackCause.message
+              : String(rollbackCause);
+
+          message +=
+            ` O canal criado não pôde ser removido: ${rollbackMessage}`;
+        }
+      }
+
+      failures.push({
+        name: item.name,
+        message,
+      });
+    } finally {
+      progress.value += 1;
+    }
+  }
+
+  summary.value = {
+    imported: importedCount,
+    skipped: skippedCount,
+    failed: failures.length,
+    failures,
+    categoriesCreated,
+    internalDuplicates: duplicateItems.size,
+  };
+
+  importing.value = false;
+
+  if (importedCount > 0) {
+    emit("imported", importedCount);
+  }
+}
+</script>
+
+<template>
+  <Teleport to="body">
+    <div
+      v-if="open"
+      class="dialog-backdrop"
+      @click.self="!importing && emit('close')"
+    >
+      <section
+        class="dialog-panel m3u-import"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="m3u-title"
+        @keydown.esc.prevent="!importing && emit('close')"
+      >
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">IPTV</p>
+            <h2 id="m3u-title">Importar playlist M3U</h2>
+          </div>
+
+          <button
+            class="icon-button"
+            type="button"
+            aria-label="Fechar importador"
+            :disabled="importing"
+            @click="emit('close')"
+          >
+            ×
+          </button>
+        </div>
+
+        <label class="form-field">
+          <span>Playlist M3U ou M3U8</span>
+          <input
+            ref="firstInput"
+            type="file"
+            accept=".m3u,.m3u8,application/vnd.apple.mpegurl,audio/x-mpegurl"
+            :disabled="importing"
+            @change="readFile"
+          />
+        </label>
+
+        <div
+          v-if="error"
+          class="form-alert form-alert-error"
+          role="alert"
+        >
+          {{ error }}
+        </div>
+
+        <section
+          v-if="summary"
+          class="m3u-result"
+          aria-labelledby="m3u-result-title"
+          aria-live="polite"
+        >
+          <h3 id="m3u-result-title">Resultado da importação</h3>
+          <p>
+            <strong>{{ summary.imported }}</strong> importadas ·
+            <strong>{{ summary.skipped }}</strong> ignoradas ·
+            <strong>{{ summary.failed }}</strong> falhadas
+          </p>
+          <p>
+            <strong>{{ summary.categoriesCreated }}</strong> categorias criadas ·
+            <strong>{{ summary.internalDuplicates }}</strong> duplicados internos
+          </p>
+
+          <details v-if="summary.failures.length">
+            <summary>Ver falhas</summary>
+            <ul>
+              <li
+                v-for="failure in summary.failures"
+                :key="`${failure.name}-${failure.message}`"
+              >
+                <strong>{{ failure.name }}:</strong>
+                {{ failure.message }}
+              </li>
+            </ul>
+          </details>
+
+          <button
+            class="button button-secondary"
+            type="button"
+            @click="reset"
+          >
+            Importar outra playlist
+          </button>
+        </section>
+
+        <template v-if="items.length && !summary">
+          <div class="m3u-summary" aria-live="polite">
+            <strong>{{ items.length }} entradas</strong>
+            <span>{{ selected.length }} selecionadas</span>
+            <span>{{ invalidCount }} inválidas</span>
+          </div>
+
+          <div class="m3u-toolbar">
+            <input
+              v-model.trim="query"
+              type="search"
+              placeholder="Pesquisar nome, grupo ou TVG-ID"
+              :disabled="importing"
+            />
+
+            <button
+              class="button button-secondary"
+              type="button"
+              :disabled="importing"
+              @click="selectAll(true)"
+            >
+              Selecionar visíveis
+            </button>
+
+            <button
+              class="button button-secondary"
+              type="button"
+              :disabled="importing"
+              @click="selectAll(false)"
+            >
+              Limpar visíveis
+            </button>
+          </div>
+
+          <div class="m3u-list">
+            <label
+              v-for="item in visible"
+              :key="`${item.url}-${item.name}`"
+              class="m3u-row"
+            >
+              <input
+                v-model="item.selected"
+                type="checkbox"
+                :disabled="importing || Boolean(item.errors.length)"
+              />
+
+              <span>
+                <strong>{{ item.name }}</strong>
+                <small>
+                  {{ item.groupTitle || "Sem grupo" }} ·
+                  {{ item.tvgId || "Sem TVG-ID" }}
+                </small>
+                <code>{{ item.url }}</code>
+                <small
+                  v-if="item.errors.length"
+                  class="field-error"
+                >
+                  {{ item.errors.join(" · ") }}
+                </small>
+              </span>
+            </label>
+          </div>
+
+          <progress
+            v-if="importing"
+            :value="progress"
+            :max="batchTotal"
+          >
+            {{ progress }} de {{ batchTotal }}
+          </progress>
+
+          <div class="form-actions">
+            <button
+              class="button button-secondary"
+              type="button"
+              :disabled="importing"
+              @click="emit('close')"
+            >
+              Cancelar
+            </button>
+
+            <button
+              class="button button-primary"
+              type="button"
+              :disabled="importing || !selected.length"
+              @click="run"
+            >
+              {{ importing ? "A importar…" : `Importar ${selected.length}` }}
+            </button>
+          </div>
+        </template>
+      </section>
+    </div>
+  </Teleport>
+</template>
+
+===== M3uImportDialog.spec.ts =====
+/**
+ * Projeto: Mediário
+ * Ficheiro: src/components/iptv/M3uImportDialog.spec.ts
+ * Versão do ficheiro: 1.1.1
+ * Tipo: Testes Vitest do importador M3U IPTV
+ * Autor: Zubiaks
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  enableAutoUnmount,
+  flushPromises,
+  mount,
+} from "@vue/test-utils";
+
+import { expectNoA11yViolations } from "@/test/accessibility";
+import M3uImportDialog from "./M3uImportDialog.vue";
+
+const mocks = vi.hoisted(() => ({
+  channelCreate: vi.fn(),
+  channelDelete: vi.fn(),
+  sourceCreate: vi.fn(),
+  categoryList: vi.fn(),
+  categoryCreate: vi.fn(),
+}));
+
+vi.mock("@/domain/repositories", () => ({
+  iptvChannelRepository: {
+    create: mocks.channelCreate,
+    delete: mocks.channelDelete,
+  },
+  iptvSourceRepository: {
+    create: mocks.sourceCreate,
+  },
+  iptvCategoryRepository: {
+    list: mocks.categoryList,
+    create: mocks.categoryCreate,
+  },
+}));
+
+vi.mock("@/domain/iptv/m3uDuplicate", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("@/domain/iptv/m3uDuplicate")
+  >();
+
+  return {
+    ...actual,
+    findM3uDuplicate: vi.fn(() => ({ kind: null })),
+  };
+});
+
+enableAutoUnmount(afterEach);
+
+function item(
+  name: string,
+  url: string,
+  groupTitle = "Notícias",
+  tvgId = name,
+) {
+  return {
+    name,
+    url,
+    tvgId,
+    tvgName: name,
+    tvgLogo: "",
+    groupTitle,
+    language: "",
+    country: "",
+    adult: false,
+    selected: true,
+    errors: [],
+  };
+}
+
+function mountDialog() {
+  return mount(M3uImportDialog, {
+    attachTo: document.body,
+    props: {
+      open: true,
+      existing: [],
+    },
+  });
+}
+
+beforeEach(() => {
+  Object.values(mocks).forEach((mock) => mock.mockReset());
+
+  mocks.categoryList.mockResolvedValue({
+    items: [],
+    totalItems: 0,
+    totalPages: 1,
+    page: 1,
+    perPage: 500,
+  });
+
+  mocks.categoryCreate.mockImplementation(async (data) => ({
+    id: "cat-new",
+    ...data,
+  }));
+});
+
+describe("M3uImportDialog", () => {
+  it("não apresenta violações automáticas", async () => {
+    const wrapper = mountDialog();
+
+    await flushPromises();
+    await expectNoA11yViolations(wrapper.element);
+  });
+
+  it("cria categoria a partir de group-title e associa ao canal", async () => {
+    mocks.categoryCreate.mockResolvedValue({
+      id: "cat1",
+      nome: "Notícias",
+    });
+    mocks.channelCreate.mockResolvedValue({ id: "c1" });
+    mocks.sourceCreate.mockResolvedValue({ id: "s1" });
+
+    const wrapper = mountDialog();
+    (wrapper.vm as any).items = [
+      item("Canal 1", "https://x/1.m3u8"),
+    ];
+
+    await (wrapper.vm as any).run();
+    await flushPromises();
+
+    expect(mocks.categoryCreate).toHaveBeenCalledWith({
+      nome: "Notícias",
+      ativo: true,
+      ordem: 0,
+    });
+    expect(mocks.channelCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ categoria: "cat1" }),
+    );
+  });
+
+  it("reutiliza categoria existente ignorando acentos e maiúsculas", async () => {
+    mocks.categoryList.mockResolvedValue({
+      items: [{ id: "cat1", nome: "Noticias" }],
+      totalItems: 1,
+      totalPages: 1,
+      page: 1,
+      perPage: 500,
+    });
+    mocks.channelCreate.mockResolvedValue({ id: "c1" });
+    mocks.sourceCreate.mockResolvedValue({ id: "s1" });
+
+    const wrapper = mountDialog();
+    (wrapper.vm as any).items = [
+      item("Canal 1", "https://x/1.m3u8", "NOTÍCIAS"),
+    ];
+
+    await (wrapper.vm as any).run();
+
+    expect(mocks.categoryCreate).not.toHaveBeenCalled();
+    expect(mocks.channelCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ categoria: "cat1" }),
+    );
+  });
+
+  it("ignora duplicados internos e continua o lote", async () => {
+    mocks.channelCreate.mockResolvedValue({ id: "c1" });
+    mocks.sourceCreate.mockResolvedValue({ id: "s1" });
+
+    const wrapper = mountDialog();
+    (wrapper.vm as any).items = [
+      item("A", "https://x/a", "Grupo", "a"),
+      item("A2", "https://x/a", "Grupo", "b"),
+    ];
+
+    await (wrapper.vm as any).run();
+    await flushPromises();
+
+    expect(mocks.categoryCreate).toHaveBeenCalledTimes(1);
+    expect(mocks.channelCreate).toHaveBeenCalledTimes(1);
+    expect(mocks.sourceCreate).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain("1 ignoradas");
+    expect(wrapper.text()).toContain("1 duplicados internos");
+  });
+});

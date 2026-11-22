@@ -47,21 +47,27 @@ export const episodeRepository =
     "podcast_episodios",
   );
 
-/** Canais de televisão e IPTV. */
-export const channelRepository =
-  new PocketBaseRepository<ChannelRecord>("canais_tv");
+/** Canais IPTV. */
+export const iptvChannelRepository =
+  new PocketBaseRepository<IptvChannelRecord>("canais_tv");
 
-/** Links principais e alternativos de canais e streams. */
-export const streamLinkRepository =
-  new PocketBaseRepository<StreamLinkRecord>(
-    "stream_links",
-  );
+/** Fontes principais e alternativas de canais IPTV. */
+export const iptvSourceRepository =
+  new PocketBaseRepository<IptvSourceRecord>("stream_links");
 
-/** Categorias específicas dos canais de televisão. */
-export const tvCategoryRepository =
-  new PocketBaseRepository<TvCategoryRecord>(
-    "categorias_tv",
-  );
+/** Categorias específicas dos canais IPTV. */
+export const iptvCategoryRepository =
+  new PocketBaseRepository<IptvCategoryRecord>("categorias_tv");
+
+/**
+ * Aliases legados temporários.
+ *
+ * Preservam compatibilidade com módulos ainda não migrados sem criar
+ * instâncias adicionais dos repositórios PocketBase.
+ */
+export const channelRepository = iptvChannelRepository;
+export const streamLinkRepository = iptvSourceRepository;
+export const tvCategoryRepository = iptvCategoryRepository;
 
 /** Países utilizados em títulos, canais e streams. */
 export const countryRepository =
@@ -89,14 +95,3 @@ export const availabilityRepository =
  */
 export const exemplarRepository =
   new PocketBaseRepository("exemplares");
-
-/**
- * Aliases públicos do domínio IPTV.
- *
- * Preservam uma única instância por coleção e mantêm compatibilidade
- * temporária com channelRepository, streamLinkRepository e
- * tvCategoryRepository.
- */
-export const iptvChannelRepository = channelRepository;
-export const iptvSourceRepository = streamLinkRepository;
-export const iptvCategoryRepository = tvCategoryRepository;
