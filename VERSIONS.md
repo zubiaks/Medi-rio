@@ -1,18 +1,19 @@
 # Versões do Mediário
 
-> **Versão do documento:** `2.0.0`
-> **Última revisão:** `2026-11-21`
-> **Autor:** Zubiaks
+> **Versão do documento:** `3.0.0`  
+> **Última revisão:** `2026-11-22`  
+> **Autor:** Zubiaks  
 > **Licença:** PolyForm Noncommercial License 1.0.0
 
 Este documento regista as versões do **Mediário**, o objetivo de cada marco, as funcionalidades incluídas, o estado de validação e o trabalho ainda pendente.
 
-As versões estão ordenadas da **mais recente para a mais antiga**. Cada bloco pode ser aberto ou fechado no GitHub.
+As versões estão ordenadas da mais recente para a mais antiga. Cada bloco pode ser aberto ou fechado no GitHub.
 
-> **Versão atual:** `v0.3.0-alpha.1` — Podcasts, sincronização, reprodução e biblioteca de episódios.
-> **Próximo marco:** `v0.4.0-alpha.1` — Separação e consolidação do domínio IPTV.
-> **Versão técnica do frontend:** consultar `pb_public/package.json`.
-> **Versão do esquema PocketBase:** legado atual, ainda não numerado.
+> **Versão atual:** `v0.4.0-alpha.1` — IPTV, M3U, XMLTV, fontes, diagnóstico e produtividade.  
+> **Marco atual:** `v0.5.0-alpha.1` — Biblioteca física.  
+> **Próximo marco:** `v0.6.0-beta.1` — Diário e reviews.  
+> **Versão técnica do frontend:** `0.4.0-alpha.1`.  
+> **Versão do esquema PocketBase:** `1.0.0`.
 
 ## Resumo
 
@@ -23,8 +24,8 @@ As versões estão ordenadas da **mais recente para a mais antiga**. Cada bloco 
 | `v0.8.0-beta.1` | Segurança, instalação e recuperação | Planeado |
 | `v0.7.0-beta.1` | Providers e manutenção | Planeado |
 | `v0.6.0-beta.1` | Diário e reviews | Planeado |
-| `v0.5.0-alpha.1` | Biblioteca física | Em desenvolvimento |
-| `v0.4.0-alpha.1` | IPTV, M3U, fontes e reprodução | **Próximo marco** |
+| `v0.5.0-alpha.1` | Biblioteca física | **Em desenvolvimento** |
+| `v0.4.0-alpha.1` | IPTV, M3U, XMLTV, fontes e reprodução | **Concluído** |
 | `v0.3.0-alpha.1` | Podcasts | **Concluído** |
 | `v0.2.0-alpha.1` | Gestão VOD | **Concluído** |
 | `v0.1.0-alpha.3` | Catálogo editável, imagens e lixeira | **Concluído** |
@@ -86,7 +87,7 @@ Preparar o Mediário para instalação reproduzível, atualização segura e uti
 ## Trabalho previsto
 
 - autenticação;
-- revisão das API Rules do PocketBase;
+- revisão das API Rules das coleções PocketBase;
 - gestão de utilizadores autorizados;
 - versionamento formal do esquema PocketBase;
 - migrations verificáveis;
@@ -140,6 +141,17 @@ Centralizar providers externos, sincronizações, importações, diagnóstico e 
 
 Registar consumo, progresso, avaliações e opiniões.
 
+## Modelo de dados
+
+Coleções PocketBase principais:
+
+- `visualizacoes`;
+- `reviews`;
+- `titulos`;
+- `temporadas`;
+- `episodios`;
+- `plataformas`.
+
 ## Trabalho previsto
 
 - diário baseado em `visualizacoes`;
@@ -150,41 +162,207 @@ Registar consumo, progresso, avaliações e opiniões.
 
 </details>
 
-<details>
-<summary><strong>v0.5.0-alpha.1 — Biblioteca física</strong> · Em desenvolvimento · [+] Mostrar detalhes</summary>
+<details open>
+<summary><strong>v0.5.0-alpha.1 — Biblioteca física</strong> · Em desenvolvimento · [−] Ocultar detalhes</summary>
 
 ## Objetivo
 
-Gerir exemplares, edições, formatos, compras, empréstimos e devoluções.
+Gerir exemplares e edições físicas, formatos, códigos, localização, conservação, empréstimos, devoluções e histórico.
 
-## Já implementado
+## Modelo conceptual
 
-- página de biblioteca;
-- contagem de exemplares;
-- contagem de empréstimos;
-- listagem inicial de records;
-- estados vazios;
-- estrutura para formatos e localização.
+```text
+Biblioteca física
+└── Exemplar
+    ├── Título do catálogo
+    ├── Formato físico
+    ├── Tipo de edição
+    ├── Número da cópia
+    ├── Código interno e código de barras
+    ├── Estado físico e região
+    ├── Localização
+    ├── Selado e Steelbook
+    ├── Notas
+    └── Empréstimos
+        ├── Pessoa
+        ├── Data de empréstimo
+        ├── Data prevista
+        ├── Renovações
+        ├── Data de devolução
+        └── Estado do histórico
+```
+
+## Modelo de dados
+
+Coleções PocketBase principais:
+
+- `exemplares`;
+- `historico_emprestimos`;
+- `formatos_fisicos`;
+- `tipos_edicao`;
+- `titulos`;
+- `pessoas`.
+
+O esquema mínimo documentado é `1.0.0`.
+
+## Concluído
+
+### Fase 1 — Fundação e exemplares
+
+- página própria em `/biblioteca`;
+- repositório tipado para `exemplares`;
+- criação e edição de exemplares;
+- pesquisa e associação a títulos do catálogo;
+- relações com `formatos_fisicos` e `tipos_edicao`;
+- número da cópia;
+- código interno;
+- código de barras;
+- estado físico;
+- região;
+- localização;
+- indicadores de exemplar selado e Steelbook;
+- notas;
+- estados de carregamento, vazio e erro;
+- paginação;
+- validação acessível.
+
+### Fase 2 — Gestão avançada e empréstimos
+
+- métricas de exemplares disponíveis, emprestados e atrasados;
+- pesquisa por título, código interno e código de barras;
+- filtros por estado, formato, edição e localização;
+- tabela expandida com os dados físicos e códigos;
+- deteção de códigos internos e códigos de barras repetidos;
+- separação entre edição do exemplar e operações de empréstimo;
+- início de empréstimo;
+- renovação;
+- devolução;
+- registo de exemplar perdido;
+- cancelamento de empréstimo;
+- prevenção de empréstimos ativos duplicados;
+- rollback compensatório entre `exemplares` e `historico_emprestimos`;
+- histórico global de empréstimos;
+- textos claros e acessíveis para cada estado;
+- testes de validação, fluxo, métricas, duplicados e acessibilidade.
+
+### Estados confirmados de empréstimo
+
+O campo `historico_emprestimos.estado` é um `select` de escolha única com os valores exatos:
+
+```text
+Emprestado
+Atrasado
+Devolvido
+Perdido
+Danificado
+Cancelado
+```
+
+Regras implementadas:
+
+- `Emprestado`: empréstimo ativo;
+- `Atrasado`: empréstimo ativo cuja data prevista já passou;
+- `Devolvido`: devolução em bom estado;
+- `Danificado`: devolução assinalada como não estando em bom estado;
+- `Perdido`: encerramento por perda, com nota obrigatória;
+- `Cancelado`: encerramento por cancelamento, com nota obrigatória.
+
+Apenas `Emprestado` e `Atrasado` são tratados como estados ativos.
+
+## Em execução
+
+### Fase 3 — Detalhe e histórico individual
+
+- detalhe completo do exemplar;
+- capa e ligação ao título associado;
+- formato e tipo de edição;
+- conservação, região, localização e códigos;
+- atributos Selado e Steelbook;
+- datas de criação e atualização;
+- notas do exemplar;
+- total de empréstimos e renovações;
+- empréstimo ativo;
+- indicação de atraso;
+- último empréstimo encerrado;
+- histórico individual por exemplar;
+- edição e ações de empréstimo a partir do detalhe;
+- atualização do detalhe depois de alterar um empréstimo.
 
 ## Trabalho previsto
 
-- criação e edição de exemplares;
-- edições e formatos;
-- localização física;
-- compras e valor;
-- empréstimos e devoluções;
-- histórico de movimentações;
-- filtros, paginação e pesquisa;
-- testes automáticos.
+### Fase 4 — Pessoas e empréstimos por destinatário
+
+- lista de pessoas com empréstimos ativos;
+- pesquisa e resumo por pessoa;
+- quantidade de empréstimos ativos e atrasados;
+- próxima data prevista;
+- histórico individual por destinatário;
+- aviso antes de emprestar a alguém com atrasos;
+- decisão documentada sobre contactos próprios ou reutilização de `pessoas`.
+
+### Fase 5 — Importação, códigos e inventário
+
+- importação CSV;
+- pré-visualização e validação por linha;
+- associação a títulos existentes;
+- geração controlada de códigos internos;
+- pesquisa rápida por código de barras;
+- exportação CSV e JSON;
+- relatório de criados, atualizados, ignorados e falhados.
+
+### Fase 6 — Sessões de inventário
+
+- sessões formais de inventário;
+- encontrados, não localizados e localização incorreta;
+- progresso e discrepâncias;
+- relatório final;
+- exportação CSV;
+- registo no `audit_log`;
+- migrations para coleções de inventário, se necessárias.
+
+### Trabalho posterior
+
+- compras, preço e valor da coleção dependem de campos ou coleções ainda não existentes no esquema `1.0.0`;
+- normalizar destinatários de empréstimos sem misturar contactos com pessoas de créditos do catálogo;
+- definir arquivo lógico de exemplares sem apagar o histórico;
+- testes de integração do marco completo.
+
+## Validação atual
+
+- Fase 2 committed;
+- `npm run type-check`: aprovado;
+- 14 testes essenciais da Fase 2: aprovados;
+- `npm run build`: aprovado após correção das expressões Vue;
+- `git diff --check`: aprovado;
+- estados do PocketBase confirmados;
+- coleções e campos preservados sem migração destrutiva.
+
+## Critérios de conclusão
+
+A versão pode ser considerada concluída quando:
+
+- criação, edição e detalhe dos exemplares estiverem funcionais;
+- empréstimos, renovações e devoluções estiverem estáveis;
+- históricos global, individual e por pessoa estiverem acessíveis;
+- importação e exportação do inventário estiverem implementadas;
+- sessões de inventário estiverem funcionais ou formalmente adiadas;
+- não existirem históricos ativos duplicados;
+- os testes críticos da Biblioteca estiverem aprovados;
+- `npm audit`, `npm run type-check`, testes, build e `git diff --check` passarem;
+- documentação e cabeçalhos técnicos estiverem atualizados.
+
+## Estado
+
+**Em desenvolvimento. Fases 1 e 2 concluídas; Fase 3 em execução.**
 
 </details>
 
-<details open>
-<summary><strong>v0.4.0-alpha.1 — IPTV, M3U, fontes e reprodução</strong> · Próximo marco · [−] Ocultar detalhes</summary>
+<details>
+<summary><strong>v0.4.0-alpha.1 — IPTV, M3U, XMLTV, fontes e reprodução</strong> · Concluído · [+] Mostrar detalhes</summary>
 
 ## Objetivo
 
-Consolidar o domínio IPTV, separar definitivamente IPTV de VOD e preparar uma arquitetura própria para canais, fontes, playlists M3U, dados EPG e reprodução.
+Consolidar o domínio IPTV, separar IPTV de VOD e disponibilizar uma arquitetura própria para canais, fontes, playlists M3U, EPG, reprodução e manutenção.
 
 ## Modelo conceptual
 
@@ -203,10 +381,6 @@ IPTV
     └── Estado técnico
 ```
 
-Um canal IPTV é a entidade apresentada ao utilizador.
-
-As fontes são detalhes técnicos do canal e não constituem uma área separada de navegação.
-
 ## Modelo de dados
 
 Coleções PocketBase principais:
@@ -218,132 +392,91 @@ Coleções PocketBase principais:
 - `idiomas`;
 - `tags`.
 
-## Compatibilidade temporária
-
-- os nomes das coleções PocketBase não serão alterados nesta versão;
-- a rota `/tv` será preservada até existir redirect para `/iptv`;
-- os diretórios `components/live` e `domain/live` permanecem temporariamente;
-- os tipos antigos permanecem disponíveis através de aliases compatíveis;
-- as preferências locais existentes devem ser migradas ou preservadas.
-
 ## Concluído
 
-### Interface
+### Estrutura e navegação
 
-- terminologia visível alterada de “TV e streams” para “IPTV”;
-- cartão IPTV atualizado no ecrã inicial;
-- navegação lateral atualizada;
-- título “Canais IPTV” aplicado à biblioteca;
-- estados de carregamento e vazio atualizados;
-- vistas de grelha, logótipos, lista e compacta;
-- largura dos cartões configurável;
-- filtros por pesquisa, país, categoria, qualidade, estado e favorito;
-- paginação acessível.
+- rota principal `/iptv`;
+- redirect de compatibilidade `/tv` para `/iptv`;
+- `IptvView.vue` como vista principal;
+- componentes e domínio consolidados em `components/iptv` e `domain/iptv`;
+- aliases `IptvChannelRecord`, `IptvSourceRecord` e `IptvCategoryRecord`;
+- repositórios IPTV tipados e aliases legados compatíveis.
 
-### Canais e fontes
+### Biblioteca de canais
 
-- listagem de canais em `canais_tv`;
-- fonte principal no canal;
-- fontes alternativas em `stream_links`;
-- detalhe do canal;
-- edição e arquivo lógico;
-- prioridade das fontes;
-- estado técnico das fontes;
-- suporte de tipos HLS, MPEG-DASH, HTTP, áudio, RTMP, RTSP e UDP/RTP;
-- identificação de fontes que exigem backend local;
-- informação TVG-ID, TVG name e EPG-ID;
-- origem da playlist.
+- pesquisa, filtros e paginação;
+- filtro por playlist de origem;
+- vistas Grelha, Logos, Lista, Compacta e Texto;
+- largura dinâmica dos cartões;
+- preferências persistentes;
+- fallback de logótipos;
+- seleção múltipla;
+- ações em lote;
+- ativação, desativação, favoritos, categoria, país e arquivo lógico.
 
-### Importação e validação
+### M3U
 
-- parser TypeScript de playlists M3U e M3U8;
-- leitura de metadados IPTV;
-- validação de protocolos;
-- deteção de URLs inválidas;
-- deteção de duplicados;
-- testes unitários do parser;
-- validação dos formulários de canais e fontes.
+- parser M3U e M3U8;
+- importação por ficheiro e URL remota;
+- timeout, limite de tamanho e diagnóstico de CORS;
+- categorias automáticas por `group-title`;
+- duplicados internos;
+- reimportação segura por TVG-ID e URL;
+- preservação de dados manuais vazios no M3U;
+- fontes alternativas sem duplicação;
+- modos Sincronizar, Apenas fontes e Apenas novos;
+- plano prévio da importação;
+- canais desaparecidos: manter, desativar ou arquivar;
+- histórico local;
+- relatórios JSON e CSV;
+- ocultação de parâmetros sensíveis nos relatórios.
 
-### Separação de domínios
+### XMLTV e EPG
 
-- `broadcast` removido dos tipos VOD;
-- `broadcast` removido dos filtros VOD;
-- `broadcast` removido da apresentação das modalidades;
-- `broadcast` removido de `AvailabilityRecord`;
-- aliases TypeScript adicionados:
-  - `IptvChannelRecord`;
-  - `IptvSourceRecord`;
-  - `IptvCategoryRecord`.
+- parser XMLTV;
+- suporte de XML e XML.GZ em navegadores compatíveis;
+- normalização de datas e fusos horários;
+- correspondência por EPG-ID, TVG-ID e nome;
+- armazenamento EPG local sem alteração do esquema;
+- gestor EPG;
+- guia de programação no detalhe do canal.
 
-## Em execução
+### Fontes, diagnóstico e player
 
-- adoção dos aliases `Iptv*` nos módulos IPTV;
-- melhoria dos cabeçalhos técnicos e relações entre ficheiros;
-- documentação das dependências do domínio;
-- normalização da nomenclatura interna;
-- preparação da rota `/iptv`;
-- preservação de `/tv` através de redirect;
-- preparação do versionamento do esquema PocketBase.
+- fontes principais e alternativas;
+- prioridade, qualidade, tipo e estado técnico;
+- seleção inteligente da melhor fonte;
+- player com seleção manual e fallback controlado;
+- diagnóstico individual e em lote;
+- cancelamento de testes;
+- latência, HTTP status e Content-Type;
+- classificação de autenticação, bloqueio, limitar pedidos e falhas de rede;
+- indicação explícita de fontes que exigem backend local.
 
-## Trabalho previsto
+### Testes e documentação
 
-- renomear `LiveView.vue` para `IptvView.vue`;
-- migrar `components/live` para `components/iptv`;
-- migrar `domain/live` para `domain/iptv`;
-- migrar estilos `live-*` para `iptv-*`;
-- avaliar a renomeação de `channelRepository` para `iptvChannelRepository`;
-- avaliar a renomeação de `streamLinkRepository` para `iptvSourceRepository`;
-- ativar o diálogo de importação M3U;
-- implementar importação selecionável;
-- concluir deteção de duplicados durante importações;
-- adicionar reprodução HLS onde não exista suporte nativo;
-- integrar XMLTV/EPG;
-- melhorar diagnóstico e histórico de testes;
-- adicionar testes da página IPTV;
-- testar a migração da preferência local da grelha;
-- documentar rollback.
-
-## Fora deste domínio
-
-Devem permanecer separados de IPTV:
-
-- rádio online;
-- webcams;
-- podcasts;
-- VOD e disponibilidades;
-- providers de filmes e séries.
-
-Estes conteúdos podem reutilizar componentes técnicos, mas não devem ser inseridos no domínio IPTV.
-
-## Validação atual
-
+- testes de domínio, componentes e acessibilidade;
+- testes corrigidos para componentes com Teleport;
+- comandos específicos `test:iptv` e `check:iptv`;
+- documentação da arquitetura e protocolos;
+- validação de rota e redirect;
+- `npm audit --omit=dev`: 0 vulnerabilidades na validação final;
 - `npm run type-check`: aprovado;
 - `npm run build`: aprovado;
-- pesquisa global por `broadcast`: sem resultados no frontend;
-- interface IPTV carregada corretamente;
-- canais existentes preservados;
-- coleções PocketBase preservadas;
-- sem alterações destrutivas ao esquema.
+- `git diff --check`: aprovado.
 
-## Critérios de conclusão
+## Limitações conhecidas
 
-A versão pode ser considerada concluída quando:
-
-- `/iptv` for uma rota funcional;
-- `/tv` redirecionar para `/iptv`;
-- os imports principais usarem nomenclatura IPTV;
-- a importação M3U estiver funcional;
-- os testes críticos estiverem aprovados;
-- `npm audit` não apresentar vulnerabilidades conhecidas;
-- `npm run type-check` passar;
-- `npm test` passar;
-- `npm run build` passar;
-- `git diff --check` passar;
-- a documentação e os cabeçalhos técnicos estiverem atualizados.
+- HLS sem suporte nativo pode exigir `hls.js` ou backend local;
+- CORS, User-Agent e Referrer personalizados podem exigir backend;
+- RTMP, RTSP e UDP/RTP não são reproduzidos diretamente pelo browser;
+- EPG permanece em armazenamento local nesta versão;
+- segurança e API Rules serão revistas no marco `v0.8.0-beta.1`.
 
 ## Estado
 
-**Em desenvolvimento.**
+**Concluído para o marco alpha.**
 
 </details>
 
@@ -356,63 +489,40 @@ Migrar o domínio de podcasts para módulos Vue e TypeScript independentes, com 
 
 ## Modelo de dados
 
-Coleções PocketBase principais:
-
 - `streams`, com `tipo = "podcast"`;
 - `podcast_episodios`.
 
 ## Concluído
 
-- parsing RSS;
-- suporte de namespaces iTunes;
-- identificação de feeds RSS;
-- sincronização individual;
-- sincronização global;
+- parsing RSS e Atom;
+- namespaces iTunes;
+- identificação de feeds;
+- sincronização individual e global;
 - prevenção de duplicação por GUID;
-- imagens por podcast e por episódio;
-- fallback de imagem do episódio para a imagem do podcast;
-- duração;
-- temporada e episódio;
+- imagens por podcast e episódio;
+- duração, temporada e episódio;
 - conteúdo explícito;
-- descrição em texto;
-- imagens remotas presentes na descrição;
-- apresentação dos episódios recentes;
-- seleção de podcast;
-- pesquisa de podcasts;
-- pesquisa de episódios;
-- filtros por estado de escuta;
-- filtros de conteúdo explícito;
-- filtros de favoritos;
+- descrição e ligações;
+- pesquisa e filtros;
 - vistas em grelha, lista e compacta;
-- paginação de podcasts;
-- paginação de episódios;
+- paginação;
 - player de áudio;
-- pausa e continuação da reprodução;
-- gravação periódica do progresso;
-- marcação automática como concluído;
+- progresso e conclusão;
 - favoritos;
-- edição do podcast;
-- edição do estado do episódio;
-- ligação para RSS;
-- ligação para a página oficial;
-- estados de loading, erro e vazio.
+- edição de podcast e episódio;
+- estados de carregamento, erro e vazio.
 
 ## Validação
 
 - `npm run type-check`: aprovado;
 - `npm run build`: aprovado;
-- carregamento dos podcasts existentes: aprovado;
-- carregamento de episódios: aprovado;
-- reprodução e progresso: implementados;
-- sincronização individual e global: implementadas.
+- carregamento, reprodução, progresso e sincronização implementados.
 
 ## Limitações conhecidas
 
-- feeds bloqueados por CORS podem exigir um hook ou proxy local no PocketBase;
-- os testes com fixtures devem continuar a crescer;
-- transferências offline ainda não estão implementadas;
-- fila global de reprodução ainda não está implementada;
-- a normalização avançada de descrições HTML pode ser melhorada.
+- feeds bloqueados por CORS podem exigir hook ou proxy local;
+- transferências offline e fila global ainda não implementadas;
+- fixtures e testes podem continuar a crescer.
 
 ## Estado
 
@@ -431,7 +541,7 @@ IPTV e emissões lineares não pertencem ao domínio VOD.
 
 ## Modelo de dados
 
-Usa a coleção PocketBase `disponibilidades`, relacionada com `titulos` e `paises`.
+Coleção `disponibilidades`, relacionada com `titulos` e `paises`.
 
 ## Modalidades suportadas
 
@@ -443,55 +553,28 @@ Usa a coleção PocketBase `disponibilidades`, relacionada com `titulos` e `pais
 - `fisico`;
 - `outro`.
 
-O tipo `broadcast` foi removido durante a separação técnica entre VOD e IPTV.
-
 ## Concluído e testado
 
-- listagem paginada com 24 ofertas por página;
+- listagem paginada;
 - criação e edição;
-- pesquisa assíncrona de títulos após 2 caracteres;
-- debounce de 300 ms e máximo de 20 resultados;
-- pesquisa por título, título original e ano;
-- provider, modalidade, URL, país, qualidade, preço, moeda e subscrição;
+- pesquisa assíncrona de títulos;
+- provider, modalidade, URL, país, qualidade, preço e moeda;
 - datas de início e fim;
-- ofertas ativas, inativas e expiradas;
-- filtros no PocketBase por texto, país, modalidade, qualidade, estado e subscrição;
-- filtros e página preservados na URL;
-- ativação, desativação e reativação;
-- eliminação definitiva com confirmação pelo provider;
+- estados ativos, inativos e expirados;
+- filtros preservados na URL;
+- ativação e desativação;
+- eliminação definitiva com confirmação;
 - diálogo responsivo e acessível;
-- deteção de duplicados com e sem país;
-- comparação de provider sem diferenças de maiúsculas, espaços ou acentos;
+- deteção de duplicados;
 - secção `Onde ver` no detalhe do título;
-- proteção contra alterações não guardadas;
-- estados de loading, erro e vazio.
-
-## Qualidades
-
-| Valor | Apresentação |
-|---|---|
-| `desconhecida` | Desconhecida |
-| `sd` | SD |
-| `hd` | HD |
-| `fhd` | Full HD |
-| `4k` | 4K |
-| `8k` | 8K |
-| `audio` | Áudio |
+- proteção contra alterações não guardadas.
 
 ## Validação
 
 - `npm audit`: 0 vulnerabilidades na validação do marco;
 - `npm run type-check`: aprovado;
 - `npm run build`: aprovado;
-- criação, edição, filtros, duplicados, estados, `Onde ver` e eliminação: aprovados;
-- interface responsiva e consola sem erros da aplicação.
-
-## Limitações conhecidas
-
-- testes automáticos ainda não implementados para todos os fluxos;
-- verificação periódica das URLs ainda não implementada;
-- histórico de preços fica para uma versão futura;
-- providers ainda não estão normalizados numa coleção própria.
+- fluxos principais aprovados.
 
 ## Estado
 
@@ -543,20 +626,18 @@ O tipo `broadcast` foi removido durante a separação técnica entre VOD e IPTV.
 <details>
 <summary><strong>Versões técnicas dos módulos</strong> · [+] Mostrar detalhes</summary>
 
-Esta tabela regista a versão documental dos módulos principais.
-
-A versão do módulo não substitui a versão do projeto nem o histórico Git. Indica a revisão do contrato técnico, das relações e das responsabilidades do ficheiro.
+Esta tabela regista a versão documental dos módulos principais. A versão do módulo não substitui a versão do projeto nem o histórico Git.
 
 | Domínio | Ficheiro principal | Versão | Estado | Revisto no projeto | Esquema mínimo |
 |---|---|---:|---|---|---|
-| Aplicação | `src/App.vue` | `1.0.0` | Em desenvolvimento | `0.3.0-alpha.1` | Legado atual |
-| Rotas | `src/router/index.ts` | `1.0.0` | Em migração | `0.3.0-alpha.1` | Legado atual |
-| Tipos PocketBase | `src/types/records.ts` | `1.1.0` | Em migração | `0.3.0-alpha.1` | Legado atual |
-| Catálogo | `src/views/CatalogView.vue` | `1.0.0` | Estável no marco alpha | `0.1.0-alpha.3` | Legado atual |
-| VOD | `src/views/VodView.vue` | `1.1.0` | Estável no marco alpha | `0.3.0-alpha.1` | Legado atual |
-| Podcasts | `src/views/PodcastsView.vue` | `1.0.0` | Estável no marco alpha | `0.3.0-alpha.1` | Legado atual |
-| IPTV | `src/views/LiveView.vue` | `1.1.0` | Em migração | `0.3.0-alpha.1` | Legado atual |
-| Biblioteca | `src/views/LibraryView.vue` | `0.1.0` | Em desenvolvimento | `0.3.0-alpha.1` | Legado atual |
+| Aplicação | `src/App.vue` | `1.0.0` | Em desenvolvimento | `0.4.0-alpha.1` | `1.0.0` |
+| Rotas | `src/router/index.ts` | `1.1.0` | Estável no marco alpha | `0.4.0-alpha.1` | `1.0.0` |
+| Tipos PocketBase | `src/types/records.ts` | `1.2.0` | Em evolução | `0.5.0-alpha.1` | `1.0.0` |
+| Catálogo | `src/views/CatalogView.vue` | `1.0.0` | Estável no marco alpha | `0.1.0-alpha.3` | `1.0.0` |
+| VOD | `src/views/VodView.vue` | `1.1.0` | Estável no marco alpha | `0.3.0-alpha.1` | `1.0.0` |
+| Podcasts | `src/views/PodcastsView.vue` | `1.0.0` | Estável no marco alpha | `0.3.0-alpha.1` | `1.0.0` |
+| IPTV | `src/views/IptvView.vue` | `3.0.0` | Concluído no marco alpha | `0.4.0-alpha.1` | `1.0.0` |
+| Biblioteca | `src/views/LibraryView.vue` | `1.0.0` | Em desenvolvimento | `0.5.0-alpha.1` | `1.0.0` |
 
 ## Regras
 
@@ -565,7 +646,7 @@ A versão do módulo não substitui a versão do projeto nem o histórico Git. I
 - `MAJOR`: mudança incompatível do contrato;
 - atualizar a versão quando mudarem props, eventos, rota, fluxo, tipos ou relações;
 - atualizar “Revisto no projeto” quando o módulo for tecnicamente revisto;
-- substituir “Legado atual” por uma versão numérica quando o esquema PocketBase passar a ser formalmente versionado.
+- atualizar “Esquema mínimo” quando uma funcionalidade depender de uma versão documentada do PocketBase.
 
 </details>
 
@@ -587,36 +668,34 @@ MAJOR.MINOR.PATCH
 
 ## Versões dos ficheiros
 
-Os módulos principais também usam `MAJOR.MINOR.PATCH`:
-
 - **PATCH**: documentação, correção, acessibilidade ou refatoração interna compatível;
 - **MINOR**: nova funcionalidade compatível, nova prop opcional, novo evento ou nova relação;
 - **MAJOR**: alteração incompatível de props, eventos, rotas, dados, coleções ou funções exportadas.
-
-A versão do ficheiro indica a revisão do contrato técnico do módulo, não substitui o Git.
 
 </details>
 
 <details>
 <summary><strong>Processo de release</strong> · [+] Mostrar detalhes</summary>
 
-1. Confirmar o estado da árvore de trabalho:
+1. Confirmar o estado da árvore:
 
    ```powershell
    git status
    git diff
    ```
 
-2. Atualizar de forma coerente:
+2. Atualizar:
 
    - `package.json`;
    - `package-lock.json`;
    - `VERSIONS.md`;
    - `CHANGELOG.md`;
    - cabeçalhos dos módulos alterados;
-   - versão mínima do esquema, quando aplicável.
+   - versão mínima do esquema.
 
-3. Executar as validações:
+3. Durante cada lote, executar apenas os testes essenciais relacionados.
+
+4. No encerramento do marco, executar:
 
    ```powershell
    npm audit
@@ -626,34 +705,19 @@ A versão do ficheiro indica a revisão do contrato técnico do módulo, não su
    git diff --check
    ```
 
-4. Realizar os testes manuais definidos para o marco.
+5. Realizar os testes manuais definidos para o marco.
 
-5. Confirmar:
+6. Confirmar:
 
-   - consola sem erros da aplicação;
-   - ausência de texto com encoding corrompido;
-   - funcionamento responsivo;
+   - consola sem erros;
+   - ausência de encoding corrompido;
+   - comportamento responsivo;
    - navegação por teclado;
    - compatibilidade com os dados PocketBase existentes.
 
-6. Fazer commit e push na `main`.
+7. Fazer commit e push na `main`.
 
-7. Gerar o pacote:
-
-   ```powershell
-   .\scripts\preparar-main.ps1
-   ```
-
-8. Criar uma tag anotada:
-
-   ```powershell
-   git tag -a v0.3.0-alpha.1 -m "Mediário v0.3.0-alpha.1"
-   git push origin v0.3.0-alpha.1
-   ```
-
-9. Criar a GitHub Release.
-
-10. Marcar como pre-release enquanto a versão for alpha, beta ou release candidate.
+8. Criar tag anotada e GitHub Release quando o marco estiver concluído.
 
 </details>
 
@@ -667,17 +731,19 @@ A versão do ficheiro indica a revisão do contrato técnico do módulo, não su
 | 2026-11-19 | `v0.1.0-alpha.2` | Fundação do catálogo. |
 | 2026-11-20 | `v0.1.0-alpha.3` | Catálogo editável, imagens e lixeira. |
 | 2026-11-20 | `v0.2.0-alpha.1` | Gestão VOD concluída. |
-| 2026-11-21 | `v0.3.0-alpha.1` | Podcasts concluídos e início da separação técnica de IPTV. |
+| 2026-11-21 | `v0.3.0-alpha.1` | Podcasts concluídos. |
+| 2026-11-22 | `v0.4.0-alpha.1` | IPTV, M3U, XMLTV, fontes, diagnóstico e produtividade concluídos. |
+| 2026-11-22 | `v0.5.0-alpha.1` | Início da Biblioteca física; Fases 1 e 2 concluídas e Fase 3 em execução. |
 
 ## Regras de manutenção deste documento
 
 - atualizar a versão atual e o próximo marco após cada release;
 - manter o resumo coerente com os blocos detalhados;
-- registar validações realmente executadas;
+- registar apenas validações realmente executadas;
 - não marcar funcionalidades como concluídas sem validação;
 - atualizar relações, compatibilidade e limitações conhecidas;
-- manter o ficheiro em UTF-8 sem BOM;
-- atualizar a versão deste documento quando a sua estrutura ou política mudar.
+- manter UTF-8 sem BOM;
+- atualizar a versão do documento quando a estrutura ou política mudar.
 
 ## Autor e licença
 
