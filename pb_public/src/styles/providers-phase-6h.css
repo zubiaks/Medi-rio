@@ -1,0 +1,19 @@
+/** Mediário | Fase 6H — diagnóstico pós-sincronização. */
+.tmdb-sync-health { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-sync-health-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-sync-score { display:grid; min-width:7rem; padding:.65rem; text-align:center; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+.tmdb-sync-score strong { font-size:1.4rem; }
+.tmdb-sync-score.is-success { color:var(--success); }
+.tmdb-sync-score.is-warning { color:var(--warning); }
+.tmdb-sync-score.is-danger { color:var(--danger); }
+.tmdb-sync-progress { height:.6rem; overflow:hidden; border-radius:999px; background:var(--surface); }
+.tmdb-sync-progress span { display:block; height:100%; background:linear-gradient(90deg,var(--primary),var(--success)); }
+.tmdb-sync-checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.55rem; padding:0; list-style:none; }
+.tmdb-sync-checks li { display:grid; grid-template-columns:auto 1fr; gap:.55rem; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-sync-checks li > span { font-weight:800; }
+.tmdb-sync-checks div { display:grid; gap:.2rem; }
+.tmdb-sync-checks small { color:var(--muted); }
+.tmdb-sync-checks .is-success > span { color:var(--success); }
+.tmdb-sync-checks .is-warning > span { color:var(--warning); }
+.tmdb-sync-checks .is-danger > span { color:var(--danger); }
+@media (max-width:640px) { .tmdb-sync-health-header { display:grid; } .tmdb-sync-score { width:100%; } }

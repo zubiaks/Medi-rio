@@ -18,6 +18,7 @@ import TmdbAlternativeTitlesPanel from "./TmdbAlternativeTitlesPanel.vue";
 import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
+import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -110,6 +111,19 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
   finally { saving.value = false; }
 }
 
+async function refreshTitle(): Promise<void> {
+  if (!selectedTitle.value) return;
+  saving.value = true;
+  error.value = "";
+  try {
+    selectedTitle.value = await titleRepository.get(selectedTitle.value.id);
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  } finally {
+    saving.value = false;
+  }
+}
+
 async function versionRestored(values: Record<string, unknown>): Promise<void> {
   if (!selectedTitle.value) return;
   await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "restaurar", origem: "interface", sucesso: true, detalhes: { operacao: "restauro_versao", campos_restaurados: Object.keys(values) } });
@@ -183,6 +197,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbAlternativeTitlesPanel v-if="selectedTitle && details" :title="selectedTitle" :details="details" :disabled="saving" @imported="alternativeTitlesImported" />
     <TmdbImagesPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" :disabled="saving" @applied="imagesApplied" />
     <TitleVersionPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @restored="versionRestored" @snapshot="snapshotCreated" />
+    <TmdbSyncHealthPanel v-if="selectedTitle" :title="selectedTitle" :details="details" :loading="saving" @refresh="refreshTitle" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>
