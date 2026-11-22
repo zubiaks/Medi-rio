@@ -1,0 +1,1 @@
+import { PocketBaseRepository } from "@/infrastructure/pocketbase/repository";import type{LibraryCopyRecord}from"./records";export const libraryCopyRepository=new PocketBaseRepository<LibraryCopyRecord>("exemplares");

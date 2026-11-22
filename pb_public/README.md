@@ -1,3 +1,5 @@
-# Correção final dos testes com Teleport
+# Biblioteca física, lote 1
 
-Os componentes funcionais não foram alterados. Os quatro testes de componentes passam a montar `<Teleport>` como stub local, mantendo o conteúdo dentro de `wrapper.element`. Isso permite usar `wrapper.get`, `wrapper.text` e `axe.run(wrapper.element)` de forma consistente.
+Usa apenas campos já observados na coleção `exemplares`: `titulo`, `formato`, `tipo_edicao`, `localizacao` e `emprestado`. O formulário cria/edita título, localização e estado de empréstimo. Formato e tipo de edição são apresentados quando já existem, sem assumir coleções ou campos adicionais.
+
+Importar `@/styles/library.css` em `src/main.ts`.
