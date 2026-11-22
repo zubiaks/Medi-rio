@@ -12,6 +12,7 @@
 import { ref, watch } from "vue";
 import TmdbEnrichmentPreview from "./TmdbEnrichmentPreview.vue";
 import TmdbRelationsPreview from "./TmdbRelationsPreview.vue";
+import TmdbCreditsPreview from "./TmdbCreditsPreview.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -19,6 +20,7 @@ import { loadTmdbDetails, searchTmdb, type TmdbDetails, type TmdbDetailType, typ
 import { buildSelectedTmdbPayload, type TmdbEnrichmentField } from "@/domain/providers/tmdbEnrichment";
 import { applyTmdbRelations, type RelationMode, type TmdbRelationField } from "@/domain/providers/tmdbRelations";
 import { tmdbSourcePayload } from "@/domain/providers/tmdbMapping";
+import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCredits";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
 
@@ -96,6 +98,20 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
   finally { saving.value = false; }
 }
 
+async function applyCredits(groups: CreditGroup[]): Promise<void> {
+  if (!selectedTitle.value || !details.value) return;
+  saving.value = true;
+  error.value = "";
+  try {
+    const result = await importTmdbCredits(selectedTitle.value, details.value, groups);
+    await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "creditos", grupos: groups, criados: result.created, ignorados: result.skipped } });
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  } finally {
+    saving.value = false;
+  }
+}
+
 async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): Promise<void> {
   if (!selectedTitle.value || !details.value) return;
   saving.value = true; error.value = "";
@@ -118,6 +134,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <section v-if="selectedResult" class="tmdb-association"><h3>Selecionar título do catálogo</h3><label class="form-field"><span>Título existente *</span><input v-model.trim="titleQuery" type="search" /></label><ul v-if="titleResults.length" class="provider-title-results"><li v-for="title in titleResults" :key="title.id"><button type="button" @click="selectTitle(title)">{{ title.titulo }}<span>{{ title.ano || "—" }}</span></button></li></ul><p v-if="selectedTitle">Selecionado: <strong>{{ selectedTitle.titulo }}</strong></p><button v-if="selectedTitle && !details" class="button button-primary" type="button" :disabled="saving" @click="prepare">{{ saving ? "A preparar…" : "Comparar metadados" }}</button></section>
     <TmdbEnrichmentPreview v-if="selectedTitle && details" :title="selectedTitle" :details="details" :disabled="saving" @apply="applyFields" />
     <TmdbRelationsPreview v-if="selectedTitle && details" :details="details" :disabled="saving" @apply="applyRelations" />
+    <TmdbCreditsPreview v-if="selectedTitle && details" :details="details" :disabled="saving" @apply="applyCredits" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>

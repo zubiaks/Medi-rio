@@ -1,7 +1,7 @@
 /**
  * Mediário
  * Caminho: pb_hooks/40_provider_tmdb.pb.js
- * Versão do ficheiro: 1.2.0
+ * Versão do ficheiro: 1.3.0
  * Tipo: Hook PocketBase
  * Domínio: Providers / TMDB
  * Finalidade: Pesquisa e detalhe avançado TMDB sem expor credenciais.
@@ -49,7 +49,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
   let apiKey = typeof decodedValue === "string" ? decodedValue : decodedValue && (decodedValue.key || decodedValue.value || decodedValue.api_key || decodedValue.tmdb_api_key_v3);
   apiKey = String(apiKey || "").trim().replace(/^"|"$/g, "");
   if (!/^[a-fA-F0-9]{32}$/.test(apiKey)) throw new BadRequestError("A chave TMDB v3 configurada tem um formato inválido.");
-  const response = $http.send({ url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT&append_to_response=external_ids,keywords,videos,release_dates,content_ratings", method: "GET", headers: { accept: "application/json" }, timeout: 30 });
+  const response = $http.send({ url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT&append_to_response=external_ids,keywords,videos,release_dates,content_ratings,credits", method: "GET", headers: { accept: "application/json" }, timeout: 30 });
   if (response.statusCode !== 200) throw new BadRequestError("O TMDB respondeu com o estado HTTP " + response.statusCode + ".");
   const item = response.json;
   const keywordBox = item.keywords || {};
@@ -71,5 +71,9 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
   return e.json(200, {
     id: item.id, media_type: mediaType, title: item.title || item.name || "Sem título", original_title: item.original_title || item.original_name || "", date: item.release_date || item.first_air_date || "", overview: item.overview || "", tagline: item.tagline || "", runtime: item.runtime || null, episode_run_time: item.episode_run_time || [], status: item.status || "", genres: item.genres || [], imdb_id: item.imdb_id || externalIds.imdb_id || "", poster_url: item.poster_path ? "https:" + "//image.tmdb.org/t/p/w500" + item.poster_path : "", backdrop_url: item.backdrop_path ? "https:" + "//image.tmdb.org/t/p/original" + item.backdrop_path : "", vote_average: item.vote_average || 0, vote_count: item.vote_count || 0, popularity: item.popularity || 0, original_language: item.original_language || "", homepage: item.homepage || "",
     production_countries: item.production_countries || [], spoken_languages: item.spoken_languages || [], production_companies: (item.production_companies || []).map((company) => ({ id: company.id, name: company.name || "", origin_country: company.origin_country || "", logo_url: company.logo_path ? "https:" + "//image.tmdb.org/t/p/w300" + company.logo_path : "" })), belongs_to_collection: item.belongs_to_collection ? { id: item.belongs_to_collection.id, name: item.belongs_to_collection.name || "", poster_url: item.belongs_to_collection.poster_path ? "https:" + "//image.tmdb.org/t/p/w500" + item.belongs_to_collection.poster_path : "", backdrop_url: item.belongs_to_collection.backdrop_path ? "https:" + "//image.tmdb.org/t/p/original" + item.belongs_to_collection.backdrop_path : "" } : null, keywords, certification, trailer_youtube_key: trailer ? trailer.key : "", number_of_seasons: item.number_of_seasons || 0, number_of_episodes: item.number_of_episodes || 0,
+    credits: {
+      cast: (((item.credits || {}).cast) || []).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", character: credit.character || "", order: credit.order || 0, popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "", department: credit.known_for_department || "Acting" })),
+      crew: (((item.credits || {}).crew) || []).filter((credit) => ["Director", "Writer", "Screenplay", "Teleplay", "Creator"].indexOf(credit.job) >= 0).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", job: credit.job || "", department: credit.department || "", popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "" })),
+    },
   });
 });

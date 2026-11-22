@@ -58,6 +58,7 @@ export interface TmdbDetails extends TmdbSearchResult {
   trailer_youtube_key: string;
   number_of_seasons: number;
   number_of_episodes: number;
+  credits: { cast: TmdbCastCredit[]; crew: TmdbCrewCredit[] };
 }
 
 export async function searchTmdb(query: string, type: TmdbMediaType = "multi", page = 1): Promise<TmdbSearchResponse> {
@@ -68,3 +69,6 @@ export async function searchTmdb(query: string, type: TmdbMediaType = "multi", p
 export async function loadTmdbDetails(type: TmdbDetailType, id: number): Promise<TmdbDetails> {
   return pb.send(`/api/mediario/providers/tmdb/details/${type}/${id}`, { method: "GET" });
 }
+
+export interface TmdbCastCredit { id: number; credit_id: string; name: string; character: string; order: number; popularity: number; profile_url: string; department: string }
+export interface TmdbCrewCredit { id: number; credit_id: string; name: string; job: string; department: string; popularity: number; profile_url: string }

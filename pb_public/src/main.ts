@@ -19,4 +19,5 @@ import "@/styles/diary.css";
 import "@/styles/providers.css";
 import "@/styles/providers-phase-5.css";
 import "@/styles/providers-phase-6a.css";
+import "@/styles/providers-phase-6b.css";
 createApp(App).use(router).mount("#app");
