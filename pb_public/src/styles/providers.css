@@ -98,3 +98,85 @@
     width: 100%;
   }
 }
+
+
+/* Fase 4: pesquisa e associação TMDB. */
+.tmdb-search-dialog {
+  width: min(1100px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+}
+
+.tmdb-search-form {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) minmax(150px, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.tmdb-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.tmdb-result-card {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.55rem;
+  color: inherit;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.tmdb-result-card:hover,
+.tmdb-result-card.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 94%);
+}
+
+.tmdb-result-card:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tmdb-result-card img,
+.tmdb-poster-fallback {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 0.55rem;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+.tmdb-poster-fallback {
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+}
+
+.tmdb-result-card small {
+  color: var(--muted);
+}
+
+.tmdb-association {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface-2);
+}
+
+@media (max-width: 700px) {
+  .tmdb-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .tmdb-search-form .button {
+    width: 100%;
+  }
+}
