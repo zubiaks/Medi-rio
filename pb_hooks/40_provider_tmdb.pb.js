@@ -1,7 +1,7 @@
 /**
  * Mediário
  * Caminho: pb_hooks/40_provider_tmdb.pb.js
- * Versão do ficheiro: 1.4.0
+ * Versão do ficheiro: 1.5.0
  * Tipo: Hook PocketBase
  * Domínio: Providers / TMDB
  * Finalidade: Pesquisa e detalhe avançado TMDB sem expor credenciais.
@@ -49,7 +49,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
   let apiKey = typeof decodedValue === "string" ? decodedValue : decodedValue && (decodedValue.key || decodedValue.value || decodedValue.api_key || decodedValue.tmdb_api_key_v3);
   apiKey = String(apiKey || "").trim().replace(/^"|"$/g, "");
   if (!/^[a-fA-F0-9]{32}$/.test(apiKey)) throw new BadRequestError("A chave TMDB v3 configurada tem um formato inválido.");
-  const response = $http.send({ url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT&append_to_response=external_ids,keywords,videos,release_dates,content_ratings,credits", method: "GET", headers: { accept: "application/json" }, timeout: 30 });
+  const response = $http.send({ url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT&append_to_response=external_ids,keywords,videos,release_dates,content_ratings,credits,alternative_titles", method: "GET", headers: { accept: "application/json" }, timeout: 30 });
   if (response.statusCode !== 200) throw new BadRequestError("O TMDB respondeu com o estado HTTP " + response.statusCode + ".");
   const item = response.json;
   const keywordBox = item.keywords || {};
@@ -75,6 +75,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
       cast: (((item.credits || {}).cast) || []).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", character: credit.character || "", order: credit.order || 0, popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "", department: credit.known_for_department || "Acting" })),
       crew: (((item.credits || {}).crew) || []).filter((credit) => ["Director", "Writer", "Screenplay", "Teleplay", "Creator"].indexOf(credit.job) >= 0).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", job: credit.job || "", department: credit.department || "", popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "" })),
     },
+    alternative_titles: ((((item.alternative_titles || {}).titles) || ((item.alternative_titles || {}).results) || []).map((title) => ({ name: title.title || "", country: title.iso_3166_1 || "", type: title.type || "" })).filter((title) => title.name)),
   });
 });
 

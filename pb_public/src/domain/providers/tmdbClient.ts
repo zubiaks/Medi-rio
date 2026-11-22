@@ -59,6 +59,7 @@ export interface TmdbDetails extends TmdbSearchResult {
   number_of_seasons: number;
   number_of_episodes: number;
   credits: { cast: TmdbCastCredit[]; crew: TmdbCrewCredit[] };
+  alternative_titles: TmdbAlternativeTitle[];
 }
 
 export async function searchTmdb(query: string, type: TmdbMediaType = "multi", page = 1): Promise<TmdbSearchResponse> {
@@ -72,3 +73,5 @@ export async function loadTmdbDetails(type: TmdbDetailType, id: number): Promise
 
 export interface TmdbCastCredit { id: number; credit_id: string; name: string; character: string; order: number; popularity: number; profile_url: string; department: string }
 export interface TmdbCrewCredit { id: number; credit_id: string; name: string; job: string; department: string; popularity: number; profile_url: string }
+
+export interface TmdbAlternativeTitle { name: string; country: string; type: string }

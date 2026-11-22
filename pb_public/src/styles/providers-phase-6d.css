@@ -1,0 +1,7 @@
+/** Mediário | Fase 6D — títulos alternativos TMDB. */
+.tmdb-alternative-titles { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-country-filter { max-width:16rem; }
+.tmdb-alternative-title-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.55rem; max-height:22rem; overflow:auto; }
+.tmdb-alternative-title-row { display:grid; grid-template-columns:auto 1fr; gap:.65rem; align-items:start; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-alternative-title-row span { display:grid; gap:.2rem; }
+.tmdb-alternative-title-row small { color:var(--muted); }
