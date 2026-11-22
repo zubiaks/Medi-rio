@@ -1,7 +1,7 @@
 /**
  * Mediário
  * Caminho: pb_hooks/40_provider_tmdb.pb.js
- * Versão do ficheiro: 1.3.0
+ * Versão do ficheiro: 1.4.0
  * Tipo: Hook PocketBase
  * Domínio: Providers / TMDB
  * Finalidade: Pesquisa e detalhe avançado TMDB sem expor credenciais.
@@ -75,5 +75,51 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
       cast: (((item.credits || {}).cast) || []).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", character: credit.character || "", order: credit.order || 0, popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "", department: credit.known_for_department || "Acting" })),
       crew: (((item.credits || {}).crew) || []).filter((credit) => ["Director", "Writer", "Screenplay", "Teleplay", "Creator"].indexOf(credit.job) >= 0).slice(0, 50).map((credit) => ({ id: credit.id, credit_id: credit.credit_id || "", name: credit.name || "", job: credit.job || "", department: credit.department || "", popularity: credit.popularity || 0, profile_url: credit.profile_path ? "https:" + "//image.tmdb.org/t/p/w300" + credit.profile_path : "" })),
     },
+  });
+});
+
+
+routerAdd("GET", "/api/mediario/providers/tmdb/season/{id}/{season}", (e) => {
+  const externalId = e.request.pathValue("id");
+  const seasonNumber = e.request.pathValue("season");
+  if (!/^\d+$/.test(externalId) || !/^\d+$/.test(seasonNumber)) {
+    throw new BadRequestError("Identificador TMDB ou temporada inválidos.");
+  }
+  const setting = $app.findFirstRecordByFilter("app_settings", 'chave = "tmdb_api_key_v3"');
+  const rawValue = setting.get("valor");
+  let decodedValue = rawValue;
+  if (rawValue && typeof rawValue !== "string" && typeof rawValue.length === "number") {
+    let jsonText = "";
+    for (let index = 0; index < rawValue.length; index += 1) jsonText += String.fromCharCode(rawValue[index]);
+    try { decodedValue = JSON.parse(jsonText); } catch (_) { decodedValue = jsonText; }
+  }
+  let apiKey = typeof decodedValue === "string" ? decodedValue : decodedValue && (decodedValue.key || decodedValue.value || decodedValue.api_key || decodedValue.tmdb_api_key_v3);
+  apiKey = String(apiKey || "").trim().replace(/^"|"$/g, "");
+  if (!/^[a-fA-F0-9]{32}$/.test(apiKey)) throw new BadRequestError("A chave TMDB v3 configurada tem um formato inválido.");
+  const response = $http.send({
+    url: "https:" + "//api.themoviedb.org/3/tv/" + externalId + "/season/" + seasonNumber + "?api_key=" + encodeURIComponent(apiKey) + "&language=pt-PT",
+    method: "GET",
+    headers: { accept: "application/json" },
+    timeout: 30,
+  });
+  if (response.statusCode !== 200) throw new BadRequestError("O TMDB respondeu com o estado HTTP " + response.statusCode + ".");
+  const item = response.json;
+  return e.json(200, {
+    id: item.id,
+    season_number: item.season_number,
+    name: item.name || "",
+    overview: item.overview || "",
+    air_date: item.air_date || "",
+    poster_url: item.poster_path ? "https:" + "//image.tmdb.org/t/p/w500" + item.poster_path : "",
+    episodes: (item.episodes || []).map((episode) => ({
+      id: episode.id,
+      episode_number: episode.episode_number,
+      name: episode.name || "",
+      overview: episode.overview || "",
+      air_date: episode.air_date || "",
+      runtime: episode.runtime || 0,
+      vote_average: episode.vote_average || 0,
+      thumbnail_url: episode.still_path ? "https:" + "//image.tmdb.org/t/p/w780" + episode.still_path : "",
+    })),
   });
 });
