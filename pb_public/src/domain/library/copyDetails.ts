@@ -1,0 +1,5 @@
+import type { LibraryCopyRecord, LoanHistoryRecord } from "./records";
+export interface CopyDetailsSummary { totalLoans:number; totalRenewals:number; current?:LoanHistoryRecord; lastClosed?:LoanHistoryRecord; overdue:boolean }
+const active=(value:LoanHistoryRecord)=>["Emprestado","Atrasado"].includes(value.estado);
+export function buildCopyDetailsSummary(copy:LibraryCopyRecord,history:LoanHistoryRecord[],today=new Date().toISOString().slice(0,10)):CopyDetailsSummary{const ordered=[...history].sort((a,b)=>b.data_emprestimo.localeCompare(a.data_emprestimo));const current=ordered.find(active);const lastClosed=ordered.find(x=>!active(x));return{totalLoans:ordered.length,totalRenewals:ordered.reduce((sum,x)=>sum+(x.renovacoes||0),0),current,lastClosed,overdue:Boolean(current&&!current.data_devolucao&&current.data_prevista&&current.data_prevista.slice(0,10)<today)}}
+export function copyDisplayCode(copy:LibraryCopyRecord){return copy.codigo_interno||copy.codigo_barras||`Exemplar ${copy.numero_copia||1}`}

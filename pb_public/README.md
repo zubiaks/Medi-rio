@@ -1,3 +1,3 @@
-# Biblioteca física, fase 2 avançada
+# Biblioteca física, Fase 3
 
-Inclui painel, filtros avançados, histórico, códigos e gestão completa dos empréstimos.
+Detalhe completo do exemplar e histórico individual, integrado na listagem existente.
