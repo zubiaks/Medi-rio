@@ -1,3 +1,3 @@
-# Fluxo de empréstimos atualizado com todos os estados PocketBase
+# Biblioteca física, fase 2 avançada
 
-Emprestado, Atrasado, Devolvido, Perdido, Danificado e Cancelado são tratados com a capitalização exata do select.
+Inclui painel, filtros avançados, histórico, códigos e gestão completa dos empréstimos.

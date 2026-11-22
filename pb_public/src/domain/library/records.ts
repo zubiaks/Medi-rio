@@ -56,6 +56,7 @@ export interface LoanHistoryRecord extends BaseRecord {
   renovacoes?: number;
   devolvido_em_bom_estado?: boolean;
   notas?: string;
+  expand?: { titulo?: TitleRecord; exemplar?: LibraryCopyRecord; pessoa?: NamedRecord };
 }
 
 export interface LibraryCopyForm {
