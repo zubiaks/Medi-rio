@@ -1,8 +1,19 @@
-/** Mapeamento seguro de resultados TMDB para fontes externas. */
+/**
+ * Projeto: Mediário
+ * Caminho: src/domain/providers/tmdbMapping.ts
+ * Versão do ficheiro: 1.1.0
+ * Tipo: Mapeamento TypeScript
+ * Domínio: Providers / TMDB
+ * Finalidade: Criar URLs e payloads seguros para fontes externas TMDB.
+ * Autor: Zubiaks <zubiaks@hotmail.com>
+ * Licença: PolyForm Noncommercial License 1.0.0
+ */
 import type { ExternalSourceRecord } from "./records";
 import type { TmdbDetails, TmdbSearchResult } from "./tmdbClient";
 
-export function tmdbExternalUrl(result: Pick<TmdbSearchResult, "id" | "media_type">): string {
+export function tmdbExternalUrl(
+  result: Pick<TmdbSearchResult, "id" | "media_type">,
+): string {
   const type = result.media_type === "tv" ? "tv" : "movie";
   return `https://www.themoviedb.org/${type}/${result.id}`;
 }

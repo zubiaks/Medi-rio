@@ -1,0 +1,63 @@
+/**
+ * Projeto: Mediário
+ * Caminho: src/styles/providers-phase-5.css
+ * Versão do ficheiro: 1.0.0
+ * Domínio: Providers / enriquecimento TMDB
+ */
+.tmdb-enrichment {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface-2);
+}
+
+.tmdb-enrichment-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tmdb-difference-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.tmdb-difference-row {
+  display: grid;
+  grid-template-columns: auto minmax(9rem, 0.7fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: start;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--surface);
+}
+
+.tmdb-difference-row > span {
+  display: grid;
+  gap: 0.2rem;
+  overflow-wrap: anywhere;
+}
+
+.tmdb-difference-row small {
+  color: var(--muted);
+}
+
+.tmdb-difference-label strong {
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .tmdb-enrichment-header,
+  .tmdb-difference-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tmdb-enrichment-header {
+    display: grid;
+  }
+}

@@ -17,4 +17,6 @@ import "@/styles/iptv-all.css";
 import "@/styles/library.css";
 import "@/styles/diary.css";
 import "@/styles/providers.css";
+import "@/styles/providers-phase-5.css";
+
 createApp(App).use(router).mount("#app");

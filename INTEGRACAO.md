@@ -1,33 +1,17 @@
-# Integrar Atualizar todos os RSS
+# Mediário — Fase 5: enriquecimento TMDB controlado
 
-1. Copiar `src/components/podcasts/PodcastSyncAllButton.vue` e `src/domain/podcasts/sync.ts` para os mesmos caminhos do projeto.
-2. Acrescentar o conteúdo de `podcasts-sync-all.css` ao final de `src/styles/podcasts.css`.
-3. Em `PodcastsView.vue`, importar:
+O ZIP está preparado para ser extraído sobre `D:\Mediário`, preservando os restantes ficheiros.
 
-```ts
-import PodcastSyncAllButton from "@/components/podcasts/PodcastSyncAllButton.vue";
-```
+Inclui:
+- diálogo TMDB completo com comparação antes da aplicação;
+- seleção automática apenas de campos vazios;
+- seleção manual de diferenças;
+- atualização de `titulos` apenas nos campos escolhidos;
+- atualização ou criação de `fontes_externas`;
+- escrita segura em `audit_log`;
+- campos técnicos de sincronização;
+- correção das URLs TMDB contaminadas por HTML;
+- testes puros focados;
+- CSS próprio da Fase 5 carregado em `main.ts`.
 
-4. Dentro de `BasePageHeader`, adicionar:
-
-```vue
-<template #actions>
-  <PodcastSyncAllButton @finished="loadEpisodes" />
-</template>
-```
-
-Exemplo:
-
-```vue
-<BasePageHeader
-  eyebrow="Áudio"
-  title="Podcasts"
-  :description="`${podcastTotal} podcasts na biblioteca`"
->
-  <template #actions>
-    <PodcastSyncAllButton @finished="loadEpisodes" />
-  </template>
-</BasePageHeader>
-```
-
-O processamento é sequencial, inclui apenas podcasts ativos, não arquivados e com RSS configurado, e pode ser cancelado depois do feed atual.
+Não cria automaticamente relações para géneros, idiomas, países, companhias ou pessoas.
