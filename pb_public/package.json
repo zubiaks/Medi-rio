@@ -1,6 +1,6 @@
 {
   "name": "mediario",
-  "version": "0.3.0-alpha.1",
+  "version": "0.4.0-alpha.1",
   "private": true,
   "description": "Catálogo multimédia pessoal source-available para uso não comercial.",
   "author": "Zubiaks <zubiaks@hotmail.com>",
@@ -14,13 +14,15 @@
     "build": "npm run type-check && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "type-check": "vue-tsc --noEmit",
-    "check": "npm audit --omit=dev && npm run type-check && npm run test && npm run build",
     "audit:prod": "npm audit --omit=dev",
+    "audit:all": "npm audit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "vitest run src/components/base/BasePagination.a11y.spec.ts src/components/iptv/ChannelEditDialog.a11y.spec.ts src/components/iptv/StreamLinkEditDialog.a11y.spec.ts",
+    "test:a11y": "vitest run src/components/base/BasePagination.a11y.spec.ts src/components/iptv/ChannelCard.a11y.spec.ts src/components/iptv/ChannelEditDialog.a11y.spec.ts src/components/iptv/GridDensityControl.a11y.spec.ts src/components/iptv/GridSizeSlider.a11y.spec.ts src/components/iptv/LookupMultiSelect.a11y.spec.ts src/components/iptv/StreamLinkEditDialog.a11y.spec.ts src/components/iptv/IptvEpgManager.spec.ts src/components/iptv/ChannelDetailDialog.spec.ts",
+    "test:iptv": "vitest run src/domain/iptv src/components/iptv",
     "test:coverage": "vitest run --coverage",
-    "audit:all": "npm audit"
+    "check:iptv": "npm run type-check && npm run test:a11y && npm run test:iptv && npm run build",
+    "check": "npm run audit:prod && npm run type-check && npm run test && npm run build"
   },
   "dependencies": {
     "pocketbase": "0.27.0",

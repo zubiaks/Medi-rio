@@ -6,7 +6,7 @@ vi.mock("@/domain/repositories",()=>({iptvChannelRepository:{create:mocks.channe
 enableAutoUnmount(afterEach);
 const item=(url="https://x/new.m3u8")=>({name:"Canal Novo",url,tvgId:"canal-1",tvgName:"Canal Novo",tvgLogo:"",groupTitle:"",language:"",country:"",adult:false,selected:true,errors:[]});
 const existing={id:"c1",created:"",updated:"",nome:"Canal Antigo",url_stream:"https://x/old.m3u8",tvg_id:"canal-1"};
-const mountDialog=(channels:any[]=[])=>mount(M3uImportDialog,{attachTo:document.body,props:{open:true,existing:channels}});
+const mountDialog=(channels:any[]=[])=>mount(M3uImportDialog,{attachTo:document.body,props:{open:true,existing:channels},global:{stubs:{Teleport:true}}});
 beforeEach(()=>{Object.values(mocks).forEach(m=>m.mockReset());mocks.categoryList.mockResolvedValue({items:[]});mocks.sourceList.mockResolvedValue({items:[]});mocks.sourceCreate.mockResolvedValue({id:"s1"});});
 
 describe("M3uImportDialog modos",()=>{

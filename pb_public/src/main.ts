@@ -1,15 +1,7 @@
-/**
- * Mediario
- * Copyright (c) 2026 Zubiaks.
- *
- * Source-available under the PolyForm Noncommercial License 1.0.0.
- * Commercial use requires prior written permission from Zubiaks.
- * See LICENSE.md.
- */
+/** Mediario | Copyright (c) 2026 Zubiaks. | See LICENSE.md. */
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";
@@ -22,6 +14,4 @@ import "@/styles/vod-management.css";
 import "@/styles/vod-delete-dialog.css";
 import "@/styles/podcasts.css";
 import "@/styles/iptv-all.css";
-
-
 createApp(App).use(router).mount("#app");
