@@ -1,3 +1,3 @@
-# Diário e avaliações — Fase 3
+# Providers e manutenção — Fase 3
 
-Adiciona estatísticas anuais, actividade mensal, distribuição por tipo de média, sequências de utilização, classificação média e exportação CSV/JSON. Não altera o esquema PocketBase.
+Adiciona criação e controlo de tarefas, repetição segura, auditoria sem segredos e estado das chaves de providers. Não executa chamadas HTTP a providers no browser e não altera o esquema PocketBase.

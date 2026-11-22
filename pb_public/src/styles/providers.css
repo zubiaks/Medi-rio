@@ -1,2 +1,100 @@
 /** Estilos dos domínios Providers e Manutenção. */
 .provider-dashboard{display:grid;gap:1rem;margin-bottom:1.5rem}.provider-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}.provider-card{display:grid;gap:.8rem;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--surface)}.provider-card header{display:flex;align-items:center;justify-content:space-between;gap:.5rem}.provider-card dl{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:0}.provider-card dl>div{padding:.55rem;border-radius:.6rem;background:var(--surface-2)}.provider-card dt{color:var(--muted);font-size:.72rem}.provider-card dd{margin:.2rem 0 0;font-weight:800}.provider-filters{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem}.external-source-dialog{width:min(850px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.provider-title-results{display:grid;max-height:15rem;padding:0;margin:0;overflow:auto;border:1px solid var(--line);border-radius:.7rem;list-style:none}.provider-title-results button{display:flex;width:100%;justify-content:space-between;padding:.65rem;color:inherit;background:var(--surface-2);border:0;border-bottom:1px solid var(--line)}.sync-job-panel,.audit-log-panel,.maintenance-issues{margin-top:1.25rem}.maintenance-inline-filters{display:flex;gap:.5rem;flex-wrap:wrap}.job-progress{width:8rem;height:.55rem;overflow:hidden;border-radius:999px;background:var(--surface-2)}.job-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--cyan))}.maintenance-issues ul{display:grid;gap:.65rem;padding:0;list-style:none}.maintenance-issues li{display:grid;grid-template-columns:minmax(12rem,1fr) minmax(0,2fr);gap:1rem;padding:.8rem;border:1px solid var(--line);border-radius:.7rem}.maintenance-issues li>div{display:grid}.maintenance-issues li span{color:var(--muted);font-size:.75rem}.status-danger{color:var(--danger)}.status-success{color:var(--success)}@media(max-width:760px){.provider-filters,.maintenance-issues li{grid-template-columns:1fr}.maintenance-inline-filters{flex-direction:column;width:100%}.job-progress{width:100%}}
+
+
+/* Fase 3: criação, detalhe, acções e configuração segura. */
+.sync-job-create-dialog,
+.sync-job-detail-dialog {
+  width: min(780px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+}
+
+.provider-settings {
+  margin-bottom: 1.25rem;
+}
+
+.provider-settings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+  padding: 0;
+  list-style: none;
+}
+
+.provider-settings-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--surface-2);
+}
+
+.status-warning {
+  color: var(--warning);
+}
+
+.sync-job-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.sync-job-facts > div {
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+}
+
+.sync-job-facts dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.sync-job-facts dd {
+  margin: 0.25rem 0 0;
+}
+
+.sync-job-actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.technical-details {
+  max-height: 22rem;
+  overflow: auto;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--surface-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: color-mix(in srgb, var(--primary), transparent 94%);
+}
+
+.clickable-row:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+}
+
+@media (max-width: 680px) {
+  .sync-job-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .sync-job-actions .button {
+    width: 100%;
+  }
+}
