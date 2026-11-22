@@ -51,6 +51,7 @@ import LibraryCopyDetailDialog from "@/components/library/LibraryCopyDetailDialo
 import LibraryCopyDialog from "@/components/library/LibraryCopyDialog.vue";
 import LibraryCsvDialog from "@/components/library/LibraryCsvDialog.vue";
 import LibraryLoanDialog from "@/components/library/LibraryLoanDialog.vue";
+import InventoryManager from "@/components/library/InventoryManager.vue";
 import LoanHistoryPanel from "@/components/library/LoanHistoryPanel.vue";
 
 import { downloadLibraryCsv } from "@/domain/library/csvInventory";
@@ -452,6 +453,8 @@ onMounted(() => Promise.all([loadLibrary(), loadHistory()]));
     label="Paginação dos exemplares"
     @change="changePage"
   />
+
+  <InventoryManager />
 
   <BorrowersPanel :items="history" />
   <LoanHistoryPanel :items="history" :loading="historyLoading" />
