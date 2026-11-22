@@ -1,7 +1,7 @@
 /**
  * Mediário
  * Caminho: pb_hooks/40_provider_tmdb.pb.js
- * Versão do ficheiro: 1.5.0
+ * Versão do ficheiro: 1.6.0
  * Tipo: Hook PocketBase
  * Domínio: Providers / TMDB
  * Finalidade: Pesquisa e detalhe avançado TMDB sem expor credenciais.
@@ -122,5 +122,46 @@ routerAdd("GET", "/api/mediario/providers/tmdb/season/{id}/{season}", (e) => {
       vote_average: episode.vote_average || 0,
       thumbnail_url: episode.still_path ? "https:" + "//image.tmdb.org/t/p/w780" + episode.still_path : "",
     })),
+  });
+});
+
+
+routerAdd("GET", "/api/mediario/providers/tmdb/images/{type}/{id}", (e) => {
+  const mediaType = e.request.pathValue("type");
+  const externalId = e.request.pathValue("id");
+  if (["movie", "tv"].indexOf(mediaType) < 0 || !/^\d+$/.test(externalId)) {
+    throw new BadRequestError("Identificador ou tipo TMDB inválido.");
+  }
+  const setting = $app.findFirstRecordByFilter("app_settings", 'chave = "tmdb_api_key_v3"');
+  const rawValue = setting.get("valor");
+  let decodedValue = rawValue;
+  if (rawValue && typeof rawValue !== "string" && typeof rawValue.length === "number") {
+    let jsonText = "";
+    for (let index = 0; index < rawValue.length; index += 1) jsonText += String.fromCharCode(rawValue[index]);
+    try { decodedValue = JSON.parse(jsonText); } catch (_) { decodedValue = jsonText; }
+  }
+  let apiKey = typeof decodedValue === "string" ? decodedValue : decodedValue && (decodedValue.key || decodedValue.value || decodedValue.api_key || decodedValue.tmdb_api_key_v3);
+  apiKey = String(apiKey || "").trim().replace(/^"|"$/g, "");
+  if (!/^[a-fA-F0-9]{32}$/.test(apiKey)) throw new BadRequestError("A chave TMDB v3 configurada tem um formato inválido.");
+  const response = $http.send({
+    url: "https:" + "//api.themoviedb.org/3/" + mediaType + "/" + externalId + "/images?api_key=" + encodeURIComponent(apiKey) + "&include_image_language=pt,en,null",
+    method: "GET",
+    headers: { accept: "application/json" },
+    timeout: 30,
+  });
+  if (response.statusCode !== 200) throw new BadRequestError("O TMDB respondeu com o estado HTTP " + response.statusCode + ".");
+  const mapImage = (item, size) => ({
+    file_path: item.file_path || "",
+    url: item.file_path ? "https:" + "//image.tmdb.org/t/p/" + size + item.file_path : "",
+    preview_url: item.file_path ? "https:" + "//image.tmdb.org/t/p/w342" + item.file_path : "",
+    language: item.iso_639_1 || "",
+    width: item.width || 0,
+    height: item.height || 0,
+    vote_average: item.vote_average || 0,
+  });
+  return e.json(200, {
+    posters: (response.json.posters || []).slice(0, 40).map((item) => mapImage(item, "original")),
+    backdrops: (response.json.backdrops || []).slice(0, 40).map((item) => mapImage(item, "original")),
+    logos: (response.json.logos || []).slice(0, 40).map((item) => mapImage(item, "original")),
   });
 });
