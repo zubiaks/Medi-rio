@@ -3,11 +3,11 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 2.1.0
+  Versão do ficheiro: 2.2.0
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
-  Última revisão: 2026-11-21
+  Última revisão: 2026-11-22
 
   Finalidade:
   Lê, pré-visualiza, filtra, seleciona e importa canais IPTV a partir
@@ -15,31 +15,21 @@
 
   Entradas:
   - open: controla a apresentação do diálogo.
-  - existing: canais IPTV já existentes, usados para detetar duplicados.
+  - existing: canais IPTV existentes, usados para detetar duplicados.
 
   Saídas e eventos:
   - close: solicita o fecho do diálogo.
   - imported: informa quantos canais foram importados com sucesso.
 
-  Relações e dependências:
-  - Usado por: src/views/IptvView.vue
-  - Parser: src/domain/iptv/m3u.ts
-  - Duplicados: src/domain/iptv/m3uDuplicate.ts
-  - Repositórios: src/domain/repositories.ts
-  - Tipos: src/types/records.ts
-  - Coleções PocketBase: canais_tv e stream_links
-
   Regras:
   - Não importar entradas inválidas.
   - Não importar duplicados fortes por URL ou TVG-ID.
-  - Criar o canal antes da respetiva fonte técnica.
-  - Remover o canal criado quando a criação da fonte falhar.
   - Continuar o lote depois de falhas individuais.
+  - Remover o canal criado quando a criação da fonte falhar.
   - Apresentar um resumo final de importados, ignorados e falhados.
-  - Manter a seleção limitada às entradas válidas.
+  - Permitir iniciar outra importação sem fechar o diálogo.
+  - Reiniciar o estado quando o diálogo voltar a abrir.
   - Preservar os nomes reais dos campos PocketBase.
-  - Manter acessibilidade por teclado e leitor de ecrã.
-  - Guardar o ficheiro como UTF-8 sem BOM.
 
   Autor: Zubiaks
   Copyright (c) 2026 Zubiaks.
@@ -49,7 +39,7 @@
   See LICENSE.md.
 -->
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 import {
   iptvChannelRepository,
@@ -59,23 +49,6 @@ import { parseM3u, type M3uItem } from "@/domain/iptv/m3u";
 import { findM3uDuplicate } from "@/domain/iptv/m3uDuplicate";
 
 import type { IptvChannelRecord } from "@/types/records";
-
-const props = defineProps<{
-  open: boolean;
-  existing: IptvChannelRecord[];
-}>();
-
-const emit = defineEmits<{
-  close: [];
-  imported: [count: number];
-}>();
-
-const items = ref<M3uItem[]>([]);
-const fileName = ref("");
-const error = ref("");
-const importing = ref(false);
-const progress = ref(0);
-const query = ref("");
 
 interface ImportFailure {
   name: string;
@@ -89,6 +62,24 @@ interface ImportSummary {
   failures: ImportFailure[];
 }
 
+const props = defineProps<{
+  open: boolean;
+  existing: IptvChannelRecord[];
+}>();
+
+const emit = defineEmits<{
+  close: [];
+  imported: [count: number];
+}>();
+
+const firstInput = ref<HTMLInputElement | null>(null);
+const items = ref<M3uItem[]>([]);
+const fileName = ref("");
+const error = ref("");
+const importing = ref(false);
+const progress = ref(0);
+const batchTotal = ref(0);
+const query = ref("");
 const summary = ref<ImportSummary | null>(null);
 
 const visible = computed(() => {
@@ -111,6 +102,28 @@ const invalidCount = computed(() =>
   items.value.filter((item) => item.errors.length).length,
 );
 
+function reset(): void {
+  items.value = [];
+  fileName.value = "";
+  error.value = "";
+  importing.value = false;
+  progress.value = 0;
+  batchTotal.value = 0;
+  query.value = "";
+  summary.value = null;
+}
+
+watch(
+  () => props.open,
+  async (open) => {
+    if (!open) return;
+
+    reset();
+    await nextTick();
+    firstInput.value?.focus();
+  },
+);
+
 async function readFile(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
@@ -120,6 +133,7 @@ async function readFile(event: Event): Promise<void> {
   fileName.value = file.name;
   error.value = "";
   progress.value = 0;
+  batchTotal.value = 0;
   summary.value = null;
 
   try {
@@ -147,6 +161,7 @@ async function run(): Promise<void> {
 
   importing.value = true;
   progress.value = 0;
+  batchTotal.value = entries.length;
   error.value = "";
   summary.value = null;
 
@@ -202,9 +217,8 @@ async function run(): Promise<void> {
               ? rollbackCause.message
               : String(rollbackCause);
 
-          message =
-            `${message} O canal criado não pôde ser removido: ` +
-            rollbackMessage;
+          message +=
+            ` O canal criado não pôde ser removido: ${rollbackMessage}`;
         }
       }
 
@@ -230,7 +244,6 @@ async function run(): Promise<void> {
     emit("imported", importedCount);
   }
 }
-
 </script>
 
 <template>
@@ -267,6 +280,7 @@ async function run(): Promise<void> {
         <label class="form-field">
           <span>Playlist M3U ou M3U8</span>
           <input
+            ref="firstInput"
             type="file"
             accept=".m3u,.m3u8,application/vnd.apple.mpegurl,audio/x-mpegurl"
             :disabled="importing"
@@ -284,7 +298,7 @@ async function run(): Promise<void> {
 
         <section
           v-if="summary"
-          class="m3u-summary"
+          class="m3u-result"
           aria-labelledby="m3u-result-title"
           aria-live="polite"
         >
@@ -307,9 +321,17 @@ async function run(): Promise<void> {
               </li>
             </ul>
           </details>
+
+          <button
+            class="button button-secondary"
+            type="button"
+            @click="reset"
+          >
+            Importar outra playlist
+          </button>
         </section>
 
-        <template v-if="items.length">
+        <template v-if="items.length && !summary">
           <div class="m3u-summary" aria-live="polite">
             <strong>{{ items.length }} entradas</strong>
             <span>{{ selected.length }} selecionadas</span>
@@ -375,9 +397,9 @@ async function run(): Promise<void> {
           <progress
             v-if="importing"
             :value="progress"
-            :max="selected.length"
+            :max="batchTotal"
           >
-            {{ progress }} de {{ selected.length }}
+            {{ progress }} de {{ batchTotal }}
           </progress>
 
           <div class="form-actions">
