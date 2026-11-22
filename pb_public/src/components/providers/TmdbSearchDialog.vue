@@ -19,6 +19,7 @@ import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
 import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
+import TmdbSyncSchedulerPanel from "./TmdbSyncSchedulerPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -111,6 +112,11 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
   finally { saving.value = false; }
 }
 
+async function syncScheduled(job: { id: string }): Promise<void> {
+  if (!selectedTitle.value) return;
+  await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "agendamento", sync_job_id: job.id } });
+}
+
 async function refreshTitle(): Promise<void> {
   if (!selectedTitle.value) return;
   saving.value = true;
@@ -198,6 +204,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbImagesPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" :disabled="saving" @applied="imagesApplied" />
     <TitleVersionPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @restored="versionRestored" @snapshot="snapshotCreated" />
     <TmdbSyncHealthPanel v-if="selectedTitle" :title="selectedTitle" :details="details" :loading="saving" @refresh="refreshTitle" />
+    <TmdbSyncSchedulerPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @scheduled="syncScheduled" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>

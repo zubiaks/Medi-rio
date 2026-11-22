@@ -1,0 +1,45 @@
+/** Mediário | Fase 6I — agendamento de atualizações TMDB. */
+.tmdb-sync-scheduler {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface-2);
+}
+
+.tmdb-sync-scheduler-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tmdb-sync-badge {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tmdb-sync-badge.is-current {
+  color: var(--success);
+}
+
+.tmdb-sync-badge.is-stale,
+.tmdb-sync-badge.is-never {
+  color: var(--warning);
+}
+
+.tmdb-sync-badge.is-error {
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .tmdb-sync-scheduler-header {
+    display: grid;
+  }
+}
