@@ -16,6 +16,7 @@ import TmdbCreditsPreview from "./TmdbCreditsPreview.vue";
 import TmdbSeasonsPanel from "./TmdbSeasonsPanel.vue";
 import TmdbAlternativeTitlesPanel from "./TmdbAlternativeTitlesPanel.vue";
 import TmdbImagesPanel from "./TmdbImagesPanel.vue";
+import TitleVersionPanel from "./TitleVersionPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -101,6 +102,16 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
   finally { saving.value = false; }
 }
 
+async function versionRestored(values: Record<string, unknown>): Promise<void> {
+  if (!selectedTitle.value) return;
+  await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "restaurar", origem: "interface", sucesso: true, detalhes: { operacao: "restauro_versao", campos_restaurados: Object.keys(values) } });
+}
+
+async function snapshotCreated(): Promise<void> {
+  if (!selectedTitle.value) return;
+  await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "arquivar", origem: "interface", sucesso: true, detalhes: { operacao: "snapshot_manual" } });
+}
+
 async function imagesApplied(values: Record<string, string>): Promise<void> {
   if (!selectedTitle.value) return;
   await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "imagens", campos_aplicados: Object.keys(values), valores_novos: values } });
@@ -156,6 +167,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbSeasonsPanel v-if="selectedTitle && details && selectedResult?.media_type === 'tv'" :title="selectedTitle" :tmdb-id="selectedResult.id" :total-seasons="details.number_of_seasons" :disabled="saving" @imported="seasonImported" />
     <TmdbAlternativeTitlesPanel v-if="selectedTitle && details" :title="selectedTitle" :details="details" :disabled="saving" @imported="alternativeTitlesImported" />
     <TmdbImagesPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" :disabled="saving" @applied="imagesApplied" />
+    <TitleVersionPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @restored="versionRestored" @snapshot="snapshotCreated" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>

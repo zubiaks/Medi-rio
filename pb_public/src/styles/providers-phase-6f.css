@@ -1,0 +1,10 @@
+/** Mediário | Fase 6F — versões e recuperação. */
+.title-versions { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.title-version-create { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:.75rem; }
+.title-version-layout { display:grid; grid-template-columns:minmax(220px,.8fr) minmax(0,1.2fr); gap:1rem; }
+.title-version-list { display:grid; gap:.45rem; max-height:24rem; overflow:auto; padding:0; list-style:none; }
+.title-version-list button { display:grid; width:100%; gap:.2rem; padding:.65rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.6rem; background:var(--surface); }
+.title-version-list button.is-selected { border-color:var(--primary); }
+.title-version-list small { color:var(--muted); }
+.title-version-fields { display:grid; gap:.5rem; align-content:start; padding:.75rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+@media (max-width:760px) { .title-version-create,.title-version-layout { grid-template-columns:1fr; } }
