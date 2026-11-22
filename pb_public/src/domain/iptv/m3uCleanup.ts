@@ -1,0 +1,1 @@
+import type{IptvChannelRecord}from"@/types/records";export type MissingChannelAction="keep"|"disable"|"archive";export function findMissingPlaylistChannels(channels:IptvChannelRecord[],origin:string,tvgIds:Set<string>,urls:Set<string>){return channels.filter(c=>c.playlist_origem===origin&&!((c.tvg_id&&tvgIds.has(c.tvg_id))||urls.has(c.url_stream)))}

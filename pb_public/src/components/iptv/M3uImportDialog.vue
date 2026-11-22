@@ -3,7 +3,7 @@
   Versão do projeto: 0.3.0-alpha.1
 
   Ficheiro: src/components/iptv/M3uImportDialog.vue
-  Versão do ficheiro: 3.0.0
+  Versão do ficheiro: 4.0.0
   Tipo: Diálogo Vue 3 com TypeScript
   Domínio: IPTV
   Estado: Em desenvolvimento
@@ -55,6 +55,14 @@ import {
   type M3uImportMode,
 } from "@/domain/iptv/m3uImportPlan";
 import {
+  fetchM3uPlaylist,
+  remotePlaylistName,
+} from "@/domain/iptv/m3uRemote";
+import {
+  findMissingPlaylistChannels,
+  type MissingChannelAction,
+} from "@/domain/iptv/m3uCleanup";
+import {
   addM3uImportHistory,
   downloadM3uReport,
   getM3uImportHistory,
@@ -105,6 +113,10 @@ const summary = ref<ImportSummary | null>(null);
 const importMode = ref<M3uImportMode>("sync");
 const history = ref<M3uImportHistoryEntry[]>(getM3uImportHistory());
 const startedAt = ref(0);
+const sourceMode = ref<"file" | "url">("file");
+const remoteUrl = ref("");
+const loadingRemote = ref(false);
+const missingAction = ref<MissingChannelAction>("keep");
 
 const visible = computed(() => {
   const normalizedQuery = query.value.toLocaleLowerCase("pt-PT");
@@ -140,6 +152,10 @@ function reset(): void {
   query.value = "";
   summary.value = null;
   importMode.value = "sync";
+  sourceMode.value = "file";
+  remoteUrl.value = "";
+  loadingRemote.value = false;
+  missingAction.value = "keep";
 }
 
 watch(
@@ -170,6 +186,23 @@ async function readFile(event: Event): Promise<void> {
   } catch (cause) {
     items.value = [];
     error.value = cause instanceof Error ? cause.message : String(cause);
+  }
+}
+
+async function readRemote(): Promise<void> {
+  error.value = "";
+  summary.value = null;
+  loadingRemote.value = true;
+
+  try {
+    const result = await fetchM3uPlaylist(remoteUrl.value);
+    fileName.value = remotePlaylistName(result.url);
+    items.value = parseM3u(result.text);
+  } catch (cause) {
+    items.value = [];
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  } finally {
+    loadingRemote.value = false;
   }
 }
 
@@ -436,7 +469,36 @@ async function run(): Promise<void> {
     importing.value = false;
   }
 
-  const changedCount = importedCount + updatedCount;
+  let missingChanged = 0;
+  if (missingAction.value !== "keep" && fileName.value) {
+    const presentTvgIds = new Set(entries.map((item) => item.tvgId).filter(Boolean));
+    const presentUrls = new Set(entries.map((item) => item.url));
+    const missing = findMissingPlaylistChannels(
+      props.existing,
+      fileName.value,
+      presentTvgIds,
+      presentUrls,
+    );
+
+    for (const channel of missing) {
+      try {
+        await iptvChannelRepository.update(
+          channel.id,
+          missingAction.value === "disable"
+            ? { ativo: false }
+            : { cemiterio: true },
+        );
+        missingChanged += 1;
+      } catch (cause) {
+        failures.push({
+          name: channel.nome,
+          message: cause instanceof Error ? cause.message : String(cause),
+        });
+      }
+    }
+  }
+
+  const changedCount = importedCount + updatedCount + missingChanged;
   if (changedCount > 0) emit("imported", changedCount);
 }
 
@@ -473,7 +535,13 @@ async function run(): Promise<void> {
           </button>
         </div>
 
-        <label class="form-field">
+        <fieldset class="m3u-source-mode" :disabled="importing || loadingRemote">
+          <legend>Origem da playlist</legend>
+          <label><input v-model="sourceMode" type="radio" value="file" /> Ficheiro</label>
+          <label><input v-model="sourceMode" type="radio" value="url" /> URL remota</label>
+        </fieldset>
+
+        <label v-if="sourceMode === 'file'" class="form-field">
           <span>Playlist M3U ou M3U8</span>
           <input
             ref="firstInput"
@@ -483,6 +551,16 @@ async function run(): Promise<void> {
             @change="readFile"
           />
         </label>
+
+        <form v-else class="m3u-remote" @submit.prevent="readRemote">
+          <label class="form-field">
+            <span>URL da playlist</span>
+            <input v-model.trim="remoteUrl" type="url" required placeholder="https://exemplo.pt/lista.m3u" />
+          </label>
+          <button class="button button-secondary" type="submit" :disabled="loadingRemote || !remoteUrl">
+            {{ loadingRemote ? "A carregar…" : "Carregar URL" }}
+          </button>
+        </form>
 
         <fieldset
           v-if="items.length && !summary"
@@ -506,6 +584,15 @@ async function run(): Promise<void> {
             Criar apenas canais novos
           </label>
         </fieldset>
+
+        <label v-if="items.length && !summary" class="form-field">
+          <span>Canais da mesma origem que desapareceram</span>
+          <select v-model="missingAction" :disabled="importing">
+            <option value="keep">Manter sem alterações</option>
+            <option value="disable">Desativar</option>
+            <option value="archive">Arquivar</option>
+          </select>
+        </label>
 
         <section
           v-if="items.length && !summary"
