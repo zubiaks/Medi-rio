@@ -539,3 +539,8 @@
 .smart-list-diff { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin:0; }.smart-list-diff > div { padding:.55rem; border:1px solid var(--line); border-radius:.55rem; background:var(--surface); }.smart-list-diff dt { color:var(--muted); font-size:.72rem; }.smart-list-diff dd { margin:.2rem 0 0; font-weight:800; }
 @media(max-width:850px) { .lists-dashboard-metrics { grid-template-columns:repeat(3,1fr); }.lists-dashboard-toolbar { grid-template-columns:1fr 1fr; } }
 @media(max-width:560px) { .lists-dashboard-metrics,.lists-dashboard-toolbar,.smart-list-diff { grid-template-columns:1fr; } }
+
+/* ===== Fase 10.3 — histórico, avisos e encerramento ===== */
+.list-change-notice { padding:.45rem .55rem; color:var(--warning); border:1px solid color-mix(in srgb,var(--warning),var(--line) 60%); border-radius:.5rem; background:color-mix(in srgb,var(--warning),transparent 94%); font-weight:700; }
+.list-activity { display:grid; gap:.7rem; margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--line); }.list-activity ol { display:grid; gap:.5rem; max-height:24rem; overflow:auto; padding:0; list-style:none; }.list-activity li { display:flex; align-items:center; justify-content:space-between; gap:.8rem; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface-2); }.list-activity li > div { display:grid; gap:.15rem; }.list-activity small,.list-activity span { color:var(--muted); }
+@media(max-width:640px) { .list-activity li { display:grid; } }

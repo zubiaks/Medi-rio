@@ -7,6 +7,7 @@
 -->
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import ListActivityPanel from "./ListActivityPanel.vue";
 import {
   buildListDashboardMetrics,
   duplicatePersonalList,
@@ -21,6 +22,7 @@ import {
   refreshAllSmartLists,
   type SmartListBatchResult,
 } from "@/domain/lists/smartListBatch";
+import { loadListChangeNotices, markListNoticeRead } from "@/domain/lists/listNotifications";
 
 const props = defineProps<{ open: boolean }>();
 const emit = defineEmits<{ close: []; manage: [string] }>();
@@ -32,6 +34,7 @@ const cancelRequested = ref(false);
 const progress = ref({ processed: 0, total: 0 });
 const result = ref<SmartListBatchResult | null>(null);
 const error = ref("");
+const notices = ref(loadListChangeNotices());
 
 const metrics = computed(() => buildListDashboardMetrics(lists.value));
 const pinned = computed(() => pinnedLists(lists.value));
@@ -56,7 +59,13 @@ watch(() => props.open, (open) => {
 
 function load(): void {
   lists.value = loadPersonalLists();
+  notices.value = loadListChangeNotices();
   error.value = "";
+}
+
+function openList(id: string): void {
+  notices.value = markListNoticeRead(id);
+  emit("manage", id);
 }
 
 function duplicate(list: PersonalList): void {
@@ -123,7 +132,7 @@ function age(value: string): string {
         <section v-if="pinned.length" class="lists-pinned" aria-labelledby="lists-pinned-title">
           <h3 id="lists-pinned-title">Listas fixadas</h3>
           <div>
-            <button v-for="list in pinned" :key="list.id" type="button" @click="emit('manage', list.id)">
+            <button v-for="list in pinned" :key="list.id" type="button" @click="openList(list.id)">
               <span :style="{ background: list.color }" aria-hidden="true" />
               <strong>{{ list.name }}</strong>
               <small>{{ list.items.length }} itens · {{ age(list.updatedAt) }}</small>
@@ -148,11 +157,16 @@ function age(value: string): string {
           <article v-for="list in visible" :key="list.id" class="list-dashboard-card">
             <header><span :style="{ background: list.color }" aria-hidden="true" /><div><h3>{{ list.name }}</h3><small>{{ list.kind === 'smart' ? 'Inteligente' : 'Manual' }} · {{ age(list.updatedAt) }}</small></div></header>
             <p>{{ list.description || "Sem descrição." }}</p>
+            <p v-if="notices.find((notice) => notice.listId === list.id && !notice.read)" class="list-change-notice">
+              {{ notices.find((notice) => notice.listId === list.id)?.added || 0 }} novos ·
+              {{ notices.find((notice) => notice.listId === list.id)?.removed || 0 }} removidos
+            </p>
             <dl><div><dt>Itens</dt><dd>{{ list.items.length }}</dd></div><div><dt>Fixada</dt><dd>{{ list.pinned ? "Sim" : "Não" }}</dd></div></dl>
-            <div class="form-actions"><button class="button button-primary" type="button" @click="emit('manage', list.id)">Abrir</button><button class="button button-secondary" type="button" @click="duplicate(list)">Duplicar</button></div>
+            <div class="form-actions"><button class="button button-primary" type="button" @click="openList(list.id)">Abrir</button><button class="button button-secondary" type="button" @click="duplicate(list)">Duplicar</button></div>
           </article>
         </div>
 
+        <ListActivityPanel @restored="load" />
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="running" @click="emit('close')">Fechar</button></div>
       </section>
     </div>

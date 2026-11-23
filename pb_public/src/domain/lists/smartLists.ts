@@ -109,8 +109,9 @@ export async function refreshSmartList(listId: string): Promise<PersonalList[]> 
   }
   const rule = normalizeSmartListRule(list.rule as ExtendedSmartListRule | undefined);
   const items = await previewSmartList(rule);
+  const difference = compareSmartListSnapshot(list.items, items);
   const updated = updatePersonalList(listId, { rule });
-  return replacePersonalLists(updated.map((item) =>
+  const saved = replacePersonalLists(updated.map((item) =>
     item.id === listId
       ? {
           ...item,
@@ -119,6 +120,23 @@ export async function refreshSmartList(listId: string): Promise<PersonalList[]> 
         }
       : item,
   ));
+  if (difference.added.length || difference.removed.length) {
+    saveListChangeNotice({
+      listId,
+      listName: list.name,
+      added: difference.added.length,
+      removed: difference.removed.length,
+    });
+  }
+  recordListActivity({
+    type: "refreshed",
+    listId,
+    listName: list.name,
+    message: `${difference.added.length} novos, ${difference.removed.length} removidos.`,
+    before: list,
+    after: saved.find((item) => item.id === listId),
+  });
+  return saved;
 }
 
 export function convertSmartListToManual(listId: string): PersonalList[] {
