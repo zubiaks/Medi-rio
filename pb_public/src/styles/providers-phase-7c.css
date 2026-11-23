@@ -1,0 +1,16 @@
+/** Mediário | Fase 7C — acessibilidade e desempenho do workspace TMDB. */
+.tmdb-detail-tabs .button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tmdb-detail-panel[role="tabpanel"]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tmdb-detail-tabs {
+    scroll-behavior: auto;
+  }
+}
