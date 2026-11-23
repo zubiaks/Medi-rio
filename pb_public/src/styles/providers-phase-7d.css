@@ -1,0 +1,4 @@
+/** Mediário | Fase 7D — componente reutilizável do workspace TMDB. */
+.tmdb-detail-panel[role="tabpanel"] {
+  contain: layout style;
+}

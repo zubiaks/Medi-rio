@@ -9,7 +9,7 @@
   Licença: PolyForm Noncommercial License 1.0.0
 -->
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import TmdbEnrichmentPreview from "./TmdbEnrichmentPreview.vue";
 import TmdbRelationsPreview from "./TmdbRelationsPreview.vue";
 import TmdbCreditsPreview from "./TmdbCreditsPreview.vue";
@@ -18,6 +18,7 @@ import TmdbAlternativeTitlesPanel from "./TmdbAlternativeTitlesPanel.vue";
 import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
+import TmdbWorkspaceTabs from "./TmdbWorkspaceTabs.vue";
 import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
@@ -30,11 +31,7 @@ import { prepareProtectedSync } from "@/domain/providers/protectedSync";
 import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCredits";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
-import {
-  availableTmdbWorkspaceTabs,
-  nextTmdbWorkspaceTab,
-  type TmdbWorkspaceTab,
-} from "@/domain/providers/tmdbWorkspace";
+import type { TmdbWorkspaceTab } from "@/domain/providers/tmdbWorkspace";
 
 const props = defineProps<{ open: boolean; existing: ExternalSourceRecord[] }>();
 const emit = defineEmits<{ close: []; saved: [ExternalSourceRecord] }>();
@@ -51,10 +48,6 @@ const loading = ref(false);
 const saving = ref(false);
 const error = ref("");
 const detailTab = ref<TmdbWorkspaceTab>("metadata");
-const tabButtons = ref<HTMLButtonElement[]>([]);
-const workspaceTabs = computed(() =>
-  availableTmdbWorkspaceTabs(selectedResult.value?.media_type || "movie"),
-);
 let titleTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch(() => props.open, (open) => {
@@ -73,39 +66,6 @@ watch(titleQuery, (value) => {
     titleResults.value = (await titleRepository.list({ page: 1, perPage: 20, filter: `apagado = false && (titulo ~ "${escaped}" || titulo_original ~ "${escaped}")`, sort: "titulo" })).items;
   }, 300);
 });
-
-async function focusActiveTab(): Promise<void> {
-  await nextTick();
-  const index = workspaceTabs.value.findIndex((item) => item.id === detailTab.value);
-  tabButtons.value[index]?.focus();
-}
-
-function moveTab(direction: 1 | -1): void {
-  detailTab.value = nextTmdbWorkspaceTab(
-    detailTab.value,
-    selectedResult.value?.media_type || "movie",
-    direction,
-  );
-  void focusActiveTab();
-}
-
-function handleTabKey(event: KeyboardEvent): void {
-  if (event.key === "ArrowRight") {
-    event.preventDefault();
-    moveTab(1);
-  } else if (event.key === "ArrowLeft") {
-    event.preventDefault();
-    moveTab(-1);
-  } else if (event.key === "Home") {
-    event.preventDefault();
-    detailTab.value = workspaceTabs.value[0]?.id || "metadata";
-    void focusActiveTab();
-  } else if (event.key === "End") {
-    event.preventDefault();
-    detailTab.value = workspaceTabs.value.at(-1)?.id || "health";
-    void focusActiveTab();
-  }
-}
 
 async function runSearch(): Promise<void> {
   if (query.value.trim().length < 2) { error.value = "Escreve pelo menos dois caracteres."; return; }
@@ -234,93 +194,77 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <section v-if="selectedResult" class="tmdb-association"><h3>Selecionar título do catálogo</h3><label class="form-field"><span>Título existente *</span><input v-model.trim="titleQuery" type="search" /></label><ul v-if="titleResults.length" class="provider-title-results"><li v-for="title in titleResults" :key="title.id"><button type="button" @click="selectTitle(title)">{{ title.titulo }}<span>{{ title.ano || "—" }}</span></button></li></ul><p v-if="selectedTitle">Selecionado: <strong>{{ selectedTitle.titulo }}</strong></p><button v-if="selectedTitle && !details" class="button button-primary" type="button" :disabled="saving" @click="prepare">{{ saving ? "A preparar…" : "Comparar metadados" }}</button></section>
     <template v-if="selectedTitle && details">
       <TmdbProtectionNotice />
-      <div class="tmdb-detail-tabs" role="tablist" aria-label="Áreas do enriquecimento TMDB">
-        <button
-          v-for="(item, index) in workspaceTabs"
-          :key="item.id"
-          :ref="(element) => { if (element) tabButtons[index] = element as HTMLButtonElement; }"
-          class="button button-secondary"
-          :class="{ 'is-active': detailTab === item.id }"
-          type="button"
-          role="tab"
-          :id="`tmdb-tab-${item.id}`"
-          :aria-controls="`tmdb-panel-${item.id}`"
-          :aria-selected="detailTab === item.id"
-          :tabindex="detailTab === item.id ? 0 : -1"
-          @keydown="handleTabKey"
-          @click="detailTab = item.id"
-        >
-          {{ item.label }}
-        </button>
-      </div>
-
-      <div v-if="detailTab === 'metadata'" :id="'tmdb-panel-metadata'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-metadata'">
-        <TmdbEnrichmentPreview
-          :title="selectedTitle"
-          :details="details"
-          :disabled="saving"
-          @apply="applyFields"
-        />
-      </div>
-      <div v-if="detailTab === 'relations'" :id="'tmdb-panel-relations'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-relations'">
-        <TmdbRelationsPreview
-          :details="details"
-          :disabled="saving"
-          @apply="applyRelations"
-        />
-      </div>
-      <div v-if="detailTab === 'credits'" :id="'tmdb-panel-credits'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-credits'">
-        <TmdbCreditsPreview
-          :details="details"
-          :disabled="saving"
-          @apply="applyCredits"
-        />
-      </div>
-      <div v-if="detailTab === 'seasons'" :id="'tmdb-panel-seasons'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-seasons'">
-        <TmdbSeasonsPanel
-          v-if="selectedResult?.media_type === 'tv'"
-          :title="selectedTitle"
-          :tmdb-id="selectedResult.id"
-          :total-seasons="details.number_of_seasons"
-          :disabled="saving"
-          @imported="seasonImported"
-        />
-        <p v-else class="form-alert">As temporadas e episódios aplicam-se apenas a séries.</p>
-      </div>
-      <div v-if="detailTab === 'aliases'" :id="'tmdb-panel-aliases'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-aliases'">
-        <TmdbAlternativeTitlesPanel
-          :title="selectedTitle"
-          :details="details"
-          :disabled="saving"
-          @imported="alternativeTitlesImported"
-        />
-      </div>
-      <div v-if="detailTab === 'images'" :id="'tmdb-panel-images'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-images'">
-        <TmdbImagesPanel
-          v-if="selectedResult"
-          :title="selectedTitle"
-          :tmdb-id="selectedResult.id"
-          :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'"
-          :disabled="saving"
-          @applied="imagesApplied"
-        />
-      </div>
-      <div v-if="detailTab === 'history'" :id="'tmdb-panel-history'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-history'">
-        <TitleVersionPanel
-          :title="selectedTitle"
-          :disabled="saving"
-          @restored="versionRestored"
-          @snapshot="snapshotCreated"
-        />
-      </div>
-      <div v-if="detailTab === 'health'" :id="'tmdb-panel-health'" class="tmdb-detail-panel" role="tabpanel" :aria-labelledby="'tmdb-tab-health'">
-        <TmdbSyncHealthPanel
-          :title="selectedTitle"
-          :details="details"
-          :loading="saving"
-          @refresh="refreshTitle"
-        />
-      </div>
+      <TmdbWorkspaceTabs
+        v-model="detailTab"
+        :media-type="selectedResult?.media_type || 'movie'"
+      >
+        <template #metadata>
+          <TmdbEnrichmentPreview
+            :title="selectedTitle"
+            :details="details"
+            :disabled="saving"
+            @apply="applyFields"
+          />
+        </template>
+        <template #relations>
+          <TmdbRelationsPreview
+            :details="details"
+            :disabled="saving"
+            @apply="applyRelations"
+          />
+        </template>
+        <template #credits>
+          <TmdbCreditsPreview
+            :details="details"
+            :disabled="saving"
+            @apply="applyCredits"
+          />
+        </template>
+        <template #seasons>
+          <TmdbSeasonsPanel
+            v-if="selectedResult?.media_type === 'tv'"
+            :title="selectedTitle"
+            :tmdb-id="selectedResult.id"
+            :total-seasons="details.number_of_seasons"
+            :disabled="saving"
+            @imported="seasonImported"
+          />
+        </template>
+        <template #aliases>
+          <TmdbAlternativeTitlesPanel
+            :title="selectedTitle"
+            :details="details"
+            :disabled="saving"
+            @imported="alternativeTitlesImported"
+          />
+        </template>
+        <template #images>
+          <TmdbImagesPanel
+            v-if="selectedResult"
+            :title="selectedTitle"
+            :tmdb-id="selectedResult.id"
+            :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'"
+            :disabled="saving"
+            @applied="imagesApplied"
+          />
+        </template>
+        <template #history>
+          <TitleVersionPanel
+            :title="selectedTitle"
+            :disabled="saving"
+            @restored="versionRestored"
+            @snapshot="snapshotCreated"
+          />
+        </template>
+        <template #health>
+          <TmdbSyncHealthPanel
+            :title="selectedTitle"
+            :details="details"
+            :loading="saving"
+            @refresh="refreshTitle"
+          />
+        </template>
+      </TmdbWorkspaceTabs>
     </template>
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
