@@ -6,6 +6,7 @@
 -->
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { parseSearchUrl, replaceSearchUrl } from "@/domain/search/searchUrlState";
 import GlobalSearchDetailDialog from "./GlobalSearchDetailDialog.vue";
 import SearchDiscoveryPanel from "./SearchDiscoveryPanel.vue";
 import SearchComparisonPanel from "./SearchComparisonPanel.vue";
@@ -75,7 +76,39 @@ watch(() => props.open, (open) => {
   history.value = loadSearchHistory();
   savedSearches.value = loadSavedSearches();
   error.value = "";
+  const state = parseSearchUrl(window.location.search);
+  query.value = state.query || query.value;
+  mode.value = state.mode || mode.value;
+  view.value = state.view || view.value;
+  if (state.filters) {
+    entities.value = [...state.filters.entities];
+    provider.value = state.filters.provider || "";
+    yearFrom.value = state.filters.yearFrom || null;
+    yearTo.value = state.filters.yearTo || null;
+    includeDeleted.value = Boolean(state.filters.includeDeleted);
+  }
+  if (query.value.length >= 2 && mode.value === "search") void search();
 });
+
+function setMode(value: "search" | "discover"): void {
+  mode.value = value;
+  replaceSearchUrl({
+    query: query.value,
+    mode: value,
+    view: view.value,
+    filters: currentFilters(),
+  });
+}
+
+function setView(value: "grid" | "list"): void {
+  view.value = value;
+  replaceSearchUrl({
+    query: query.value,
+    mode: mode.value,
+    view: value,
+    filters: currentFilters(),
+  });
+}
 
 function currentFilters() {
   return {
@@ -137,6 +170,12 @@ async function search(): Promise<void> {
       includeDeleted: includeDeleted.value,
     });
     history.value = addSearchHistory(query.value);
+    replaceSearchUrl({
+      query: query.value,
+      mode: mode.value,
+      view: view.value,
+      filters: currentFilters(),
+    });
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : String(cause);
     result.value = null;
@@ -166,8 +205,8 @@ function clearHistory(): void {
         </div>
 
         <div class="global-search-mode-tabs" role="tablist" aria-label="Modo da pesquisa">
-          <button class="button button-secondary" :class="{ 'is-active': mode === 'search' }" type="button" role="tab" :aria-selected="mode === 'search'" @click="mode = 'search'">Pesquisar</button>
-          <button class="button button-secondary" :class="{ 'is-active': mode === 'discover' }" type="button" role="tab" :aria-selected="mode === 'discover'" @click="mode = 'discover'">Descobrir</button>
+          <button class="button button-secondary" :class="{ 'is-active': mode === 'search' }" type="button" role="tab" :aria-selected="mode === 'search'" @click="setMode('search')">Pesquisar</button>
+          <button class="button button-secondary" :class="{ 'is-active': mode === 'discover' }" type="button" role="tab" :aria-selected="mode === 'discover'" @click="setMode('discover')">Descobrir</button>
         </div>
 
         <SearchDiscoveryPanel v-if="mode === 'discover'" @select="selectedItem = $event" />
@@ -204,7 +243,7 @@ function clearHistory(): void {
         <template v-if="result">
           <div class="global-search-summary">
             <p><strong>{{ result.total }}</strong> resultado{{ result.total === 1 ? "" : "s" }} para “{{ result.query }}”</p>
-            <div><button class="button button-secondary" :class="{ 'is-active': view === 'grid' }" type="button" @click="view = 'grid'">Grelha</button><button class="button button-secondary" :class="{ 'is-active': view === 'list' }" type="button" @click="view = 'list'">Lista</button></div>
+            <div><button class="button button-secondary" :class="{ 'is-active': view === 'grid' }" type="button" @click="setView('grid')">Grelha</button><button class="button button-secondary" :class="{ 'is-active': view === 'list' }" type="button" @click="setView('list')">Lista</button></div>
           </div>
 
           <p v-if="!groups.length" class="form-alert">Não foram encontrados resultados com estes filtros.</p>

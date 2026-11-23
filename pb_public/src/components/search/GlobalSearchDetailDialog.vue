@@ -1,7 +1,11 @@
 <!-- Mediário | Fase 9.1: detalhe contextual de resultados globais. -->
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { GlobalSearchItem } from "@/domain/search/globalSearch";
+import {
+  actionsForSearchItem,
+  executeSearchAction,
+} from "@/domain/search/searchActions";
 import {
   loadSearchItemDetails,
   type SearchItemDetails,
@@ -12,6 +16,8 @@ const emit = defineEmits<{ close: []; use: [GlobalSearchItem] }>();
 const details = ref<SearchItemDetails | null>(null);
 const loading = ref(false);
 const error = ref("");
+const message = ref("");
+const actions = computed(() => props.item ? actionsForSearchItem(props.item) : []);
 
 watch(() => props.item, async (item) => {
   details.value = null;
@@ -27,6 +33,18 @@ watch(() => props.item, async (item) => {
     loading.value = false;
   }
 }, { immediate: true });
+async function runAction(action: ReturnType<typeof actionsForSearchItem>[number]): Promise<void> {
+  if (!props.item) return;
+  error.value = "";
+  message.value = "";
+  try {
+    await executeSearchAction(action, props.item);
+    if (action.id !== "open-source") message.value = "Valor copiado para a área de transferência.";
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  }
+}
+
 </script>
 
 <template>
@@ -69,6 +87,10 @@ watch(() => props.item, async (item) => {
           </details>
         </template>
 
+        <div v-if="message" class="form-alert form-alert-success" role="status">{{ message }}</div>
+        <div class="search-detail-actions" aria-label="Ações do resultado">
+          <button v-for="action in actions" :key="action.id" class="button button-secondary" type="button" @click="runAction(action)">{{ action.label }}</button>
+        </div>
         <div class="form-actions">
           <button class="button button-primary" type="button" :disabled="loading" @click="emit('use', item)">Usar na página atual</button>
           <button class="button button-secondary" type="button" :disabled="loading" @click="emit('close')">Voltar aos resultados</button>

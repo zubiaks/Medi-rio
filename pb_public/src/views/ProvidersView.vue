@@ -9,7 +9,7 @@
   Licença: PolyForm Noncommercial License 1.0.0
 -->
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import BaseEmptyState from "@/components/base/BaseEmptyState.vue";
 import BasePageHeader from "@/components/base/BasePageHeader.vue";
 import ProviderDashboard from "@/components/providers/ProviderDashboard.vue";
@@ -18,6 +18,7 @@ import TmdbSearchDialog from "@/components/providers/TmdbSearchDialog.vue";
 import OmdbSearchDialog from "@/components/providers/OmdbSearchDialog.vue";
 import GlobalSearchDialog from "@/components/search/GlobalSearchDialog.vue";
 import type { GlobalSearchItem } from "@/domain/search/globalSearch";
+import { isGlobalSearchShortcut } from "@/domain/search/searchKeyboard";
 import {
   externalSourceRepository,
   syncJobRepository,
@@ -101,7 +102,23 @@ async function saved(): Promise<void> {
   await load();
 }
 
-onMounted(load);
+function handleGlobalShortcut(event: KeyboardEvent): void {
+  if (!isGlobalSearchShortcut(event)) return;
+  event.preventDefault();
+  globalSearchOpen.value = true;
+}
+
+onMounted(() => {
+  void load();
+  window.addEventListener("keydown", handleGlobalShortcut);
+  if (new URLSearchParams(window.location.search).has("q")) {
+    globalSearchOpen.value = true;
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleGlobalShortcut);
+});
 </script>
 
 <template>
@@ -111,7 +128,7 @@ onMounted(load);
     description="Fontes externas e enriquecimento individual do catálogo. As operações globais estão em Manutenção."
   >
     <template #actions>
-      <button class="button button-secondary" type="button" @click="globalSearchOpen = true">Pesquisa global</button>
+      <button class="button button-secondary" type="button" @click="globalSearchOpen = true">Pesquisa global <kbd>Ctrl K</kbd></button>
       <RouterLink class="button button-secondary" to="/manutencao">Manutenção</RouterLink>
       <button class="button button-secondary" type="button" @click="tmdbOpen = true">Pesquisar TMDB</button>
       <button class="button button-secondary" type="button" @click="omdbOpen = true">Pesquisar OMDb</button>
