@@ -21,8 +21,10 @@ import {
   type ExtendedSmartListRule,
 } from "@/domain/lists/smartLists";
 import type { GlobalSearchItem, SearchEntity } from "@/domain/search/globalSearch";
+import { compareSmartListSnapshot } from "@/domain/lists/smartListDiff";
+import { duplicatePersonalList, filterPersonalListItems } from "@/domain/lists/listDashboard";
 
-const props = defineProps<{ open: boolean }>();
+const props = defineProps<{ open: boolean; initialListId?: string }>();
 const emit = defineEmits<{ close: [] }>();
 const lists = ref<PersonalList[]>([]);
 const selectedId = ref("");
@@ -35,6 +37,15 @@ const importInput = ref<HTMLInputElement | null>(null);
 const selected = computed(() => lists.value.find((list) => list.id === selectedId.value) || null);
 const smartRule = ref<ExtendedSmartListRule>(normalizeSmartListRule());
 const preview = ref<GlobalSearchItem[]>([]);
+const itemQuery = ref("");
+const smartDifference = computed(() =>
+  selected.value?.kind === "smart"
+    ? compareSmartListSnapshot(selected.value.items, preview.value)
+    : null,
+);
+const visibleItems = computed(() =>
+  selected.value ? filterPersonalListItems(selected.value.items, itemQuery.value) : [],
+);
 const smartLoading = ref(false);
 const entityOptions: Array<{ id: SearchEntity; label: string }> = [
   { id: "titles", label: "Títulos" },
@@ -58,7 +69,9 @@ watch(selected, (list) => {
 watch(() => props.open, (open) => {
   if (!open) return;
   lists.value = loadPersonalLists();
-  selectedId.value = lists.value[0]?.id || "";
+  selectedId.value = props.initialListId && lists.value.some((item) => item.id === props.initialListId)
+    ? props.initialListId
+    : lists.value[0]?.id || "";
   error.value = "";
   message.value = "";
 });
@@ -78,6 +91,16 @@ function create(): void {
     kind.value = "manual";
     message.value = "Lista criada.";
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
+}
+
+function duplicateList(list: PersonalList): void {
+  try {
+    lists.value = duplicatePersonalList(list.id);
+    selectedId.value = lists.value[0]?.id || "";
+    message.value = "Lista duplicada.";
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  }
 }
 
 function removeList(list: PersonalList): void {
@@ -177,7 +200,7 @@ async function importFile(event: Event): Promise<void> {
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="!lists.length" @click="download">Exportar</button><button class="button button-secondary" type="button" @click="importInput?.click()">Importar</button><input ref="importInput" class="sr-only" type="file" accept="application/json,.json" @change="importFile" /></div>
       </aside>
       <main v-if="selected" class="personal-list-detail">
-        <header><div><p class="eyebrow">{{ selected.kind === 'manual' ? 'Lista manual' : 'Lista inteligente' }}</p><h3>{{ selected.name }}</h3><p>{{ selected.description || 'Sem descrição.' }}</p></div><div class="form-actions"><button class="button button-secondary" type="button" @click="togglePinned(selected)">{{ selected.pinned ? 'Desafixar' : 'Fixar' }}</button><button class="button button-danger" type="button" @click="removeList(selected)">Eliminar</button></div></header>
+        <header><div><p class="eyebrow">{{ selected.kind === 'manual' ? 'Lista manual' : 'Lista inteligente' }}</p><h3>{{ selected.name }}</h3><p>{{ selected.description || 'Sem descrição.' }}</p></div><div class="form-actions"><button class="button button-secondary" type="button" @click="togglePinned(selected)">{{ selected.pinned ? 'Desafixar' : 'Fixar' }}</button><button class="button button-secondary" type="button" @click="duplicateList(selected)">Duplicar</button><button class="button button-danger" type="button" @click="removeList(selected)">Eliminar</button></div></header>
         <section v-if="selected.kind === 'smart'" class="smart-list-editor" aria-labelledby="smart-rule-title">
           <div><p class="eyebrow">Regra automática</p><h4 id="smart-rule-title">Configurar lista inteligente</h4></div>
           <label class="form-field field-wide"><span>Termo de pesquisa *</span><input v-model.trim="smartRule.query" type="search" minlength="2" maxlength="300" /></label>
@@ -192,9 +215,11 @@ async function importFile(event: Event): Promise<void> {
           </div>
           <div class="form-actions"><button class="button button-secondary" type="button" :disabled="smartLoading" @click="previewRule">Pré-visualizar</button><button class="button button-secondary" type="button" :disabled="smartLoading" @click="saveRule">Guardar regra</button><button class="button button-primary" type="button" :disabled="smartLoading" @click="refreshRule">{{ smartLoading ? "A atualizar…" : "Atualizar lista" }}</button><button class="button button-secondary" type="button" :disabled="smartLoading" @click="convertToManual">Converter em manual</button></div>
           <div v-if="preview.length" class="smart-list-preview"><h5>Pré-visualização ({{ preview.length }})</h5><div><article v-for="item in preview" :key="`${item.entity}-${item.id}`"><img v-if="item.imageUrl" :src="item.imageUrl" :alt="" loading="lazy" /><span v-else class="global-search-fallback" aria-hidden="true">◇</span><strong>{{ item.title }}</strong><small>{{ item.subtitle || item.entity }}</small></article></div></div>
+          <dl v-if="preview.length && smartDifference" class="smart-list-diff"><div><dt>Novos</dt><dd>{{ smartDifference.added.length }}</dd></div><div><dt>Removidos</dt><dd>{{ smartDifference.removed.length }}</dd></div><div><dt>Inalterados</dt><dd>{{ smartDifference.unchanged }}</dd></div></dl>
         </section>
         <p v-if="selected.kind === 'manual' && !selected.items.length">Adiciona itens a partir do detalhe da Pesquisa global.</p>
-        <ol v-if="selected.items.length" class="personal-list-items"><li v-for="(item, index) in selected.items" :key="`${item.entity}-${item.id}`"><img v-if="item.imageUrl" :src="item.imageUrl" :alt="" loading="lazy" /><span v-else class="global-search-fallback" aria-hidden="true">◇</span><div><strong>{{ item.title }}</strong><small>{{ item.subtitle || item.entity }}</small></div><div class="personal-list-order"><button class="icon-button" type="button" aria-label="Subir" :disabled="index === 0" @click="move(index, -1)">↑</button><button class="icon-button" type="button" aria-label="Descer" :disabled="index === selected.items.length - 1" @click="move(index, 1)">↓</button><button class="icon-button" type="button" aria-label="Remover" @click="removeItem(item.entity, item.id)">×</button></div></li></ol>
+        <label v-if="selected.items.length" class="form-field"><span>Pesquisar dentro da lista</span><input v-model.trim="itemQuery" type="search" placeholder="Título, subtítulo ou entidade" /></label>
+        <ol v-if="visibleItems.length" class="personal-list-items"><li v-for="(item, index) in visibleItems" :key="`${item.entity}-${item.id}`"><img v-if="item.imageUrl" :src="item.imageUrl" :alt="" loading="lazy" /><span v-else class="global-search-fallback" aria-hidden="true">◇</span><div><strong>{{ item.title }}</strong><small>{{ item.subtitle || item.entity }}</small></div><div class="personal-list-order"><button class="icon-button" type="button" aria-label="Subir" :disabled="index === 0" @click="move(selected.items.findIndex((value) => value.id === item.id && value.entity === item.entity), -1)">↑</button><button class="icon-button" type="button" aria-label="Descer" :disabled="index === selected.items.length - 1" @click="move(selected.items.findIndex((value) => value.id === item.id && value.entity === item.entity), 1)">↓</button><button class="icon-button" type="button" aria-label="Remover" @click="removeItem(item.entity, item.id)">×</button></div></li></ol>
       </main>
       <p v-else class="form-alert">Cria ou seleciona uma lista.</p>
     </div>

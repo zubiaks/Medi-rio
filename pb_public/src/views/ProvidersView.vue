@@ -18,6 +18,7 @@ import TmdbSearchDialog from "@/components/providers/TmdbSearchDialog.vue";
 import OmdbSearchDialog from "@/components/providers/OmdbSearchDialog.vue";
 import GlobalSearchDialog from "@/components/search/GlobalSearchDialog.vue";
 import PersonalListsDialog from "@/components/lists/PersonalListsDialog.vue";
+import ListsDashboardDialog from "@/components/lists/ListsDashboardDialog.vue";
 import type { GlobalSearchItem } from "@/domain/search/globalSearch";
 import { isGlobalSearchShortcut } from "@/domain/search/searchKeyboard";
 import {
@@ -40,6 +41,8 @@ const tmdbOpen = ref(false);
 const omdbOpen = ref(false);
 const globalSearchOpen = ref(false);
 const listsOpen = ref(false);
+const listsDashboardOpen = ref(false);
+const requestedListId = ref("");
 const editing = ref<ExternalSourceRecord | null>(null);
 
 const providers = computed(() =>
@@ -87,6 +90,12 @@ function handleGlobalResult(item: GlobalSearchItem): void {
   search.value = item.title;
 }
 
+function manageList(id: string): void {
+  requestedListId.value = id;
+  listsDashboardOpen.value = false;
+  listsOpen.value = true;
+}
+
 function createSource(): void {
   editing.value = null;
   dialogOpen.value = true;
@@ -130,7 +139,7 @@ onBeforeUnmount(() => {
     description="Fontes externas e enriquecimento individual do catálogo. As operações globais estão em Manutenção."
   >
     <template #actions>
-      <button class="button button-secondary" type="button" @click="listsOpen = true">Listas</button>
+      <button class="button button-secondary" type="button" @click="listsDashboardOpen = true">Listas</button>
       <button class="button button-secondary" type="button" @click="globalSearchOpen = true">Pesquisa global <kbd>Ctrl K</kbd></button>
       <RouterLink class="button button-secondary" to="/manutencao">Manutenção</RouterLink>
       <button class="button button-secondary" type="button" @click="tmdbOpen = true">Pesquisar TMDB</button>
@@ -154,6 +163,7 @@ onBeforeUnmount(() => {
   <TmdbSearchDialog :open="tmdbOpen" :existing="sources" @close="tmdbOpen = false" @saved="saved" />
   <OmdbSearchDialog :open="omdbOpen" :existing="sources" @close="omdbOpen = false" @saved="saved" />
   <GlobalSearchDialog :open="globalSearchOpen" @close="globalSearchOpen = false" @select="handleGlobalResult" />
-  <PersonalListsDialog :open="listsOpen" @close="listsOpen = false" />
+  <ListsDashboardDialog :open="listsDashboardOpen" @close="listsDashboardOpen = false" @manage="manageList" />
+  <PersonalListsDialog :open="listsOpen" :initial-list-id="requestedListId" @close="listsOpen = false" />
   <ExternalSourceDialog :open="dialogOpen" :source="editing" :existing="sources" @close="dialogOpen = false" @saved="saved" />
 </template>
