@@ -6,6 +6,7 @@
 -->
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import GlobalSearchDetailDialog from "./GlobalSearchDetailDialog.vue";
 import {
   globalSearch,
   type GlobalSearchItem,
@@ -34,6 +35,7 @@ const history = ref<SearchHistoryItem[]>([]);
 const loading = ref(false);
 const error = ref("");
 const view = ref<"grid" | "list">("grid");
+const selectedItem = ref<GlobalSearchItem | null>(null);
 const entityLabels: Record<SearchEntity, string> = {
   titles: "Títulos",
   people: "Pessoas",
@@ -135,7 +137,7 @@ function clearHistory(): void {
           <section v-for="group in groups" :key="group.entity" class="global-search-group">
             <header><h3>{{ group.label }}</h3><span>{{ group.total }}</span></header>
             <div :class="view === 'grid' ? 'global-search-grid' : 'global-search-list'">
-              <button v-for="item in group.items" :key="`${item.entity}-${item.id}`" type="button" class="global-search-card" @click="emit('select', item)">
+              <button v-for="item in group.items" :key="`${item.entity}-${item.id}`" type="button" class="global-search-card" @click="selectedItem = item">
                 <img v-if="item.imageUrl" :src="item.imageUrl" :alt="" loading="lazy" />
                 <span v-else class="global-search-fallback" aria-hidden="true">◇</span>
                 <span class="global-search-card-body"><strong>{{ item.title }}</strong><small>{{ item.subtitle || entityLabels[item.entity] }}</small><span v-if="item.description">{{ item.description }}</span><code>{{ item.id }}</code></span>
@@ -145,6 +147,11 @@ function clearHistory(): void {
         </template>
 
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="loading" @click="emit('close')">Fechar</button></div>
+        <GlobalSearchDetailDialog
+          :item="selectedItem"
+          @close="selectedItem = null"
+          @use="emit('select', $event)"
+        />
       </section>
     </div>
   </Teleport>
