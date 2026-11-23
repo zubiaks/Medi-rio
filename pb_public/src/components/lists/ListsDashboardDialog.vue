@@ -9,6 +9,7 @@
 import { computed, ref, watch } from "vue";
 import ListActivityPanel from "./ListActivityPanel.vue";
 import LocalListsMigrationPanel from "./LocalListsMigrationPanel.vue";
+import RemoteListsPanel from "./RemoteListsPanel.vue";
 import {
   buildListDashboardMetrics,
   duplicatePersonalList,
@@ -167,6 +168,7 @@ function age(value: string): string {
           </article>
         </div>
 
+        <RemoteListsPanel />
         <LocalListsMigrationPanel />
         <ListActivityPanel @restored="load" />
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="running" @click="emit('close')">Fechar</button></div>
