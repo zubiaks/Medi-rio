@@ -38,4 +38,5 @@ import "@/styles/providers-phase-7a.css";
 import "@/styles/providers-phase-7b.css";
 import "@/styles/providers-phase-7c.css";
 import "@/styles/providers-phase-7d.css";
+import "@/styles/providers-phase-7e.css";
 createApp(App).use(router).mount("#app");

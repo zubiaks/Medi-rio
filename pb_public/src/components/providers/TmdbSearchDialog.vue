@@ -32,6 +32,10 @@ import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCred
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
 import type { TmdbWorkspaceTab } from "@/domain/providers/tmdbWorkspace";
+import {
+  loadTmdbWorkspaceTab,
+  saveTmdbWorkspaceTab,
+} from "@/domain/providers/tmdbWorkspaceState";
 
 const props = defineProps<{ open: boolean; existing: ExternalSourceRecord[] }>();
 const emit = defineEmits<{ close: []; saved: [ExternalSourceRecord] }>();
@@ -47,7 +51,8 @@ const source = ref<ExternalSourceRecord | null>(null);
 const loading = ref(false);
 const saving = ref(false);
 const error = ref("");
-const detailTab = ref<TmdbWorkspaceTab>("metadata");
+const detailTab = ref<TmdbWorkspaceTab>(loadTmdbWorkspaceTab());
+watch(detailTab, (value) => saveTmdbWorkspaceTab(value));
 let titleTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch(() => props.open, (open) => {

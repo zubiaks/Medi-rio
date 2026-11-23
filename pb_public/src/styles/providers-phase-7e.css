@@ -1,0 +1,4 @@
+/** Mediário | Fase 7E — acabamento do workspace TMDB. */
+.tmdb-detail-tabs {
+  overscroll-behavior-inline: contain;
+}
