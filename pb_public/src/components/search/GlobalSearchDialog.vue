@@ -7,6 +7,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import GlobalSearchDetailDialog from "./GlobalSearchDetailDialog.vue";
+import SearchDiscoveryPanel from "./SearchDiscoveryPanel.vue";
+import SearchComparisonPanel from "./SearchComparisonPanel.vue";
+import {
+  deleteSavedSearch,
+  loadSavedSearches,
+  saveSearchPreset,
+  type SavedSearch,
+} from "@/domain/search/savedSearches";
 import {
   globalSearch,
   type GlobalSearchItem,
@@ -36,6 +44,10 @@ const loading = ref(false);
 const error = ref("");
 const view = ref<"grid" | "list">("grid");
 const selectedItem = ref<GlobalSearchItem | null>(null);
+const comparison = ref<GlobalSearchItem[]>([]);
+const savedSearches = ref<SavedSearch[]>([]);
+const presetName = ref("");
+const mode = ref<"search" | "discover">("search");
 const entityLabels: Record<SearchEntity, string> = {
   titles: "Títulos",
   people: "Pessoas",
@@ -61,8 +73,57 @@ const groups = computed(() => {
 watch(() => props.open, (open) => {
   if (!open) return;
   history.value = loadSearchHistory();
+  savedSearches.value = loadSavedSearches();
   error.value = "";
 });
+
+function currentFilters() {
+  return {
+    entities: entities.value,
+    provider: provider.value,
+    yearFrom: yearFrom.value,
+    yearTo: yearTo.value,
+    includeDeleted: includeDeleted.value,
+  };
+}
+
+function savePreset(): void {
+  try {
+    savedSearches.value = saveSearchPreset(
+      presetName.value,
+      query.value,
+      currentFilters(),
+    );
+    presetName.value = "";
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  }
+}
+
+function applyPreset(preset: SavedSearch): void {
+  query.value = preset.query;
+  entities.value = [...preset.filters.entities];
+  provider.value = preset.filters.provider || "";
+  yearFrom.value = preset.filters.yearFrom || null;
+  yearTo.value = preset.filters.yearTo || null;
+  includeDeleted.value = Boolean(preset.filters.includeDeleted);
+  mode.value = "search";
+  void search();
+}
+
+function removePreset(id: string): void {
+  savedSearches.value = deleteSavedSearch(id);
+}
+
+function addComparison(item: GlobalSearchItem): void {
+  if (item.entity !== "titles") return;
+  if (comparison.value.some((value) => value.id === item.id)) return;
+  comparison.value = [...comparison.value, item].slice(-4);
+}
+
+function removeComparison(id: string): void {
+  comparison.value = comparison.value.filter((item) => item.id !== id);
+}
 
 async function search(): Promise<void> {
   loading.value = true;
@@ -104,6 +165,14 @@ function clearHistory(): void {
           <button class="icon-button" type="button" aria-label="Fechar" :disabled="loading" @click="emit('close')">×</button>
         </div>
 
+        <div class="global-search-mode-tabs" role="tablist" aria-label="Modo da pesquisa">
+          <button class="button button-secondary" :class="{ 'is-active': mode === 'search' }" type="button" role="tab" :aria-selected="mode === 'search'" @click="mode = 'search'">Pesquisar</button>
+          <button class="button button-secondary" :class="{ 'is-active': mode === 'discover' }" type="button" role="tab" :aria-selected="mode === 'discover'" @click="mode = 'discover'">Descobrir</button>
+        </div>
+
+        <SearchDiscoveryPanel v-if="mode === 'discover'" @select="selectedItem = $event" />
+
+        <template v-if="mode === 'search'">
         <form class="global-search-form" @submit.prevent="search">
           <label class="form-field field-wide"><span>Pesquisar em todo o Mediário</span><input v-model.trim="query" type="search" placeholder="Título, pessoa, episódio, coleção, alias ou identificador" autofocus required /></label>
           <button class="button button-primary" type="submit" :disabled="loading">{{ loading ? "A pesquisar…" : "Pesquisar" }}</button>
@@ -119,6 +188,11 @@ function clearHistory(): void {
             <label class="check-field"><input v-model="includeDeleted" type="checkbox" /> Incluir títulos apagados</label>
           </div>
         </details>
+
+        <section class="saved-searches">
+          <div class="saved-search-create"><label class="form-field"><span>Nome da pesquisa guardada</span><input v-model.trim="presetName" placeholder="Ex.: Ficção científica dos anos 80" /></label><button class="button button-secondary" type="button" :disabled="!presetName || query.length < 2" @click="savePreset">Guardar pesquisa</button></div>
+          <ul v-if="savedSearches.length"><li v-for="preset in savedSearches" :key="preset.id"><button type="button" @click="applyPreset(preset)"><strong>{{ preset.name }}</strong><small>{{ preset.query }}</small></button><button class="icon-button" type="button" :aria-label="`Eliminar ${preset.name}`" @click="removePreset(preset.id)">×</button></li></ul>
+        </section>
 
         <div v-if="history.length && !result" class="search-history">
           <div><h3>Pesquisas recentes</h3><button class="button button-secondary" type="button" @click="clearHistory">Limpar</button></div>
@@ -140,12 +214,14 @@ function clearHistory(): void {
               <button v-for="item in group.items" :key="`${item.entity}-${item.id}`" type="button" class="global-search-card" @click="selectedItem = item">
                 <img v-if="item.imageUrl" :src="item.imageUrl" :alt="" loading="lazy" />
                 <span v-else class="global-search-fallback" aria-hidden="true">◇</span>
-                <span class="global-search-card-body"><strong>{{ item.title }}</strong><small>{{ item.subtitle || entityLabels[item.entity] }}</small><span v-if="item.description">{{ item.description }}</span><code>{{ item.id }}</code></span>
+                <span class="global-search-card-body"><strong>{{ item.title }}</strong><small>{{ item.subtitle || entityLabels[item.entity] }}</small><span v-if="item.description">{{ item.description }}</span><code>{{ item.id }}</code><span v-if="item.entity === 'titles'" class="comparison-action" role="button" tabindex="0" @click.stop="addComparison(item)" @keydown.enter.stop="addComparison(item)">Comparar</span></span>
               </button>
             </div>
           </section>
         </template>
 
+        <SearchComparisonPanel :items="comparison" @remove="removeComparison" @clear="comparison = []" />
+        </template>
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="loading" @click="emit('close')">Fechar</button></div>
         <GlobalSearchDetailDialog
           :item="selectedItem"
