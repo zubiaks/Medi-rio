@@ -1,6 +1,7 @@
 <!-- Mediário | Fase 9.1: detalhe contextual de resultados globais. -->
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import AddToListPanel from "@/components/lists/AddToListPanel.vue";
 import type { GlobalSearchItem } from "@/domain/search/globalSearch";
 import {
   actionsForSearchItem,
@@ -80,6 +81,8 @@ async function runAction(action: ReturnType<typeof actionsForSearchItem>[number]
               </li>
             </ul>
           </section>
+
+          <AddToListPanel :item="item" />
 
           <details class="search-detail-technical">
             <summary>Dados técnicos</summary>
