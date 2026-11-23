@@ -1,0 +1,36 @@
+/** Mediário | Fase 7B — espaço de trabalho TMDB por título. */
+.tmdb-detail-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: 0.45rem;
+  padding: 0.65rem 0;
+  overflow-x: auto;
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+
+.tmdb-detail-tabs .button {
+  flex: 0 0 auto;
+}
+
+.tmdb-detail-tabs .is-active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 90%);
+}
+
+.tmdb-detail-panel {
+  min-height: 10rem;
+}
+
+.tmdb-detail-panel > section {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .tmdb-detail-tabs {
+    margin-inline: -0.5rem;
+    padding-inline: 0.5rem;
+  }
+}
