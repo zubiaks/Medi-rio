@@ -400,3 +400,21 @@
   border-color: color-mix(in srgb, var(--success), var(--line) 60%);
   background: color-mix(in srgb, var(--success), transparent 93%);
 }
+
+/* ===== Marco 0.8.0, Fase 8A — OMDb base ===== */
+.omdb-search-dialog { width:min(1050px,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; }
+.omdb-search-form { display:grid; grid-template-columns:minmax(220px,2fr) minmax(140px,1fr) 8rem auto; gap:.75rem; align-items:end; }
+.omdb-result-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:.75rem; margin:1rem 0; }
+.omdb-result-card { display:grid; gap:.4rem; min-width:0; padding:.55rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.8rem; background:var(--surface); cursor:pointer; }
+.omdb-result-card:hover,.omdb-result-card.is-selected { border-color:var(--primary); background:color-mix(in srgb,var(--primary),transparent 94%); }
+.omdb-result-card img { width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:.55rem; }
+.omdb-result-card small { color:var(--muted); }
+.omdb-detail { display:grid; gap:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.omdb-detail > div { display:grid; grid-template-columns:minmax(120px,180px) minmax(0,1fr); gap:1rem; }
+.omdb-detail > div > img { width:100%; border-radius:.65rem; }
+.omdb-detail dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; margin:0; }
+.omdb-detail dl > div { padding:.6rem; border:1px solid var(--line); border-radius:.6rem; background:var(--surface); }
+.omdb-detail dt { color:var(--muted); font-size:.74rem; }
+.omdb-detail dd { margin:.2rem 0 0; }
+.omdb-detail pre { max-height:20rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:760px) { .omdb-search-form,.omdb-detail > div,.omdb-detail dl { grid-template-columns:1fr; } }
