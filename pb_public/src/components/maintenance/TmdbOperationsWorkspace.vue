@@ -17,6 +17,8 @@ import TmdbOperationsPanel from "@/components/providers/TmdbOperationsPanel.vue"
 import TmdbOperationsReportPanel from "@/components/providers/TmdbOperationsReportPanel.vue";
 import TmdbOperationalSettingsPanel from "@/components/maintenance/TmdbOperationalSettingsPanel.vue";
 import OmdbJobExecutorPanel from "@/components/maintenance/OmdbJobExecutorPanel.vue";
+import OmdbBatchRecoveryPanel from "@/components/maintenance/OmdbBatchRecoveryPanel.vue";
+import ProviderAdminPanel from "@/components/maintenance/ProviderAdminPanel.vue";
 import type { OmdbJobExecutionResult } from "@/domain/providers/omdbJobExecutor";
 import type { TmdbJobExecutionResult } from "@/domain/providers/tmdbJobExecutor";
 import type { TmdbBatchResult } from "@/domain/providers/tmdbBatchExecutor";
@@ -47,10 +49,10 @@ function omdbPrepared(result: OmdbJobExecutionResult): void {
       <button v-for="item in ([['queue','Fila TMDB'],['omdb','Fila OMDb'],['recovery','Recuperação'],['health','Saúde'],['reports','Relatórios'],['settings','Configuração']] as const)" :key="item[0]" class="button button-secondary" :class="{ 'is-active': tab === item[0] }" type="button" role="tab" :aria-selected="tab === item[0]" @click="tab = item[0]">{{ item[1] }}</button>
     </div>
     <div v-show="tab === 'queue'"><TmdbJobExecutorPanel @prepared="prepared" /><TmdbBatchExecutorPanel @completed="batchCompleted" /></div>
-    <div v-show="tab === 'omdb'"><OmdbJobExecutorPanel @prepared="omdbPrepared" /></div>
+    <div v-show="tab === 'omdb'"><OmdbJobExecutorPanel @prepared="omdbPrepared" /><OmdbBatchRecoveryPanel /></div>
     <div v-show="tab === 'recovery'"><TmdbJobRecoveryPanel /></div>
     <div v-show="tab === 'health'"><TmdbOperationsPanel /></div>
     <div v-show="tab === 'reports'"><TmdbOperationsReportPanel /></div>
-    <div v-show="tab === 'settings'"><TmdbOperationalSettingsPanel /></div>
+    <div v-show="tab === 'settings'"><ProviderAdminPanel /><TmdbOperationalSettingsPanel /></div>
   </section>
 </template>
