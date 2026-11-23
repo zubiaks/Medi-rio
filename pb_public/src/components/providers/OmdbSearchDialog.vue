@@ -23,6 +23,10 @@ import OmdbRatingsPanel from "./OmdbRatingsPanel.vue";
 import type { SyncJobRecord } from "@/domain/providers/records";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
+import {
+  clearOmdbPreparedReview,
+  loadOmdbPreparedReview,
+} from "@/domain/providers/omdbReviewStore";
 
 const props = defineProps<{
   open: boolean;
@@ -69,6 +73,30 @@ watch(() => props.open, (open) => {
   selectedFields.value = [];
   error.value = "";
   success.value = "";
+  const prepared = loadOmdbPreparedReview();
+  if (prepared) {
+    void (async () => {
+      try {
+        selectedTitle.value = await titleRepository.get(prepared.titleId);
+        details.value = prepared.details;
+        selectedResult.value = {
+          imdb_id: prepared.details.imdb_id,
+          title: prepared.details.title,
+          year: prepared.details.year,
+          type: prepared.details.type,
+          poster_url: prepared.details.poster_url,
+        };
+        titleQuery.value = prepared.titleName;
+        selectedFields.value = selectEmptyOmdbFields(
+          buildOmdbDifferences(selectedTitle.value, prepared.details),
+        );
+        success.value = "Dados da tarefa OMDb carregados para revisão manual.";
+        clearOmdbPreparedReview();
+      } catch (cause) {
+        error.value = cause instanceof Error ? cause.message : String(cause);
+      }
+    })();
+  }
 });
 
 watch(titleQuery, (value) => {
