@@ -1,0 +1,6 @@
+/** Mediário | Fase 7A — consolidação das áreas Providers e Manutenção. */
+.maintenance-section-tabs,.tmdb-workspace-tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+.maintenance-section-tabs .is-active,.tmdb-workspace-tabs .is-active { border-color:var(--primary); background:color-mix(in srgb,var(--primary),transparent 90%); }
+.tmdb-workspace { display:grid; gap:1rem; }
+.tmdb-workspace > div[style*="display: none"] { display:none !important; }
+@media (max-width:640px) { .maintenance-section-tabs,.tmdb-workspace-tabs { display:grid; } }

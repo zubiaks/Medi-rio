@@ -19,14 +19,6 @@ import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
 import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
-import TmdbSyncSchedulerPanel from "./TmdbSyncSchedulerPanel.vue";
-import TmdbJobExecutorPanel from "./TmdbJobExecutorPanel.vue";
-import TmdbBatchExecutorPanel from "./TmdbBatchExecutorPanel.vue";
-import TmdbJobRecoveryPanel from "./TmdbJobRecoveryPanel.vue";
-import TmdbOperationsPanel from "./TmdbOperationsPanel.vue";
-import TmdbOperationsReportPanel from "./TmdbOperationsReportPanel.vue";
-import TmdbOperationalSettingsPanel from "@/components/maintenance/TmdbOperationalSettingsPanel.vue";
-import TmdbAdvancedAutomationPanel from "./TmdbAdvancedAutomationPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
 import { writeAuditLog } from "@/domain/providers/audit";
@@ -35,8 +27,6 @@ import { buildSelectedTmdbPayload, type TmdbEnrichmentField } from "@/domain/pro
 import { applyTmdbRelations, type RelationMode, type TmdbRelationField } from "@/domain/providers/tmdbRelations";
 import { tmdbSourcePayload } from "@/domain/providers/tmdbMapping";
 import { prepareProtectedSync } from "@/domain/providers/protectedSync";
-import type { TmdbJobExecutionResult } from "@/domain/providers/tmdbJobExecutor";
-import type { TmdbBatchResult } from "@/domain/providers/tmdbBatchExecutor";
 import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCredits";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
@@ -119,32 +109,6 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
     emit("saved", saved);
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
   finally { saving.value = false; }
-}
-
-async function stuckJobResolved(result: { id: string; ageMinutes: number }): Promise<void> {
-  await writeAuditLog({ entidade: "sync_jobs", entidade_id: result.id, entidade_nome: "Tarefa TMDB bloqueada", acao: "erro", origem: "manutencao", sucesso: true, detalhes: { provider: "tmdb", operacao: "encerrar_tarefa_bloqueada", minutos_em_execucao: result.ageMinutes } });
-}
-
-async function recoveryRetried(result: { created: number; failed: number }): Promise<void> {
-  await writeAuditLog({ entidade: "sync_jobs", entidade_nome: "Recuperação TMDB", acao: "sincronizar", origem: "interface", sucesso: result.failed === 0, detalhes: { provider: "tmdb", operacao: "repeticao_falhas", tarefas_criadas: result.created, falhas: result.failed } });
-}
-
-async function batchCompleted(result: TmdbBatchResult): Promise<void> {
-  await writeAuditLog({ entidade: "sync_jobs", entidade_nome: "Lote TMDB", acao: "sincronizar", origem: "interface", sucesso: result.failed === 0, erro: result.errors.map((item) => item.message).join(" | ").slice(0, 2000), detalhes: { provider: "tmdb", operacao: "execucao_lote", total: result.total, processados: result.processed, sucessos: result.succeeded, falhas: result.failed, cancelado: result.cancelled, tarefas: result.prepared.map((item) => item.job.id) } });
-}
-
-async function jobPrepared(result: TmdbJobExecutionResult): Promise<void> {
-  if (!selectedTitle.value || selectedTitle.value.id !== result.titleId) {
-    error.value = `A tarefa de ${result.titleName} foi executada. Abre esse título para rever os metadados carregados.`;
-    return;
-  }
-  details.value = result.details;
-  await writeAuditLog({ entidade: "titulos", entidade_id: result.titleId, entidade_nome: result.titleName, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "execucao_tarefa", sync_job_id: result.job.id, modo: "revisao_manual" } });
-}
-
-async function syncScheduled(job: { id: string }): Promise<void> {
-  if (!selectedTitle.value) return;
-  await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "agendamento", sync_job_id: job.id } });
 }
 
 async function refreshTitle(): Promise<void> {
@@ -234,14 +198,6 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     <TmdbImagesPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" :disabled="saving" @applied="imagesApplied" />
     <TitleVersionPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @restored="versionRestored" @snapshot="snapshotCreated" />
     <TmdbSyncHealthPanel v-if="selectedTitle" :title="selectedTitle" :details="details" :loading="saving" @refresh="refreshTitle" />
-    <TmdbSyncSchedulerPanel v-if="selectedTitle" :title="selectedTitle" :disabled="saving" @scheduled="syncScheduled" />
-    <TmdbJobExecutorPanel @prepared="jobPrepared" />
-    <TmdbBatchExecutorPanel @completed="batchCompleted" />
-    <TmdbJobRecoveryPanel @retried="recoveryRetried" />
-    <TmdbOperationsPanel @resolved="stuckJobResolved" />
-    <TmdbOperationsReportPanel />
-    <TmdbOperationalSettingsPanel />
-    <TmdbAdvancedAutomationPanel v-if="selectedTitle && selectedResult" :title="selectedTitle" :tmdb-id="selectedResult.id" :media-type="selectedResult.media_type === 'tv' ? 'tv' : 'movie'" />
     <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
   </section></div></Teleport>
 </template>

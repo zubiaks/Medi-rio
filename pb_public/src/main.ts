@@ -34,4 +34,5 @@ import "@/styles/providers-phase-6m.css";
 import "@/styles/providers-phase-6n.css";
 import "@/styles/providers-phase-6o.css";
 import "@/styles/providers-zip-2.css";
+import "@/styles/providers-phase-7a.css";
 createApp(App).use(router).mount("#app");
