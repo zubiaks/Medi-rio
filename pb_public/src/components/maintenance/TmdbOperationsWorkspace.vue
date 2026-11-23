@@ -17,14 +17,15 @@ import TmdbOperationsPanel from "@/components/providers/TmdbOperationsPanel.vue"
 import TmdbOperationsReportPanel from "@/components/providers/TmdbOperationsReportPanel.vue";
 import TmdbOperationalSettingsPanel from "@/components/maintenance/TmdbOperationalSettingsPanel.vue";
 import OmdbJobExecutorPanel from "@/components/maintenance/OmdbJobExecutorPanel.vue";
+import ProviderOperationsDashboard from "@/components/maintenance/ProviderOperationsDashboard.vue";
 import OmdbBatchRecoveryPanel from "@/components/maintenance/OmdbBatchRecoveryPanel.vue";
 import ProviderAdminPanel from "@/components/maintenance/ProviderAdminPanel.vue";
 import type { OmdbJobExecutionResult } from "@/domain/providers/omdbJobExecutor";
 import type { TmdbJobExecutionResult } from "@/domain/providers/tmdbJobExecutor";
 import type { TmdbBatchResult } from "@/domain/providers/tmdbBatchExecutor";
 
-type Tab = "queue" | "omdb" | "recovery" | "health" | "reports" | "settings";
-const tab = ref<Tab>("queue");
+type Tab = "overview" | "queue" | "omdb" | "recovery" | "health" | "reports" | "settings";
+const tab = ref<Tab>("overview");
 const notice = ref("");
 
 function prepared(result: TmdbJobExecutionResult): void {
@@ -46,8 +47,9 @@ function omdbPrepared(result: OmdbJobExecutionResult): void {
     <p>As operações globais foram separadas da pesquisa e enriquecimento de um título.</p>
     <div v-if="notice" class="form-alert" role="status">{{ notice }}</div>
     <div class="tmdb-workspace-tabs" role="tablist" aria-label="Áreas de manutenção TMDB">
-      <button v-for="item in ([['queue','Fila TMDB'],['omdb','Fila OMDb'],['recovery','Recuperação'],['health','Saúde'],['reports','Relatórios'],['settings','Configuração']] as const)" :key="item[0]" class="button button-secondary" :class="{ 'is-active': tab === item[0] }" type="button" role="tab" :aria-selected="tab === item[0]" @click="tab = item[0]">{{ item[1] }}</button>
+      <button v-for="item in ([['overview','Visão geral'],['queue','Fila TMDB'],['omdb','Fila OMDb'],['recovery','Recuperação'],['health','Saúde'],['reports','Relatórios'],['settings','Configuração']] as const)" :key="item[0]" class="button button-secondary" :class="{ 'is-active': tab === item[0] }" type="button" role="tab" :aria-selected="tab === item[0]" @click="tab = item[0]">{{ item[1] }}</button>
     </div>
+    <div v-show="tab === 'overview'"><ProviderOperationsDashboard /></div>
     <div v-show="tab === 'queue'"><TmdbJobExecutorPanel @prepared="prepared" /><TmdbBatchExecutorPanel @completed="batchCompleted" /></div>
     <div v-show="tab === 'omdb'"><OmdbJobExecutorPanel @prepared="omdbPrepared" /><OmdbBatchRecoveryPanel /></div>
     <div v-show="tab === 'recovery'"><TmdbJobRecoveryPanel /></div>

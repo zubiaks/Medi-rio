@@ -110,7 +110,7 @@ onMounted(load);
 
   <div class="maintenance-section-tabs" role="tablist" aria-label="Áreas de manutenção">
     <button class="button button-secondary" :class="{ 'is-active': section === 'overview' }" type="button" role="tab" :aria-selected="section === 'overview'" @click="section = 'overview'">Visão geral</button>
-    <button class="button button-secondary" :class="{ 'is-active': section === 'tmdb' }" type="button" role="tab" :aria-selected="section === 'tmdb'" @click="section = 'tmdb'">Operações TMDB</button>
+    <button class="button button-secondary" :class="{ 'is-active': section === 'tmdb' }" type="button" role="tab" :aria-selected="section === 'tmdb'" @click="section = 'tmdb'">Operações de providers</button>
   </div>
 
   <div v-if="error" class="form-alert form-alert-error" role="alert">{{ error }}</div>
