@@ -123,6 +123,6 @@ onMounted(load);
   <div v-else class="table-wrap"><table><thead><tr><th>Título</th><th>Provider</th><th>Identificador</th><th>Tipo</th><th>Principal</th><th>Última sincronização</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody><tr v-for="source in filtered" :key="source.id"><td>{{ source.expand?.titulo?.titulo || source.titulo }}</td><td>{{ source.provider }}</td><td>{{ source.external_id }}</td><td>{{ source.tipo_externo || "—" }}</td><td>{{ source.principal ? "Sim" : "Não" }}</td><td>{{ source.ultima_sincronizacao ? new Date(source.ultima_sincronizacao).toLocaleString("pt-PT") : "Nunca" }}</td><td><div class="library-row-actions"><a v-if="source.external_url" class="button button-secondary" :href="source.external_url" target="_blank" rel="noopener noreferrer">Abrir</a><button class="button button-secondary" type="button" @click="editSource(source)">Editar</button></div></td></tr></tbody></table></div>
 
   <TmdbSearchDialog :open="tmdbOpen" :existing="sources" @close="tmdbOpen = false" @saved="saved" />
-  <OmdbSearchDialog :open="omdbOpen" @close="omdbOpen = false" />
+  <OmdbSearchDialog :open="omdbOpen" :existing="sources" @close="omdbOpen = false" @saved="saved" />
   <ExternalSourceDialog :open="dialogOpen" :source="editing" :existing="sources" @close="dialogOpen = false" @saved="saved" />
 </template>
