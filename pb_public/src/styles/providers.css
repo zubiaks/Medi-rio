@@ -421,3 +421,20 @@
 
 /* ===== Marco 0.8.0, Fase 8B — aplicação controlada OMDb ===== */
 .omdb-association,.omdb-comparison { display:grid; gap:.8rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+
+/* ===== Marco 0.8.0, Fase 8C — ratings múltiplos e diagnóstico OMDb ===== */
+.omdb-ratings-panel { display:grid; gap:.8rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.omdb-health-score { display:grid; min-width:5rem; padding:.55rem; text-align:center; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.omdb-health-score strong { font-size:1.25rem; }
+.omdb-rating-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; margin:0; }
+.omdb-rating-grid > div { padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.omdb-rating-grid dt { color:var(--muted); font-size:.74rem; }
+.omdb-rating-grid dd { margin:.2rem 0 0; font-size:1.1rem; font-weight:800; }
+.omdb-health-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.55rem; padding:0; list-style:none; }
+.omdb-health-list li { display:grid; grid-template-columns:auto 1fr; gap:.55rem; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.omdb-health-list li > span { font-weight:800; color:var(--warning); }
+.omdb-health-list li.is-ok > span { color:var(--success); }
+.omdb-health-list li.is-required { border-color:color-mix(in srgb,var(--danger),var(--line) 60%); }
+.omdb-health-list div { display:grid; gap:.2rem; }
+.omdb-health-list small { color:var(--muted); }
+@media(max-width:640px) { .omdb-rating-grid { grid-template-columns:1fr; } }

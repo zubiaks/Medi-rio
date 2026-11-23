@@ -19,6 +19,8 @@ import {
   type OmdbEnrichmentField,
 } from "@/domain/providers/omdbEnrichment";
 import { omdbSourcePayload } from "@/domain/providers/omdbSource";
+import OmdbRatingsPanel from "./OmdbRatingsPanel.vue";
+import type { SyncJobRecord } from "@/domain/providers/records";
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
 
@@ -141,6 +143,23 @@ function display(value: unknown): string {
     : String(value);
 }
 
+async function jobScheduled(job: SyncJobRecord): Promise<void> {
+  if (!selectedTitle.value) return;
+  await writeAuditLog({
+    entidade: "titulos",
+    entidade_id: selectedTitle.value.id,
+    entidade_nome: selectedTitle.value.titulo,
+    acao: "sincronizar",
+    origem: "interface",
+    sucesso: true,
+    detalhes: {
+      provider: "omdb",
+      operacao: "agendamento",
+      sync_job_id: job.id,
+    },
+  });
+}
+
 async function apply(): Promise<void> {
   if (!selectedTitle.value || !details.value || !selectedFields.value.length) return;
   saving.value = true;
@@ -240,6 +259,13 @@ async function apply(): Promise<void> {
           <div v-else class="tmdb-difference-list"><label v-for="item in differences" :key="item.field" class="tmdb-difference-row"><input v-model="selectedFields" type="checkbox" :value="item.field" /><span class="tmdb-difference-label"><strong>{{ item.label }}</strong><small>{{ item.empty ? "Campo vazio" : "Valor já preenchido" }}</small></span><span><small>Atual</small>{{ display(item.currentValue) }}</span><span><small>OMDb</small>{{ display(item.proposedValue) }}</span></label></div>
           <div class="form-actions"><button class="button button-primary" type="button" :disabled="saving || !selectedFields.length" @click="apply">{{ saving ? "A aplicar…" : `Aplicar ${selectedFields.length} campo(s)` }}</button></div>
         </section>
+        <OmdbRatingsPanel
+          v-if="selectedTitle && details"
+          :title="selectedTitle"
+          :details="details"
+          :disabled="saving"
+          @scheduled="jobScheduled"
+        />
         <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Fechar</button></div>
       </section>
     </div>
