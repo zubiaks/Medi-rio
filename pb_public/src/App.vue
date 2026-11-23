@@ -6,6 +6,7 @@ import AppSidebar from "@/components/layout/AppSidebar.vue";
 import AppTopbar from "@/components/layout/AppTopbar.vue";
 import AppBreadcrumbs from "@/components/layout/AppBreadcrumbs.vue";
 import AuthSessionMenu from "@/components/auth/AuthSessionMenu.vue";
+import NotificationCenter from "@/components/notifications/NotificationCenter.vue";
 import { checkPocketBase } from "@/infrastructure/pocketbase/client";
 import { useAuth } from "@/composables/useAuth";
 import { usePermissions } from "@/composables/usePermissions";
@@ -26,7 +27,7 @@ onMounted(()=>{void checkBackend();});
       <AppSidebar :open="sidebarOpen" @close="sidebarOpen=false"><template #status><div class="server-state" :class="backendOnline?'is-online':'is-offline'"><span class="state-dot" aria-hidden="true"/><span><strong>Local</strong><small>{{backendOnline?'PocketBase disponível':'PocketBase indisponível'}}</small></span></div></template></AppSidebar>
       <div class="app-main">
         <AppTopbar @menu="sidebarOpen=!sidebarOpen" @add="openCommandDialog"/>
-        <div class="app-integrated-nav"><nav aria-label="Áreas principais"><RouterLink to="/">Início</RouterLink><RouterLink to="/pesquisa">Pesquisa</RouterLink><RouterLink v-if="auth.user.value?.role!=='leitor'" to="/listas">Listas</RouterLink><RouterLink v-if="['admin','editor'].includes(auth.user.value?.role||'')" to="/providers">Providers</RouterLink><RouterLink v-if="auth.user.value?.role==='admin'" to="/administracao">Administração</RouterLink></nav><AuthSessionMenu/></div>
+        <div class="app-integrated-nav"><nav aria-label="Áreas principais"><RouterLink to="/">Início</RouterLink><RouterLink to="/pesquisa">Pesquisa</RouterLink><RouterLink v-if="auth.user.value?.role!=='leitor'" to="/listas">Listas</RouterLink><RouterLink v-if="['admin','editor'].includes(auth.user.value?.role||'')" to="/providers">Providers</RouterLink><RouterLink v-if="auth.user.value?.role==='admin'" to="/administracao">Administração</RouterLink></nav><div class="app-user-tools"><NotificationCenter/><AuthSessionMenu/></div></div>
         <main id="main-content" tabindex="-1"><AppBreadcrumbs/><RouterView v-slot="{Component}"><component :is="Component"/></RouterView></main>
         <footer class="footer"><span>Mediário <b>v0.13.0-beta.1</b></span><span>Dados locais · PocketBase</span></footer>
       </div>
