@@ -9,7 +9,7 @@
   Licença: PolyForm Noncommercial License 1.0.0
 -->
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import TmdbEnrichmentPreview from "./TmdbEnrichmentPreview.vue";
 import TmdbRelationsPreview from "./TmdbRelationsPreview.vue";
 import TmdbCreditsPreview from "./TmdbCreditsPreview.vue";
@@ -53,6 +53,9 @@ const source = ref<ExternalSourceRecord | null>(null);
 const loading = ref(false);
 const saving = ref(false);
 const error = ref("");
+const success = ref("");
+const hasPendingReview = ref(false);
+let returnFocus: HTMLElement | null = null;
 const detailTab = ref<TmdbWorkspaceTab>(loadTmdbWorkspaceTab());
 watch(detailTab, (value) => saveTmdbWorkspaceTab(value));
 const workflowInput = computed(() => ({
@@ -65,8 +68,11 @@ const workflowStep = computed(() => currentTmdbDialogStep(workflowInput.value));
 const completedWorkflowSteps = computed(() => completedTmdbDialogSteps(workflowInput.value));
 let titleTimer: ReturnType<typeof setTimeout> | undefined;
 
-watch(() => props.open, (open) => {
+watch(() => props.open, async (open) => {
   if (!open) return;
+  returnFocus = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : null;
   query.value = ""; mediaType.value = "multi"; results.value = [];
   selectedResult.value = null; titleQuery.value = ""; titleResults.value = [];
   selectedTitle.value = null; details.value = null; source.value = null; error.value = "";
@@ -82,6 +88,31 @@ watch(titleQuery, (value) => {
   }, 300);
 });
 
+async function requestClose(): Promise<void> {
+  if (saving.value) return;
+  if (
+    hasPendingReview.value &&
+    !window.confirm(
+      "Existem seleções ou dados em revisão que ainda podem não ter sido aplicados. Queres fechar o diálogo?",
+    )
+  ) {
+    return;
+  }
+  emit("close");
+  await nextTick();
+  returnFocus?.focus();
+}
+
+function handleDialogKey(event: KeyboardEvent): void {
+  if (event.key !== "Escape") return;
+  event.preventDefault();
+  void requestClose();
+}
+
+onBeforeUnmount(() => {
+  if (titleTimer) clearTimeout(titleTimer);
+});
+
 async function runSearch(): Promise<void> {
   if (query.value.trim().length < 2) { error.value = "Escreve pelo menos dois caracteres."; return; }
   loading.value = true; error.value = ""; selectedResult.value = null; details.value = null;
@@ -90,8 +121,8 @@ async function runSearch(): Promise<void> {
   finally { loading.value = false; }
 }
 
-function selectResult(result: TmdbSearchResult): void { selectedResult.value = result; selectedTitle.value = null; details.value = null; source.value = null; titleQuery.value = result.title; }
-function selectTitle(title: TitleRecord): void { selectedTitle.value = title; details.value = null; source.value = null; titleQuery.value = `${title.titulo}${title.ano ? ` (${title.ano})` : ""}`; titleResults.value = []; }
+function selectResult(result: TmdbSearchResult): void { hasPendingReview.value = true; success.value = ""; selectedResult.value = result; selectedTitle.value = null; details.value = null; source.value = null; titleQuery.value = result.title; }
+function selectTitle(title: TitleRecord): void { hasPendingReview.value = true; success.value = ""; selectedTitle.value = title; details.value = null; source.value = null; titleQuery.value = `${title.titulo}${title.ano ? ` (${title.ano})` : ""}`; titleResults.value = []; }
 
 async function prepare(): Promise<void> {
   if (!selectedResult.value || !selectedTitle.value) { error.value = "Seleciona um resultado TMDB e um título do catálogo."; return; }
@@ -124,6 +155,8 @@ async function applyFields(fields: TmdbEnrichmentField[]): Promise<void> {
     await titleRepository.update(selectedTitle.value.id, { ...values, tmdb_id: selectedResult.value.id, tipo_tmdb: selectedResult.value.media_type === "tv" ? "tv" : "movie", fonte_principal: "tmdb", sync_estado: "atualizado", ultima_sincronizacao: new Date().toISOString() });
     const saved = await saveSource();
     await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "metadados", campos_aplicados: fields, valores_novos: values } });
+    hasPendingReview.value = false;
+    success.value = "Alterações guardadas com sucesso.";
     emit("saved", saved);
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
   finally { saving.value = false; }
@@ -194,6 +227,8 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
     const values = await applyTmdbRelations(selectedTitle.value, details.value, fields, mode);
     const saved = await saveSource();
     await writeAuditLog({ entidade: "titulos", entidade_id: selectedTitle.value.id, entidade_nome: selectedTitle.value.titulo, acao: "sincronizar", origem: "interface", sucesso: true, detalhes: { provider: "tmdb", operacao: "relacoes_estruturais", modo: mode, relacoes_aplicadas: fields, valores_novos: values } });
+    hasPendingReview.value = false;
+    success.value = "Alterações guardadas com sucesso.";
     emit("saved", saved);
   } catch (cause) { error.value = cause instanceof Error ? cause.message : String(cause); }
   finally { saving.value = false; }
@@ -201,10 +236,11 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
 </script>
 
 <template>
-  <Teleport to="body"><div v-if="open" class="dialog-backdrop" @click.self="!saving && emit('close')"><section class="dialog-panel tmdb-search-dialog" role="dialog" aria-modal="true" aria-labelledby="tmdb-search-title">
-    <div class="dialog-header"><div><p class="eyebrow">Provider TMDB</p><h2 id="tmdb-search-title">Pesquisar, associar e enriquecer</h2></div><button class="icon-button" type="button" aria-label="Fechar" :disabled="saving" @click="emit('close')">×</button></div>
+  <Teleport to="body"><div v-if="open" class="dialog-backdrop" @click.self="requestClose"><section class="dialog-panel tmdb-search-dialog" role="dialog" aria-modal="true" aria-labelledby="tmdb-search-title" @keydown="handleDialogKey">
+    <div class="dialog-header"><div><p class="eyebrow">Provider TMDB</p><h2 id="tmdb-search-title">Pesquisar, associar e enriquecer</h2></div><button class="icon-button" type="button" aria-label="Fechar" :disabled="saving" @click="requestClose">×</button></div>
     <TmdbDialogProgress :current="workflowStep" :completed="completedWorkflowSteps" />
     <div v-if="error" class="form-alert form-alert-error" role="alert">{{ error }}</div>
+    <div v-if="success" class="form-alert form-alert-success" role="status">{{ success }}</div>
     <form class="tmdb-search-form" @submit.prevent="runSearch"><label class="form-field"><span>Pesquisa TMDB</span><input v-model.trim="query" type="search" required /></label><label class="form-field"><span>Tipo</span><select v-model="mediaType"><option value="multi">Filmes e séries</option><option value="movie">Filmes</option><option value="tv">Séries</option></select></label><button class="button button-secondary" type="submit" :disabled="loading">{{ loading ? "A pesquisar…" : "Pesquisar" }}</button></form>
     <div v-if="results.length" class="tmdb-result-grid"><button v-for="result in results" :key="`${result.media_type}-${result.id}`" type="button" class="tmdb-result-card" :class="{ 'is-selected': selectedResult?.id === result.id }" @click="selectResult(result)"><img v-if="result.poster_url" :src="result.poster_url" :alt="`Capa de ${result.title}`" /><span v-else class="tmdb-poster-fallback" aria-hidden="true">◇</span><strong>{{ result.title }}</strong><small>{{ result.media_type === "tv" ? "Série" : "Filme" }} · {{ result.date?.slice(0, 4) || "—" }}</small></button></div>
     <section v-if="selectedResult" class="tmdb-association"><h3>Selecionar título do catálogo</h3><label class="form-field"><span>Título existente *</span><input v-model.trim="titleQuery" type="search" /></label><ul v-if="titleResults.length" class="provider-title-results"><li v-for="title in titleResults" :key="title.id"><button type="button" @click="selectTitle(title)">{{ title.titulo }}<span>{{ title.ano || "—" }}</span></button></li></ul><p v-if="selectedTitle">Selecionado: <strong>{{ selectedTitle.titulo }}</strong></p><button v-if="selectedTitle && !details" class="button button-primary" type="button" :disabled="saving" @click="prepare">{{ saving ? "A preparar…" : "Comparar metadados" }}</button></section>
@@ -282,6 +318,6 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
         </template>
       </TmdbWorkspaceTabs>
     </template>
-    <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="emit('close')">Cancelar</button></div>
+    <div class="form-actions"><button class="button button-secondary" type="button" :disabled="saving" @click="requestClose">Cancelar</button></div>
   </section></div></Teleport>
 </template>

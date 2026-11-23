@@ -1,0 +1,6 @@
+/** Mediário | Fase 7G — saída segura e mensagens persistentes. */
+.form-alert-success {
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success), var(--line) 60%);
+  background: color-mix(in srgb, var(--success), transparent 93%);
+}
