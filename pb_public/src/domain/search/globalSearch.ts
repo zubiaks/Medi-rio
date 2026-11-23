@@ -6,6 +6,7 @@
  * Finalidade: Pesquisa transversal paginada nas coleções principais.
  */
 import { pb } from "@/infrastructure/pocketbase/client";
+import { sortSearchItems, type SearchEntityFailure } from "./searchResilience";
 
 export type SearchEntity =
   | "titles"
@@ -42,6 +43,7 @@ export interface GlobalSearchResult {
   total: number;
   items: GlobalSearchItem[];
   counts: Partial<Record<SearchEntity, number>>;
+  failures: SearchEntityFailure[];
 }
 
 function escapeFilter(value: string): string {
@@ -92,7 +94,7 @@ export async function globalSearch(
   const escaped = escapeFilter(trimmed);
   const entities = filters.entities.length ? filters.entities : Object.keys(definitions) as SearchEntity[];
 
-  const results = await Promise.all(entities.map(async (entity) => {
+  const settled = await Promise.allSettled(entities.map(async (entity) => {
     const definition = definitions[entity];
     const extra: string[] = [];
     if (entity === "titles") {
@@ -118,14 +120,28 @@ export async function globalSearch(
     };
   }));
 
+  const results = settled
+    .filter((entry): entry is PromiseFulfilledResult<{ entity: SearchEntity; total: number; items: GlobalSearchItem[] }> => entry.status === "fulfilled")
+    .map((entry) => entry.value);
+  const failures = settled.flatMap((entry, index) =>
+    entry.status === "rejected"
+      ? [{
+          entity: entities[index],
+          message: entry.reason instanceof Error ? entry.reason.message : String(entry.reason),
+        }]
+      : [],
+  );
   const counts: Partial<Record<SearchEntity, number>> = {};
   for (const result of results) counts[result.entity] = result.total;
-  const items = results.flatMap((result) => result.items)
-    .sort((a, b) => Number(b.entity === "titles") - Number(a.entity === "titles") || a.title.localeCompare(b.title, "pt-PT"));
+  const items = sortSearchItems(
+    results.flatMap((result) => result.items),
+    trimmed,
+  );
   return {
     query: trimmed,
     total: results.reduce((sum, result) => sum + result.total, 0),
     items,
     counts,
+    failures,
   };
 }

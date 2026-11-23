@@ -59,3 +59,9 @@ export function deleteSavedSearch(id: string): SavedSearch[] {
   localStorage.setItem(KEY, JSON.stringify(values));
   return values;
 }
+
+export function replaceSavedSearches(items: SavedSearch[]): SavedSearch[] {
+  const normalized = items.slice(0, MAX);
+  localStorage.setItem(KEY, JSON.stringify(normalized));
+  return normalized;
+}

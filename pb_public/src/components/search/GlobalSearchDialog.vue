@@ -14,8 +14,13 @@ import {
   deleteSavedSearch,
   loadSavedSearches,
   saveSearchPreset,
+  replaceSavedSearches,
   type SavedSearch,
 } from "@/domain/search/savedSearches";
+import {
+  exportSavedSearches,
+  importSavedSearches,
+} from "@/domain/search/savedSearchTransfer";
 import {
   globalSearch,
   type GlobalSearchItem,
@@ -49,6 +54,8 @@ const comparison = ref<GlobalSearchItem[]>([]);
 const savedSearches = ref<SavedSearch[]>([]);
 const presetName = ref("");
 const mode = ref<"search" | "discover">("search");
+const importInput = ref<HTMLInputElement | null>(null);
+const transferMessage = ref("");
 const entityLabels: Record<SearchEntity, string> = {
   titles: "Títulos",
   people: "Pessoas",
@@ -108,6 +115,35 @@ function setView(value: "grid" | "list"): void {
     view: value,
     filters: currentFilters(),
   });
+}
+
+function downloadSavedSearches(): void {
+  const blob = new Blob([exportSavedSearches(savedSearches.value)], {
+    type: "application/json;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `mediario-pesquisas-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importSavedSearchFile(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  error.value = "";
+  transferMessage.value = "";
+  try {
+    const imported = importSavedSearches(await file.text());
+    savedSearches.value = replaceSavedSearches(imported);
+    transferMessage.value = `${imported.length} pesquisa(s) importada(s).`;
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : String(cause);
+  } finally {
+    input.value = "";
+  }
 }
 
 function currentFilters() {
@@ -230,6 +266,11 @@ function clearHistory(): void {
 
         <section class="saved-searches">
           <div class="saved-search-create"><label class="form-field"><span>Nome da pesquisa guardada</span><input v-model.trim="presetName" placeholder="Ex.: Ficção científica dos anos 80" /></label><button class="button button-secondary" type="button" :disabled="!presetName || query.length < 2" @click="savePreset">Guardar pesquisa</button></div>
+          <div class="saved-search-transfer">
+            <button class="button button-secondary" type="button" :disabled="!savedSearches.length" @click="downloadSavedSearches">Exportar</button>
+            <button class="button button-secondary" type="button" @click="importInput?.click()">Importar</button>
+            <input ref="importInput" class="sr-only" type="file" accept="application/json,.json" @change="importSavedSearchFile" />
+          </div>
           <ul v-if="savedSearches.length"><li v-for="preset in savedSearches" :key="preset.id"><button type="button" @click="applyPreset(preset)"><strong>{{ preset.name }}</strong><small>{{ preset.query }}</small></button><button class="icon-button" type="button" :aria-label="`Eliminar ${preset.name}`" @click="removePreset(preset.id)">×</button></li></ul>
         </section>
 
@@ -239,6 +280,10 @@ function clearHistory(): void {
         </div>
 
         <div v-if="error" class="form-alert form-alert-error" role="alert">{{ error }}</div>
+        <div v-if="result?.failures.length" class="form-alert form-alert-warning" role="status">
+          A pesquisa terminou parcialmente. Falharam: {{ result.failures.map((item) => entityLabels[item.entity]).join(", ") }}.
+        </div>
+        <div v-if="transferMessage" class="form-alert form-alert-success" role="status">{{ transferMessage }}</div>
 
         <template v-if="result">
           <div class="global-search-summary">

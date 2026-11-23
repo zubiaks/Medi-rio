@@ -508,3 +508,8 @@
 .search-detail-actions { display:flex; gap:.45rem; flex-wrap:wrap; margin-top:1rem; }
 .search-view-intro { display:grid; gap:.7rem; max-width:760px; }.search-view-intro .button { justify-self:start; }
 @media(max-width:640px) { .search-detail-actions { display:grid; }.search-detail-actions .button { width:100%; } }
+
+/* ===== Fase 9.4 — resiliência, relevância e portabilidade ===== */
+.form-alert-warning { color:var(--warning); border-color:color-mix(in srgb,var(--warning),var(--line) 55%); background:color-mix(in srgb,var(--warning),transparent 93%); }
+.saved-search-transfer { display:flex; gap:.45rem; flex-wrap:wrap; }
+@media(max-width:640px) { .saved-search-transfer { display:grid; }.saved-search-transfer .button { width:100%; } }
