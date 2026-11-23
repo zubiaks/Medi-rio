@@ -10,7 +10,28 @@
  */
 /// <reference path="../pb_data/types.d.ts" />
 
+
+const tmdbRateState = {};
+function requireTmdbUser(e) {
+  const auth = e.auth;
+  const role = auth ? String(auth.get("role") || "") : "";
+  const state = auth ? String(auth.get("estado") || "") : "";
+  if (!auth) throw new UnauthorizedError("É necessário iniciar sessão.");
+  if (state && state !== "ativo") throw new ForbiddenError("A conta não está ativa.");
+  if (["admin", "editor"].indexOf(role) < 0) {
+    throw new ForbiddenError("A conta não tem permissão para utilizar providers.");
+  }
+  const key = auth.id;
+  const now = Date.now();
+  const window = tmdbRateState[key] || { started: now, count: 0 };
+  if (now - window.started >= 60000) { window.started = now; window.count = 0; }
+  window.count += 1;
+  tmdbRateState[key] = window;
+  if (window.count > 40) throw new TooManyRequestsError("Limite de pedidos TMDB atingido. Tenta novamente dentro de um minuto.");
+}
+
 routerAdd("GET", "/api/mediario/providers/tmdb/search", (e) => {
+  requireTmdbUser(e);
   const query = (e.request.url.query().get("query") || "").trim();
   const mediaType = (e.request.url.query().get("type") || "multi").trim();
   const page = Math.max(1, parseInt(e.request.url.query().get("page") || "1", 10));
@@ -35,6 +56,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/search", (e) => {
 });
 
 routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
+  requireTmdbUser(e);
   const mediaType = e.request.pathValue("type");
   const externalId = e.request.pathValue("id");
   if (["movie", "tv"].indexOf(mediaType) < 0 || !/^\d+$/.test(externalId)) throw new BadRequestError("Identificador ou tipo TMDB inválido.");
@@ -81,6 +103,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/details/{type}/{id}", (e) => {
 
 
 routerAdd("GET", "/api/mediario/providers/tmdb/season/{id}/{season}", (e) => {
+  requireTmdbUser(e);
   const externalId = e.request.pathValue("id");
   const seasonNumber = e.request.pathValue("season");
   if (!/^\d+$/.test(externalId) || !/^\d+$/.test(seasonNumber)) {
@@ -127,6 +150,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/season/{id}/{season}", (e) => {
 
 
 routerAdd("GET", "/api/mediario/providers/tmdb/images/{type}/{id}", (e) => {
+  requireTmdbUser(e);
   const mediaType = e.request.pathValue("type");
   const externalId = e.request.pathValue("id");
   if (["movie", "tv"].indexOf(mediaType) < 0 || !/^\d+$/.test(externalId)) {
@@ -168,6 +192,7 @@ routerAdd("GET", "/api/mediario/providers/tmdb/images/{type}/{id}", (e) => {
 
 
 routerAdd("GET", "/api/mediario/providers/tmdb/discovery/{type}/{id}/{mode}", (e) => {
+  requireTmdbUser(e);
   const mediaType = e.request.pathValue("type");
   const externalId = e.request.pathValue("id");
   const mode = e.request.pathValue("mode");

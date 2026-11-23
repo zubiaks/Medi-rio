@@ -83,13 +83,35 @@ function safeProvider(provider) {
   };
 }
 
+
+const providerAdminRateState = {};
+function requireProviderAdmin(e) {
+  const auth = e.auth;
+  const role = auth ? String(auth.get("role") || "") : "";
+  const state = auth ? String(auth.get("estado") || "") : "";
+  if (!auth) throw new UnauthorizedError("É necessário iniciar sessão.");
+  if (state && state !== "ativo") throw new ForbiddenError("A conta não está ativa.");
+  if (role !== "admin") {
+    throw new ForbiddenError("Apenas administradores podem gerir credenciais e providers.");
+  }
+  const key = auth.id;
+  const now = Date.now();
+  const window = providerAdminRateState[key] || { started: now, count: 0 };
+  if (now - window.started >= 60000) { window.started = now; window.count = 0; }
+  window.count += 1;
+  providerAdminRateState[key] = window;
+  if (window.count > 20) throw new TooManyRequestsError("Limite de operações administrativas atingido.");
+}
+
 routerAdd("GET", "/api/mediario/providers/admin/settings", (e) => {
+  requireProviderAdmin(e);
   return e.json(200, {
     providers: Object.keys(providerDefinitions).map(safeProvider),
   });
 });
 
 routerAdd("PUT", "/api/mediario/providers/admin/settings/{provider}", (e) => {
+  requireProviderAdmin(e);
   const provider = e.request.pathValue("provider");
   const definition = providerDefinition(provider);
   const body = new DynamicModel({
@@ -113,6 +135,7 @@ routerAdd("PUT", "/api/mediario/providers/admin/settings/{provider}", (e) => {
 });
 
 routerAdd("POST", "/api/mediario/providers/admin/settings/{provider}/credential", (e) => {
+  requireProviderAdmin(e);
   const provider = e.request.pathValue("provider");
   const definition = providerDefinition(provider);
   const body = new DynamicModel({ credential: "" });
@@ -127,6 +150,7 @@ routerAdd("POST", "/api/mediario/providers/admin/settings/{provider}/credential"
 });
 
 routerAdd("DELETE", "/api/mediario/providers/admin/settings/{provider}/credential", (e) => {
+  requireProviderAdmin(e);
   const provider = e.request.pathValue("provider");
   const definition = providerDefinition(provider);
   const record = settingRecord(definition.credentialKey);
@@ -135,6 +159,7 @@ routerAdd("DELETE", "/api/mediario/providers/admin/settings/{provider}/credentia
 });
 
 routerAdd("POST", "/api/mediario/providers/admin/settings/{provider}/test", (e) => {
+  requireProviderAdmin(e);
   const provider = e.request.pathValue("provider");
   const credential = credentialValue(provider);
   if (!credential) throw new BadRequestError("A credencial ainda não está configurada.");

@@ -36,7 +36,28 @@ function omdbKey() {
   return normalized;
 }
 
+
+const omdbRateState = {};
+function requireOmdbUser(e) {
+  const auth = e.auth;
+  const role = auth ? String(auth.get("role") || "") : "";
+  const state = auth ? String(auth.get("estado") || "") : "";
+  if (!auth) throw new UnauthorizedError("É necessário iniciar sessão.");
+  if (state && state !== "ativo") throw new ForbiddenError("A conta não está ativa.");
+  if (["admin", "editor"].indexOf(role) < 0) {
+    throw new ForbiddenError("A conta não tem permissão para utilizar providers.");
+  }
+  const key = auth.id;
+  const now = Date.now();
+  const window = omdbRateState[key] || { started: now, count: 0 };
+  if (now - window.started >= 60000) { window.started = now; window.count = 0; }
+  window.count += 1;
+  omdbRateState[key] = window;
+  if (window.count > 30) throw new TooManyRequestsError("Limite de pedidos OMDb atingido. Tenta novamente dentro de um minuto.");
+}
+
 routerAdd("GET", "/api/mediario/providers/omdb/search", (e) => {
+  requireOmdbUser(e);
   const query = (e.request.url.query().get("query") || "").trim();
   const type = (e.request.url.query().get("type") || "").trim();
   const year = (e.request.url.query().get("year") || "").trim();
@@ -93,6 +114,7 @@ routerAdd("GET", "/api/mediario/providers/omdb/search", (e) => {
 });
 
 routerAdd("GET", "/api/mediario/providers/omdb/details/{id}", (e) => {
+  requireOmdbUser(e);
   const imdbId = e.request.pathValue("id");
   if (!/^tt\d{7,8}$/.test(imdbId)) {
     throw new BadRequestError("Identificador IMDb inválido.");

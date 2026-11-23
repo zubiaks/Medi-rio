@@ -17,7 +17,13 @@ export function installAuthGuards(router: Router): void {
     if (to.name === "login" && authState.authenticated.value) {
       return { path: "/" };
     }
-    const permission = to.meta.permission as Permission | undefined;
+    const inferredPermission: Permission | undefined =
+      to.path.startsWith("/manutencao")
+        ? "maintenance.use"
+        : to.path.startsWith("/providers")
+          ? "providers.use"
+          : undefined;
+    const permission = (to.meta.permission as Permission | undefined) || inferredPermission;
     if (permission && !roleCan(authState.user.value?.role, permission)) {
       return { name: "forbidden" };
     }
