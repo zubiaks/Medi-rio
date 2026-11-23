@@ -16,6 +16,8 @@ import ProviderDashboard from "@/components/providers/ProviderDashboard.vue";
 import ExternalSourceDialog from "@/components/providers/ExternalSourceDialog.vue";
 import TmdbSearchDialog from "@/components/providers/TmdbSearchDialog.vue";
 import OmdbSearchDialog from "@/components/providers/OmdbSearchDialog.vue";
+import GlobalSearchDialog from "@/components/search/GlobalSearchDialog.vue";
+import type { GlobalSearchItem } from "@/domain/search/globalSearch";
 import {
   externalSourceRepository,
   syncJobRepository,
@@ -34,6 +36,7 @@ const provider = ref("");
 const dialogOpen = ref(false);
 const tmdbOpen = ref(false);
 const omdbOpen = ref(false);
+const globalSearchOpen = ref(false);
 const editing = ref<ExternalSourceRecord | null>(null);
 
 const providers = computed(() =>
@@ -76,6 +79,11 @@ async function load(): Promise<void> {
   }
 }
 
+function handleGlobalResult(item: GlobalSearchItem): void {
+  globalSearchOpen.value = false;
+  search.value = item.title;
+}
+
 function createSource(): void {
   editing.value = null;
   dialogOpen.value = true;
@@ -103,6 +111,7 @@ onMounted(load);
     description="Fontes externas e enriquecimento individual do catálogo. As operações globais estão em Manutenção."
   >
     <template #actions>
+      <button class="button button-secondary" type="button" @click="globalSearchOpen = true">Pesquisa global</button>
       <RouterLink class="button button-secondary" to="/manutencao">Manutenção</RouterLink>
       <button class="button button-secondary" type="button" @click="tmdbOpen = true">Pesquisar TMDB</button>
       <button class="button button-secondary" type="button" @click="omdbOpen = true">Pesquisar OMDb</button>
@@ -124,5 +133,6 @@ onMounted(load);
 
   <TmdbSearchDialog :open="tmdbOpen" :existing="sources" @close="tmdbOpen = false" @saved="saved" />
   <OmdbSearchDialog :open="omdbOpen" :existing="sources" @close="omdbOpen = false" @saved="saved" />
+  <GlobalSearchDialog :open="globalSearchOpen" @close="globalSearchOpen = false" @select="handleGlobalResult" />
   <ExternalSourceDialog :open="dialogOpen" :source="editing" :existing="sources" @close="dialogOpen = false" @saved="saved" />
 </template>

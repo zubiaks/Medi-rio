@@ -469,3 +469,19 @@
 .provider-metric-card dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; margin:0; }
 .provider-metric-card dl > div { padding:.55rem; border-radius:.55rem; background:var(--surface-2); }
 .provider-metric-card dt { color:var(--muted); font-size:.72rem; }.provider-metric-card dd { margin:.2rem 0 0; font-weight:800; }
+
+/* ===== Fase 9.0 — Pesquisa e descoberta ===== */
+.global-search-dialog { width:min(1200px,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; }
+.global-search-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.75rem; align-items:end; }
+.global-search-filters { margin:.8rem 0; padding:.75rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface-2); }
+.global-search-filters fieldset { display:flex; gap:.7rem; flex-wrap:wrap; margin:.75rem 0; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; }
+.global-search-filter-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.65rem; align-items:end; }
+.search-history { display:grid; gap:.55rem; margin:1rem 0; }.search-history > div { display:flex; justify-content:space-between; align-items:center; }.search-history > button { padding:.55rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.55rem; background:var(--surface); }
+.global-search-summary { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin:1rem 0; }.global-search-summary > div { display:flex; gap:.4rem; }
+.global-search-summary .is-active { border-color:var(--primary); }
+.global-search-group { display:grid; gap:.6rem; margin:1.2rem 0; }.global-search-group > header { display:flex; justify-content:space-between; align-items:center; }.global-search-group > header span { color:var(--muted); }
+.global-search-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.65rem; }.global-search-list { display:grid; gap:.5rem; }
+.global-search-card { display:grid; grid-template-rows:auto 1fr; gap:.5rem; min-width:0; padding:.55rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); cursor:pointer; }.global-search-list .global-search-card { grid-template-columns:70px minmax(0,1fr); grid-template-rows:none; }
+.global-search-card:hover,.global-search-card:focus-visible { border-color:var(--primary); }.global-search-card img,.global-search-fallback { width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:.5rem; background:var(--surface-2); }.global-search-list .global-search-card img,.global-search-list .global-search-fallback { width:70px; height:90px; aspect-ratio:auto; }
+.global-search-fallback { display:grid; place-items:center; font-size:2rem; }.global-search-card-body { display:grid; gap:.2rem; min-width:0; }.global-search-card-body small,.global-search-card-body code { color:var(--muted); }.global-search-card-body > span { display:-webkit-box; overflow:hidden; -webkit-line-clamp:3; -webkit-box-orient:vertical; font-size:.82rem; }
+@media(max-width:760px) { .global-search-form,.global-search-filter-grid { grid-template-columns:1fr; }.global-search-summary { display:grid; }.global-search-summary > div .button { flex:1; }.global-search-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
