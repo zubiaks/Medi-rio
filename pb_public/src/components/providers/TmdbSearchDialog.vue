@@ -9,7 +9,7 @@
   Licença: PolyForm Noncommercial License 1.0.0
 -->
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import TmdbEnrichmentPreview from "./TmdbEnrichmentPreview.vue";
 import TmdbRelationsPreview from "./TmdbRelationsPreview.vue";
 import TmdbCreditsPreview from "./TmdbCreditsPreview.vue";
@@ -19,6 +19,7 @@ import TmdbImagesPanel from "./TmdbImagesPanel.vue";
 import TitleVersionPanel from "./TitleVersionPanel.vue";
 import TmdbProtectionNotice from "./TmdbProtectionNotice.vue";
 import TmdbWorkspaceTabs from "./TmdbWorkspaceTabs.vue";
+import TmdbDialogProgress from "./TmdbDialogProgress.vue";
 import TmdbSyncHealthPanel from "./TmdbSyncHealthPanel.vue";
 import { titleRepository } from "@/domain/repositories";
 import { externalSourceRepository } from "@/domain/providers/repository";
@@ -32,6 +33,7 @@ import { importTmdbCredits, type CreditGroup } from "@/domain/providers/tmdbCred
 import type { ExternalSourceRecord } from "@/domain/providers/records";
 import type { TitleRecord } from "@/types/records";
 import type { TmdbWorkspaceTab } from "@/domain/providers/tmdbWorkspace";
+import { completedTmdbDialogSteps, currentTmdbDialogStep } from "@/domain/providers/tmdbDialogWorkflow";
 import {
   loadTmdbWorkspaceTab,
   saveTmdbWorkspaceTab,
@@ -53,6 +55,14 @@ const saving = ref(false);
 const error = ref("");
 const detailTab = ref<TmdbWorkspaceTab>(loadTmdbWorkspaceTab());
 watch(detailTab, (value) => saveTmdbWorkspaceTab(value));
+const workflowInput = computed(() => ({
+  hasResults: results.value.length > 0,
+  hasSelectedResult: Boolean(selectedResult.value),
+  hasSelectedTitle: Boolean(selectedTitle.value),
+  hasDetails: Boolean(details.value),
+}));
+const workflowStep = computed(() => currentTmdbDialogStep(workflowInput.value));
+const completedWorkflowSteps = computed(() => completedTmdbDialogSteps(workflowInput.value));
 let titleTimer: ReturnType<typeof setTimeout> | undefined;
 
 watch(() => props.open, (open) => {
@@ -193,6 +203,7 @@ async function applyRelations(fields: TmdbRelationField[], mode: RelationMode): 
 <template>
   <Teleport to="body"><div v-if="open" class="dialog-backdrop" @click.self="!saving && emit('close')"><section class="dialog-panel tmdb-search-dialog" role="dialog" aria-modal="true" aria-labelledby="tmdb-search-title">
     <div class="dialog-header"><div><p class="eyebrow">Provider TMDB</p><h2 id="tmdb-search-title">Pesquisar, associar e enriquecer</h2></div><button class="icon-button" type="button" aria-label="Fechar" :disabled="saving" @click="emit('close')">×</button></div>
+    <TmdbDialogProgress :current="workflowStep" :completed="completedWorkflowSteps" />
     <div v-if="error" class="form-alert form-alert-error" role="alert">{{ error }}</div>
     <form class="tmdb-search-form" @submit.prevent="runSearch"><label class="form-field"><span>Pesquisa TMDB</span><input v-model.trim="query" type="search" required /></label><label class="form-field"><span>Tipo</span><select v-model="mediaType"><option value="multi">Filmes e séries</option><option value="movie">Filmes</option><option value="tv">Séries</option></select></label><button class="button button-secondary" type="submit" :disabled="loading">{{ loading ? "A pesquisar…" : "Pesquisar" }}</button></form>
     <div v-if="results.length" class="tmdb-result-grid"><button v-for="result in results" :key="`${result.media_type}-${result.id}`" type="button" class="tmdb-result-card" :class="{ 'is-selected': selectedResult?.id === result.id }" @click="selectResult(result)"><img v-if="result.poster_url" :src="result.poster_url" :alt="`Capa de ${result.title}`" /><span v-else class="tmdb-poster-fallback" aria-hidden="true">◇</span><strong>{{ result.title }}</strong><small>{{ result.media_type === "tv" ? "Série" : "Filme" }} · {{ result.date?.slice(0, 4) || "—" }}</small></button></div>

@@ -1,0 +1,8 @@
+/** Mediário | Fase 7F — fluxo orientado do diálogo TMDB. */
+.tmdb-dialog-progress { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; padding:0; margin:0 0 1rem; list-style:none; }
+.tmdb-dialog-progress li { display:grid; grid-template-columns:auto minmax(0,1fr); gap:.45rem; align-items:center; padding:.55rem; color:var(--muted); border:1px solid var(--line); border-radius:.65rem; background:var(--surface-2); }
+.tmdb-dialog-progress li > span { display:grid; width:1.45rem; height:1.45rem; place-items:center; border-radius:999px; background:var(--surface); font-size:.76rem; font-weight:800; }
+.tmdb-dialog-progress .is-completed { color:var(--success); }
+.tmdb-dialog-progress .is-current { color:var(--text); border-color:var(--primary); }
+.tmdb-dialog-progress .is-current > span { color:var(--surface); background:var(--primary); }
+@media (max-width:640px) { .tmdb-dialog-progress { grid-template-columns:repeat(2,minmax(0,1fr)); } }
