@@ -8,8 +8,9 @@ import AppBreadcrumbs from "@/components/layout/AppBreadcrumbs.vue";
 import AuthSessionMenu from "@/components/auth/AuthSessionMenu.vue";
 import { checkPocketBase } from "@/infrastructure/pocketbase/client";
 import { useAuth } from "@/composables/useAuth";
+import { usePermissions } from "@/composables/usePermissions";
 
-const route=useRoute(); const auth=useAuth();
+const route=useRoute(); const auth=useAuth(); const permissions=usePermissions();
 const sidebarOpen=ref(false); const backendOnline=ref(false); const dialog=ref<HTMLDialogElement|null>(null);
 const publicLayout=computed(()=>route.meta.public===true);
 async function checkBackend(){backendOnline.value=await checkPocketBase();}
@@ -30,6 +31,6 @@ onMounted(()=>{void checkBackend();});
         <footer class="footer"><span>Mediário <b>v0.13.0-beta.1</b></span><span>Dados locais · PocketBase</span></footer>
       </div>
     </div>
-    <dialog ref="dialog" class="command-dialog" aria-labelledby="command-dialog-title"><form method="dialog"><div class="dialog-header"><div><p class="eyebrow">Ação rápida</p><h2 id="command-dialog-title">Adicionar conteúdo</h2></div><button class="icon-button" type="submit" value="cancel" aria-label="Fechar">×</button></div><div class="dialog-options"><RouterLink to="/catalogo/novo" @click="closeCommandDialog"><span aria-hidden="true">＋</span>Novo título</RouterLink><RouterLink to="/podcasts" @click="closeCommandDialog"><span aria-hidden="true">◉</span>Podcast RSS</RouterLink><RouterLink to="/iptv" @click="closeCommandDialog"><span aria-hidden="true">▣</span>Canal ou stream</RouterLink><RouterLink to="/biblioteca" @click="closeCommandDialog"><span aria-hidden="true">▤</span>Exemplar</RouterLink></div></form></dialog>
+    <dialog ref="dialog" class="command-dialog" aria-labelledby="command-dialog-title"><form method="dialog"><div class="dialog-header"><div><p class="eyebrow">Ação rápida</p><h2 id="command-dialog-title">Adicionar conteúdo</h2></div><button class="icon-button" type="submit" value="cancel" aria-label="Fechar">×</button></div><div class="dialog-options"><RouterLink v-if="permissions.can('catalog.write')" to="/catalogo/novo" @click="closeCommandDialog"><span aria-hidden="true">＋</span>Novo título</RouterLink><RouterLink v-if="permissions.can('catalog.write')" to="/podcasts" @click="closeCommandDialog"><span aria-hidden="true">◉</span>Podcast RSS</RouterLink><RouterLink v-if="permissions.can('catalog.write')" to="/iptv" @click="closeCommandDialog"><span aria-hidden="true">▣</span>Canal ou stream</RouterLink><RouterLink v-if="permissions.can('catalog.write')" to="/biblioteca" @click="closeCommandDialog"><span aria-hidden="true">▤</span>Exemplar</RouterLink></div></form></dialog>
   </template>
 </template>
