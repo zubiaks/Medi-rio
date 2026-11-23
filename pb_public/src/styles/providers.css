@@ -1,182 +1,402 @@
-/** Estilos dos domínios Providers e Manutenção. */
+/**
+ * Projeto: Mediário
+ * Caminho: src/styles/providers.css
+ * Versão do ficheiro: 3.0.0
+ * Domínio: Providers, TMDB e Manutenção
+ * Finalidade: Consolidar os estilos das Fases 3 a 7G.
+ * Autor: Zubiaks <zubiaks@hotmail.com>
+ * Licença: PolyForm Noncommercial License 1.0.0
+ * A ordem histórica da cascata foi preservada.
+ */
+
+/* ===== Base, Fases 3 e 4 ===== */
 .provider-dashboard{display:grid;gap:1rem;margin-bottom:1.5rem}.provider-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}.provider-card{display:grid;gap:.8rem;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--surface)}.provider-card header{display:flex;align-items:center;justify-content:space-between;gap:.5rem}.provider-card dl{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:0}.provider-card dl>div{padding:.55rem;border-radius:.6rem;background:var(--surface-2)}.provider-card dt{color:var(--muted);font-size:.72rem}.provider-card dd{margin:.2rem 0 0;font-weight:800}.provider-filters{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem}.external-source-dialog{width:min(850px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.provider-title-results{display:grid;max-height:15rem;padding:0;margin:0;overflow:auto;border:1px solid var(--line);border-radius:.7rem;list-style:none}.provider-title-results button{display:flex;width:100%;justify-content:space-between;padding:.65rem;color:inherit;background:var(--surface-2);border:0;border-bottom:1px solid var(--line)}.sync-job-panel,.audit-log-panel,.maintenance-issues{margin-top:1.25rem}.maintenance-inline-filters{display:flex;gap:.5rem;flex-wrap:wrap}.job-progress{width:8rem;height:.55rem;overflow:hidden;border-radius:999px;background:var(--surface-2)}.job-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--cyan))}.maintenance-issues ul{display:grid;gap:.65rem;padding:0;list-style:none}.maintenance-issues li{display:grid;grid-template-columns:minmax(12rem,1fr) minmax(0,2fr);gap:1rem;padding:.8rem;border:1px solid var(--line);border-radius:.7rem}.maintenance-issues li>div{display:grid}.maintenance-issues li span{color:var(--muted);font-size:.75rem}.status-danger{color:var(--danger)}.status-success{color:var(--success)}@media(max-width:760px){.provider-filters,.maintenance-issues li{grid-template-columns:1fr}.maintenance-inline-filters{flex-direction:column;width:100%}.job-progress{width:100%}}
+.sync-job-create-dialog,.sync-job-detail-dialog{width:min(780px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.provider-settings{margin-bottom:1.25rem}.provider-settings-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.65rem;padding:0;list-style:none}.provider-settings-list li{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem;border:1px solid var(--line);border-radius:.7rem;background:var(--surface-2)}.status-warning{color:var(--warning)}.sync-job-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem}.sync-job-facts>div{padding:.7rem;border:1px solid var(--line);border-radius:.7rem}.sync-job-facts dt{color:var(--muted);font-size:.72rem}.sync-job-facts dd{margin:.25rem 0 0}.sync-job-actions{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1rem}.technical-details{max-height:22rem;overflow:auto;padding:.8rem;border:1px solid var(--line);border-radius:.7rem;background:var(--surface-2);white-space:pre-wrap;overflow-wrap:anywhere}.clickable-row{cursor:pointer}.clickable-row:hover{background:color-mix(in srgb,var(--primary),transparent 94%)}.clickable-row:focus-visible{outline:3px solid var(--primary);outline-offset:-3px}@media(max-width:680px){.sync-job-facts{grid-template-columns:1fr}.sync-job-actions .button{width:100%}}
+.tmdb-search-dialog{width:min(1100px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto}.tmdb-search-form{display:grid;grid-template-columns:minmax(240px,2fr) minmax(150px,1fr) auto;align-items:end;gap:.75rem}.tmdb-result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin:1rem 0}.tmdb-result-card{display:grid;gap:.4rem;min-width:0;padding:.55rem;color:inherit;text-align:left;border:1px solid var(--line);border-radius:.8rem;background:var(--surface);cursor:pointer}.tmdb-result-card:hover,.tmdb-result-card.is-selected{border-color:var(--primary);background:color-mix(in srgb,var(--primary),transparent 94%)}.tmdb-result-card:focus-visible{outline:3px solid var(--primary);outline-offset:2px}.tmdb-result-card img,.tmdb-poster-fallback{width:100%;aspect-ratio:2/3;border-radius:.55rem;object-fit:cover;background:var(--surface-2)}.tmdb-poster-fallback{display:grid;place-items:center;font-size:2rem}.tmdb-result-card small{color:var(--muted)}.tmdb-association{padding:1rem;border:1px solid var(--line);border-radius:.8rem;background:var(--surface-2)}@media(max-width:700px){.tmdb-search-form{grid-template-columns:1fr}.tmdb-search-form .button{width:100%}}
 
+/* ===== providers-phase-5.css ===== */
+.tmdb-enrichment{display:grid;gap:1rem;margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:.8rem;background:var(--surface-2)}.tmdb-enrichment-header{display:flex;align-items:start;justify-content:space-between;gap:1rem}.tmdb-difference-list{display:grid;gap:.65rem}.tmdb-difference-row{display:grid;grid-template-columns:auto minmax(9rem,.7fr) minmax(0,1fr) minmax(0,1fr);gap:.8rem;align-items:start;padding:.75rem;border:1px solid var(--line);border-radius:.7rem;background:var(--surface)}.tmdb-difference-row>span{display:grid;gap:.2rem;overflow-wrap:anywhere}.tmdb-difference-row small{color:var(--muted)}.tmdb-difference-label strong{color:var(--text)}@media(max-width:760px){.tmdb-enrichment-header,.tmdb-difference-row{grid-template-columns:1fr}.tmdb-enrichment-header{display:grid}}
 
-/* Fase 3: criação, detalhe, acções e configuração segura. */
-.sync-job-create-dialog,
-.sync-job-detail-dialog {
-  width: min(780px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
-  overflow: auto;
-}
+/* ===== providers-phase-6a.css ===== */
+/** Mediário | Fase 6A — relações estruturais TMDB. */
+.tmdb-relations { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-relation-mode { min-width:min(24rem,100%); }
+.tmdb-relation-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:.65rem; }
+.tmdb-relation-row { display:grid; grid-template-columns:auto 1fr; gap:.7rem; align-items:start; padding:.75rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+.tmdb-relation-row span { display:grid; gap:.25rem; }
+.tmdb-relation-row small { color:var(--muted); overflow-wrap:anywhere; }
+@media (max-width:760px) { .tmdb-relation-mode { min-width:0; } }
 
-.provider-settings {
-  margin-bottom: 1.25rem;
-}
+/* ===== providers-phase-6b.css ===== */
+/** Mediário | Fase 6B — pessoas e créditos TMDB. */
+.tmdb-credits { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-credit-list { display:grid; gap:.65rem; }
+.tmdb-credit-row { display:grid; grid-template-columns:auto 1fr; gap:.7rem; align-items:start; padding:.75rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+.tmdb-credit-row span { display:grid; gap:.25rem; }
+.tmdb-credit-row small { color:var(--muted); overflow-wrap:anywhere; }
 
-.provider-settings-list {
+/* ===== providers-phase-6c.css ===== */
+/** Mediário | Fase 6C — temporadas e episódios TMDB. */
+.tmdb-seasons { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-season-controls { display:flex; align-items:end; gap:.75rem; flex-wrap:wrap; }
+.tmdb-season-preview { display:grid; gap:.65rem; padding:.8rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+.tmdb-season-preview ul { display:grid; gap:.4rem; max-height:20rem; overflow:auto; padding:0; list-style:none; }
+.tmdb-season-preview li { display:flex; justify-content:space-between; gap:1rem; padding:.5rem; border-bottom:1px solid var(--line); }
+.tmdb-season-preview li span { color:var(--muted); }
+
+/* ===== providers-phase-6d.css ===== */
+/** Mediário | Fase 6D — títulos alternativos TMDB. */
+.tmdb-alternative-titles { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-country-filter { max-width:16rem; }
+.tmdb-alternative-title-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.55rem; max-height:22rem; overflow:auto; }
+.tmdb-alternative-title-row { display:grid; grid-template-columns:auto 1fr; gap:.65rem; align-items:start; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-alternative-title-row span { display:grid; gap:.2rem; }
+.tmdb-alternative-title-row small { color:var(--muted); }
+
+/* ===== providers-phase-6e.css ===== */
+/** Mediário | Fase 6E — galeria de imagens TMDB. */
+.tmdb-images { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-image-tabs { display:flex; gap:.5rem; flex-wrap:wrap; }
+.tmdb-image-tabs .is-active { border-color:var(--primary); background:color-mix(in srgb,var(--primary),transparent 90%); }
+.tmdb-image-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:.65rem; max-height:32rem; overflow:auto; }
+.tmdb-image-card { display:grid; gap:.35rem; padding:.4rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); cursor:pointer; }
+.tmdb-image-card.is-selected { border-color:var(--primary); box-shadow:0 0 0 2px color-mix(in srgb,var(--primary),transparent 65%); }
+.tmdb-image-card img { width:100%; aspect-ratio:2/3; object-fit:contain; border-radius:.45rem; background:var(--surface-2); }
+.tmdb-image-card small { color:var(--muted); }
+
+/* ===== providers-phase-6f.css ===== */
+/** Mediário | Fase 6F — versões e recuperação. */
+.title-versions { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.title-version-create { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:.75rem; }
+.title-version-layout { display:grid; grid-template-columns:minmax(220px,.8fr) minmax(0,1.2fr); gap:1rem; }
+.title-version-list { display:grid; gap:.45rem; max-height:24rem; overflow:auto; padding:0; list-style:none; }
+.title-version-list button { display:grid; width:100%; gap:.2rem; padding:.65rem; color:inherit; text-align:left; border:1px solid var(--line); border-radius:.6rem; background:var(--surface); }
+.title-version-list button.is-selected { border-color:var(--primary); }
+.title-version-list small { color:var(--muted); }
+.title-version-fields { display:grid; gap:.5rem; align-content:start; padding:.75rem; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+@media (max-width:760px) { .title-version-create,.title-version-layout { grid-template-columns:1fr; } }
+
+/* ===== providers-phase-6g.css ===== */
+/** Mediário | Fase 6G — proteção automática das sincronizações. */
+.tmdb-protection-notice {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.65rem;
-  padding: 0;
-  list-style: none;
-}
-
-.provider-settings-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  grid-template-columns: auto 1fr;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 0.7rem;
-  background: var(--surface-2);
-}
-
-.status-warning {
-  color: var(--warning);
-}
-
-.sync-job-facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.65rem;
-}
-
-.sync-job-facts > div {
-  padding: 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 0.7rem;
-}
-
-.sync-job-facts dt {
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.sync-job-facts dd {
-  margin: 0.25rem 0 0;
-}
-
-.sync-job-actions {
-  display: flex;
-  gap: 0.65rem;
-  flex-wrap: wrap;
+  align-items: start;
   margin-top: 1rem;
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--success), var(--line) 55%);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--success), transparent 93%);
 }
 
-.technical-details {
-  max-height: 22rem;
-  overflow: auto;
-  padding: 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: 0.7rem;
-  background: var(--surface-2);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.clickable-row {
-  cursor: pointer;
-}
-
-.clickable-row:hover {
-  background: color-mix(in srgb, var(--primary), transparent 94%);
-}
-
-.clickable-row:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: -3px;
-}
-
-@media (max-width: 680px) {
-  .sync-job-facts {
-    grid-template-columns: 1fr;
-  }
-
-  .sync-job-actions .button {
-    width: 100%;
-  }
-}
-
-
-/* Fase 4: pesquisa e associação TMDB. */
-.tmdb-search-dialog {
-  width: min(1100px, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
-  overflow: auto;
-}
-
-.tmdb-search-form {
-  display: grid;
-  grid-template-columns: minmax(240px, 2fr) minmax(150px, 1fr) auto;
-  align-items: end;
-  gap: 0.75rem;
-}
-
-.tmdb-result-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.75rem;
-  margin: 1rem 0;
-}
-
-.tmdb-result-card {
-  display: grid;
-  gap: 0.4rem;
-  min-width: 0;
-  padding: 0.55rem;
-  color: inherit;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: 0.8rem;
-  background: var(--surface);
-  cursor: pointer;
-}
-
-.tmdb-result-card:hover,
-.tmdb-result-card.is-selected {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary), transparent 94%);
-}
-
-.tmdb-result-card:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
-.tmdb-result-card img,
-.tmdb-poster-fallback {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  border-radius: 0.55rem;
-  object-fit: cover;
-  background: var(--surface-2);
-}
-
-.tmdb-poster-fallback {
-  display: grid;
-  place-items: center;
-  font-size: 2rem;
-}
-
-.tmdb-result-card small {
+.tmdb-protection-notice p {
+  margin: 0.25rem 0 0;
   color: var(--muted);
 }
 
-.tmdb-association {
+.tmdb-protection-icon {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  color: var(--surface);
+  font-weight: 800;
+  border-radius: 999px;
+  background: var(--success);
+}
+
+/* ===== providers-phase-6h.css ===== */
+/** Mediário | Fase 6H — diagnóstico pós-sincronização. */
+.tmdb-sync-health { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-sync-health-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-sync-score { display:grid; min-width:7rem; padding:.65rem; text-align:center; border:1px solid var(--line); border-radius:.7rem; background:var(--surface); }
+.tmdb-sync-score strong { font-size:1.4rem; }
+.tmdb-sync-score.is-success { color:var(--success); }
+.tmdb-sync-score.is-warning { color:var(--warning); }
+.tmdb-sync-score.is-danger { color:var(--danger); }
+.tmdb-sync-progress { height:.6rem; overflow:hidden; border-radius:999px; background:var(--surface); }
+.tmdb-sync-progress span { display:block; height:100%; background:linear-gradient(90deg,var(--primary),var(--success)); }
+.tmdb-sync-checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.55rem; padding:0; list-style:none; }
+.tmdb-sync-checks li { display:grid; grid-template-columns:auto 1fr; gap:.55rem; padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-sync-checks li > span { font-weight:800; }
+.tmdb-sync-checks div { display:grid; gap:.2rem; }
+.tmdb-sync-checks small { color:var(--muted); }
+.tmdb-sync-checks .is-success > span { color:var(--success); }
+.tmdb-sync-checks .is-warning > span { color:var(--warning); }
+.tmdb-sync-checks .is-danger > span { color:var(--danger); }
+@media (max-width:640px) { .tmdb-sync-health-header { display:grid; } .tmdb-sync-score { width:100%; } }
+
+/* ===== providers-phase-6i.css ===== */
+/** Mediário | Fase 6I — agendamento de atualizações TMDB. */
+.tmdb-sync-scheduler {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
   padding: 1rem;
   border: 1px solid var(--line);
   border-radius: 0.8rem;
   background: var(--surface-2);
 }
 
-@media (max-width: 700px) {
-  .tmdb-search-form {
-    grid-template-columns: 1fr;
-  }
+.tmdb-sync-scheduler-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
 
-  .tmdb-search-form .button {
-    width: 100%;
+.tmdb-sync-badge {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tmdb-sync-badge.is-current {
+  color: var(--success);
+}
+
+.tmdb-sync-badge.is-stale,
+.tmdb-sync-badge.is-never {
+  color: var(--warning);
+}
+
+.tmdb-sync-badge.is-error {
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .tmdb-sync-scheduler-header {
+    display: grid;
   }
+}
+
+/* ===== providers-phase-6j.css ===== */
+/** Mediário | Fase 6J — executor controlado de tarefas TMDB. */
+.tmdb-job-executor {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface-2);
+}
+
+.tmdb-job-executor-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tmdb-job-executor-note {
+  color: var(--muted);
+}
+
+.tmdb-job-list {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tmdb-job-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--surface);
+}
+
+.tmdb-job-list li > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.tmdb-job-list small {
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .tmdb-job-executor-header,
+  .tmdb-job-list li {
+    display: grid;
+  }
+}
+
+/* ===== providers-phase-6k.css ===== */
+/** Mediário | Fase 6K — execução TMDB em lote. */
+.tmdb-batch { display:grid; gap:.85rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-batch-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-batch-controls { display:flex; align-items:end; gap:1rem; flex-wrap:wrap; }
+.tmdb-batch-controls .form-field { max-width:12rem; }
+.tmdb-batch-progress { display:grid; gap:.4rem; }
+.tmdb-batch-progress > div { height:.65rem; overflow:hidden; border-radius:999px; background:var(--surface); }
+.tmdb-batch-progress span { display:block; height:100%; background:linear-gradient(90deg,var(--primary),var(--success)); }
+.tmdb-batch-summary { display:flex; gap:.5rem; padding:.7rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+@media (max-width:640px) { .tmdb-batch-header,.tmdb-batch-controls,.tmdb-batch-summary { display:grid; } }
+
+/* ===== providers-phase-6l.css ===== */
+/** Mediário | Fase 6L — recuperação de tarefas TMDB. */
+.tmdb-recovery { display:grid; gap:.85rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-recovery-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-recovery-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
+.tmdb-recovery-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; margin:0; }
+.tmdb-recovery-summary div { padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-recovery-summary dt { color:var(--muted); font-size:.76rem; }
+.tmdb-recovery-summary dd { margin:.2rem 0 0; font-size:1.2rem; font-weight:800; }
+.tmdb-recovery-list { display:grid; gap:.5rem; max-height:24rem; overflow:auto; padding:0; list-style:none; }
+.tmdb-recovery-list li { display:grid; grid-template-columns:auto 1fr; gap:.65rem; padding:.7rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-recovery-list li div { display:grid; gap:.2rem; }
+.tmdb-recovery-list small { color:var(--muted); overflow-wrap:anywhere; }
+@media (max-width:700px) { .tmdb-recovery-header { display:grid; } .tmdb-recovery-summary { grid-template-columns:repeat(2,1fr); } }
+
+/* ===== providers-phase-6m.css ===== */
+/** Mediário | Fase 6M — monitorização operacional TMDB. */
+.tmdb-operations { display:grid; gap:.9rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-operations-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-operations-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.55rem; margin:0; }
+.tmdb-operations-metrics div { padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-operations-metrics dt { color:var(--muted); font-size:.74rem; }
+.tmdb-operations-metrics dd { margin:.2rem 0 0; font-size:1.15rem; font-weight:800; }
+.tmdb-stuck-jobs { display:grid; gap:.6rem; }
+.tmdb-stuck-jobs ul { display:grid; gap:.5rem; padding:0; list-style:none; }
+.tmdb-stuck-jobs li { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.7rem; border:1px solid color-mix(in srgb,var(--danger),var(--line) 65%); border-radius:.65rem; background:var(--surface); }
+.tmdb-stuck-jobs li div { display:grid; gap:.2rem; }
+.tmdb-stuck-jobs small { color:var(--muted); }
+@media (max-width:640px) { .tmdb-operations-header,.tmdb-stuck-jobs li { display:grid; } }
+
+/* ===== providers-phase-6n.css ===== */
+/** Mediário | Fase 6N — relatórios e tendências TMDB. */
+.tmdb-report { display:grid; gap:.9rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-report-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-report-header .form-field { min-width:9rem; }
+.tmdb-report-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; margin:0; }
+.tmdb-report-summary div { padding:.65rem; border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-report-summary dt { color:var(--muted); font-size:.74rem; }
+.tmdb-report-summary dd { margin:.2rem 0 0; font-size:1.2rem; font-weight:800; }
+.tmdb-report-bars { display:grid; gap:.35rem; max-height:20rem; overflow:auto; }
+.tmdb-report-day { display:grid; grid-template-columns:3.5rem minmax(0,1fr) 2rem; gap:.55rem; align-items:center; }
+.tmdb-report-day > div { height:.55rem; overflow:hidden; border-radius:999px; background:var(--surface); }
+.tmdb-report-day i { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--primary),var(--cyan)); }
+.tmdb-report-day span,.tmdb-report-day strong { font-size:.76rem; }
+@media (max-width:700px) { .tmdb-report-header { display:grid; } .tmdb-report-summary { grid-template-columns:repeat(2,1fr); } }
+
+/* ===== providers-phase-6o.css ===== */
+/** Mediário | Fase 6O — configuração operacional TMDB. */
+.tmdb-operational-settings { display:grid; gap:1rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-operational-settings-header { display:flex; align-items:start; justify-content:space-between; gap:1rem; }
+.tmdb-operational-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:.75rem; }
+@media (max-width:640px) { .tmdb-operational-settings-header { display:grid; } }
+
+/* ===== providers-zip-2.css ===== */
+/** Mediário | ZIP 2 — automação e descoberta avançada TMDB. */
+.tmdb-advanced { display:grid; gap:.8rem; margin-top:1rem; padding:1rem; border:1px solid var(--line); border-radius:.8rem; background:var(--surface-2); }
+.tmdb-advanced details { border:1px solid var(--line); border-radius:.65rem; background:var(--surface); }
+.tmdb-advanced summary { padding:.75rem; cursor:pointer; font-weight:700; }
+.tmdb-advanced-block { display:grid; gap:.75rem; padding:0 .75rem .75rem; }
+.tmdb-advanced-results { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:.55rem; }
+.tmdb-advanced-results article { display:grid; gap:.25rem; }
+.tmdb-advanced-results img { width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:.45rem; }
+.tmdb-advanced-results small { color:var(--muted); }
+
+/* ===== providers-phase-7a.css ===== */
+/** Mediário | Fase 7A — consolidação das áreas Providers e Manutenção. */
+.maintenance-section-tabs,.tmdb-workspace-tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+.maintenance-section-tabs .is-active,.tmdb-workspace-tabs .is-active { border-color:var(--primary); background:color-mix(in srgb,var(--primary),transparent 90%); }
+.tmdb-workspace { display:grid; gap:1rem; }
+.tmdb-workspace > div[style*="display: none"] { display:none !important; }
+@media (max-width:640px) { .maintenance-section-tabs,.tmdb-workspace-tabs { display:grid; } }
+
+/* ===== providers-phase-7b.css ===== */
+/** Mediário | Fase 7B — espaço de trabalho TMDB por título. */
+.tmdb-detail-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: 0.45rem;
+  padding: 0.65rem 0;
+  overflow-x: auto;
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+
+.tmdb-detail-tabs .button {
+  flex: 0 0 auto;
+}
+
+.tmdb-detail-tabs .is-active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 90%);
+}
+
+.tmdb-detail-panel {
+  min-height: 10rem;
+}
+
+.tmdb-detail-panel > section {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .tmdb-detail-tabs {
+    margin-inline: -0.5rem;
+    padding-inline: 0.5rem;
+  }
+}
+
+/* ===== providers-phase-7c.css ===== */
+/** Mediário | Fase 7C — acessibilidade e desempenho do workspace TMDB. */
+.tmdb-detail-tabs .button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tmdb-detail-panel[role="tabpanel"]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tmdb-detail-tabs {
+    scroll-behavior: auto;
+  }
+}
+
+/* ===== providers-phase-7d.css ===== */
+/** Mediário | Fase 7D — componente reutilizável do workspace TMDB. */
+.tmdb-detail-panel[role="tabpanel"] {
+  contain: layout style;
+}
+
+/* ===== providers-phase-7e.css ===== */
+/** Mediário | Fase 7E — acabamento do workspace TMDB. */
+.tmdb-detail-tabs {
+  overscroll-behavior-inline: contain;
+}
+
+/* ===== providers-phase-7f.css ===== */
+/** Mediário | Fase 7F — fluxo orientado do diálogo TMDB. */
+.tmdb-dialog-progress { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem; padding:0; margin:0 0 1rem; list-style:none; }
+.tmdb-dialog-progress li { display:grid; grid-template-columns:auto minmax(0,1fr); gap:.45rem; align-items:center; padding:.55rem; color:var(--muted); border:1px solid var(--line); border-radius:.65rem; background:var(--surface-2); }
+.tmdb-dialog-progress li > span { display:grid; width:1.45rem; height:1.45rem; place-items:center; border-radius:999px; background:var(--surface); font-size:.76rem; font-weight:800; }
+.tmdb-dialog-progress .is-completed { color:var(--success); }
+.tmdb-dialog-progress .is-current { color:var(--text); border-color:var(--primary); }
+.tmdb-dialog-progress .is-current > span { color:var(--surface); background:var(--primary); }
+@media (max-width:640px) { .tmdb-dialog-progress { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* ===== providers-phase-7g.css ===== */
+/** Mediário | Fase 7G — saída segura e mensagens persistentes. */
+.form-alert-success {
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success), var(--line) 60%);
+  background: color-mix(in srgb, var(--success), transparent 93%);
 }
