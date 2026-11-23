@@ -1,0 +1,1 @@
+<template><main class="auth-page"><section class="auth-card"><p class="eyebrow">403</p><h1>Acesso negado</h1><p>A conta atual não tem permissão para abrir esta área.</p><RouterLink class="button button-primary" to="/">Voltar à aplicação</RouterLink></section></main></template>
